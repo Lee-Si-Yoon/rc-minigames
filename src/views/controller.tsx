@@ -3,7 +3,7 @@ import EventDispatcher from "./utils/eventDispatcher";
 import DataLayer from "./layers/data-layer";
 import InteractionLayer from "./layers/interaction-layer";
 import { CanvasEvents } from "./types";
-import { CanvasDataChangeParams } from "./model";
+import { CanvasDataChangeParams, ControllerChangeParams } from "./model";
 import { DataProps } from "./layers/model";
 
 interface ControllerConstructor {
@@ -24,6 +24,7 @@ class Controller extends EventDispatcher {
   private interactionLayer: InteractionLayer;
 
   private isPlaying: boolean = false;
+  private fps: number = 60;
 
   constructor({
     backgroundLayer,
@@ -102,25 +103,58 @@ class Controller extends EventDispatcher {
     this.setDprs(devicePixelRatio ? devicePixelRatio : this.dpr);
   }
 
-  setIsPlaying(isPlaying?: boolean) {
-    this.isPlaying = isPlaying || false;
+  setIsPlaying(isPlaying: boolean) {
+    this.isPlaying = isPlaying;
+    this.backgroundLayer.render();
+    this.play();
+    this.emitControllerData();
+  }
+
+  setFps(fps: number) {
+    this.fps = fps;
   }
 
   emitDataChangeEvent(params: CanvasDataChangeParams) {
     this.emit(CanvasEvents.DATA_CHANGE, params);
   }
 
+  emitControllerChangeEvent(params: ControllerChangeParams) {
+    this.emit(CanvasEvents.SET_ISPLAYING, params);
+  }
+
   emitCurrentData() {
+    // console.log(
+    //   "emitted current data" + JSON.stringify(this.dataLayer.getCopiedData())
+    // );
     this.emitDataChangeEvent({ data: this.dataLayer.getCopiedData() });
   }
 
-  renderAll() {
-    console.log(`controller is now :${this.isPlaying ? "on" : "off"}`);
-    this.backgroundLayer.render();
-    if (this.isPlaying) {
-      const allLayers = [this.dataLayer, this.interactionLayer];
-      allLayers.forEach((layer) => layer.render());
+  emitControllerData() {
+    const copiedData = JSON.parse(
+      JSON.stringify({ isPlaying: this.isPlaying })
+    );
+    this.emitControllerChangeEvent({ data: copiedData });
+  }
+
+  play() {
+    if (!this.isPlaying) return;
+
+    const texts = this.dataLayer.getTexts();
+    const overflowedText = texts.find(
+      (text) => text.getPosition().y >= this.height
+    );
+
+    if (overflowedText) {
+      const indexOfOverflowedText = texts.indexOf(overflowedText);
+      this.dataLayer.spliceTextByIndex(indexOfOverflowedText);
+      this.emitCurrentData();
     }
+
+    this.dataLayer.render();
+
+    setTimeout(() => {
+      requestAnimationFrame(() => this.play());
+    }, 1000 / this.fps);
   }
 
   destroy() {

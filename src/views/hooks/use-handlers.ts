@@ -1,5 +1,9 @@
 import { MutableRefObject, useCallback } from "react";
-import { CanvasDataChangeHandler, TypingRef } from "../model";
+import {
+  CanvasDataChangeHandler,
+  ControllerChangeHandler,
+  TypingRef,
+} from "../model";
 
 function useHandlers(ref: MutableRefObject<TypingRef | null>) {
   /**
@@ -8,7 +12,6 @@ function useHandlers(ref: MutableRefObject<TypingRef | null>) {
   const addCanvasElementEventListener = useCallback(
     (event: string, listener: EventListenerOrEventListenerObject) => {
       ref.current?.addCanvasElementEventListener(event, listener);
-      return true;
     },
     [ref]
   );
@@ -16,7 +19,6 @@ function useHandlers(ref: MutableRefObject<TypingRef | null>) {
   const removeCanvasElementEventListener = useCallback(
     (event: string, listener: EventListenerOrEventListenerObject) => {
       ref.current?.removeCanvasElementEventListener(event, listener);
-      return true;
     },
     [ref]
   );
@@ -38,11 +40,30 @@ function useHandlers(ref: MutableRefObject<TypingRef | null>) {
     [ref]
   );
 
+  /**
+   * @summary CONTROLLER HANDLERS
+   */
+  const addControllerChangeListener = useCallback(
+    (listener: ControllerChangeHandler) => {
+      ref.current?.addControllerChangeListener(listener);
+    },
+    [ref]
+  );
+
+  const removeControllerChangeListener = useCallback(
+    (listener: ControllerChangeHandler) => {
+      ref.current?.removeControllerChangeListener(listener);
+    },
+    [ref]
+  );
+
   return {
     addDataChangeListener,
     removeDataChangeListener,
     addCanvasElementEventListener,
     removeCanvasElementEventListener,
+    addControllerChangeListener,
+    removeControllerChangeListener,
   };
 }
 

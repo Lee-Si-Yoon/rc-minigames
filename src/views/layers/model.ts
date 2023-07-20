@@ -1,5 +1,19 @@
+/**
+ * @description for initial data
+ */
+type Words = string[];
+
 interface DataProps {
+  words: Words;
+}
+
+/**
+ * TODO update to match business logic
+ */
+interface MetaData {
   score: number;
+  words: Words;
+  failedWords: Words;
 }
 
 interface CanvasLayerConstructor {
@@ -8,6 +22,13 @@ interface CanvasLayerConstructor {
 
 interface DataLayerConstructor extends CanvasLayerConstructor {
   initData?: DataProps;
+  words?: string[];
 }
 
-export { DataProps, CanvasLayerConstructor, DataLayerConstructor };
+export {
+  Words,
+  DataProps,
+  MetaData,
+  CanvasLayerConstructor,
+  DataLayerConstructor,
+};

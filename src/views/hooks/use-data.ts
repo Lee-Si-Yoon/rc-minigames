@@ -5,7 +5,7 @@ import { CanvasDataChangeHandler, TypingRef } from "../model";
 
 function useData(ref: MutableRefObject<TypingRef | null>) {
   const { addDataChangeListener, removeDataChangeListener } = useHandlers(ref);
-  const [data, setData] = useState<DataProps>({ score: 0 });
+  const [data, setData] = useState<DataProps>({ words: [] });
 
   useEffect(() => {
     const listener: CanvasDataChangeHandler = ({ data: canvasData }) => {

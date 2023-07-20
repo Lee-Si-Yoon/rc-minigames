@@ -1,22 +1,20 @@
 import { ForwardedRef } from "react";
 import { DataProps } from "./layers/model";
 
-type CanvasDataChangeParams = { data: DataProps };
-
-type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
-
 interface TypingProps {
-  width: number | string;
-  height: number | string;
+  width: React.CSSProperties["width"];
+  height: React.CSSProperties["height"];
   ref?: ForwardedRef<TypingRef>;
   initData?: DataProps;
   style?: React.CSSProperties;
-  isPlaying?: boolean;
+  fps?: number;
 }
 
 interface TypingRef {
   // for useController
   setIsPlaying: () => void;
+  addControllerChangeListener: (listener: ControllerChangeHandler) => void;
+  removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
   // for useData
   addDataChangeListener: (listener: CanvasDataChangeHandler) => void;
   removeDataChangeListener: (listener: CanvasDataChangeHandler) => void;
@@ -31,9 +29,19 @@ interface TypingRef {
   ) => void;
 }
 
+type CanvasDataChangeParams = { data: DataProps };
+type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
+
+type ControllerProps = { isPlaying: boolean };
+type ControllerChangeParams = { data: ControllerProps };
+type ControllerChangeHandler = (params: ControllerChangeParams) => void;
+
 export {
   CanvasDataChangeParams,
   CanvasDataChangeHandler,
+  ControllerProps,
+  ControllerChangeParams,
+  ControllerChangeHandler,
   TypingProps,
   TypingRef,
 };

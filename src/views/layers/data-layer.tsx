@@ -1,15 +1,25 @@
 import BaseLayer from "./base-layer";
-import { DataLayerConstructor, DataProps } from "./model";
+import { DataLayerConstructor, DataProps, Words } from "./model";
+import Text from "../text/text";
 
 class DataLayer extends BaseLayer {
-  private data: { score: number } = { score: 0 };
+  private data: DataProps = { words: [] };
+  private texts: Text[] = [];
+  private score: number = 0;
+
+  private gravity: number = 0.5;
 
   constructor({ canvas, initData }: DataLayerConstructor) {
     super({ canvas });
 
     if (initData) {
       this.data = initData;
+      this.initialize();
     }
+  }
+
+  initialize(): void {
+    this.createTexts(this.data.words);
   }
 
   getCopiedData(): DataProps {
@@ -17,11 +27,52 @@ class DataLayer extends BaseLayer {
     return data;
   }
 
+  getTextLength(): number {
+    return this.texts.length;
+  }
+
+  getTexts(): Text[] {
+    return this.texts;
+  }
+
+  updateGravity(value: number): void {
+    this.gravity = this.gravity += value;
+  }
+
+  createTexts(words: Words): void {
+    for (const word of words) {
+      this.texts.push(new Text({ data: word, ctx: this.ctx }));
+    }
+  }
+
+  spliceTextByIndex(index: number): void {
+    this.texts.splice(index, 1);
+    this.data.words.splice(index, 1);
+  }
+
   render(): void {
     const ctx = this.ctx;
-    ctx.clearRect(0, 0, this.width, this.height);
-
+    const canvas = { width: this.width, height: this.height };
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "24px serif";
     ctx.save();
+
+    for (const [index, text] of this.texts.entries()) {
+      const centerOfCanvas = canvas.width / 2;
+      const { x, y } = text.getPosition();
+      const { width, height } = text.getDimension();
+
+      text.setPosition({
+        x: centerOfCanvas - width / 2,
+        y: (index + 1) * height * 2,
+      });
+      text.render({ x, y });
+
+      // FIXME gravity is now cumulative
+      text.setVelocity({ x: 0, y: this.gravity });
+      text.updatePositionByVelocity();
+      this.updateGravity(0.5);
+    }
 
     ctx.restore();
   }

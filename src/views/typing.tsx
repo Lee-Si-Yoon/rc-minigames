@@ -9,7 +9,12 @@ import React, {
 } from "react";
 import Controller from "./controller";
 import { CanvasEvents } from "./types";
-import { CanvasDataChangeHandler, TypingProps, TypingRef } from "./model";
+import {
+  CanvasDataChangeHandler,
+  ControllerChangeHandler,
+  TypingProps,
+  TypingRef,
+} from "./model";
 
 const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   props: TypingProps,
@@ -68,8 +73,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       interactionLayer: interactionCanvasRef,
       initData: props.initData,
     });
-    editor.setIsPlaying(props.isPlaying);
-
+    editor.setFps(props.fps || 60);
     setEditor(editor);
 
     return () => {
@@ -87,7 +91,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
-        editor.renderAll();
+        editor.setIsPlaying(false);
       }
     };
     // on init
@@ -116,9 +120,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    * @example for mousemove, mousedown, mouseup, etc.
    */
   useEffect(() => {
-    if (!editor) {
-      return;
-    }
+    if (!editor) return;
+
     canvasElementEventListeners.forEach(({ type, listener }) => {
       const canvasElement = editor.getCanvasElement();
       canvasElement?.addEventListener(type, listener);
@@ -181,9 +184,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   );
 
   useEffect(() => {
-    if (!editor) {
-      return;
-    }
+    if (!editor) return;
+
     dataChangeListeners.forEach((listener) => {
       editor.addEventListener(CanvasEvents.DATA_CHANGE, listener);
     });
@@ -198,10 +200,45 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   /**
    * @summary CONTROLLER HANDLER
    */
+  const [controllerChangeListeners, setControllerChangeListeners] = useState<
+    ControllerChangeHandler[]
+  >([]);
+
+  const addControllerChangeListener = useCallback(
+    (listener: ControllerChangeHandler) => {
+      setControllerChangeListeners((listeners) => [...listeners, listener]);
+    },
+    []
+  );
+
+  const removeControllerChangeListener = useCallback(
+    (listener: ControllerChangeHandler) => {
+      if (!editor) return;
+      editor.removeEventListener(CanvasEvents.DATA_CHANGE, listener);
+      setControllerChangeListeners((listeners) =>
+        listeners.filter((l) => l !== listener)
+      );
+    },
+    [editor]
+  );
+
+  useEffect(() => {
+    if (!editor) return;
+
+    controllerChangeListeners.forEach((listener) => {
+      editor.addEventListener(CanvasEvents.SET_ISPLAYING, listener);
+    });
+    editor.emitControllerData();
+    return () => {
+      controllerChangeListeners.forEach((listener) => {
+        editor?.removeEventListener(CanvasEvents.SET_ISPLAYING, listener);
+      });
+    };
+  }, [editor, controllerChangeListeners]);
+
   const setIsPlaying = useCallback(() => {
     const isPlaying = editor?.getIsPlaying();
     editor?.setIsPlaying(!isPlaying);
-    editor?.renderAll();
   }, [editor]);
 
   /**
@@ -212,6 +249,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     ref,
     () => ({
       // for useController
+      addControllerChangeListener,
+      removeControllerChangeListener,
       setIsPlaying,
       // for useData
       addDataChangeListener,
@@ -236,7 +275,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     <div
       ref={containerRef}
       tabIndex={-1}
-      style={{ width: "500px", height: "300px", outline: "none" }}
+      style={{ width: props.width, height: props.height, outline: "none" }}
     >
       <canvas
         ref={getBackgroundRef}
