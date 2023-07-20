@@ -114,6 +114,11 @@ class Controller extends EventDispatcher {
     this.fps = fps;
   }
 
+  removeText(text: string) {
+    this.dataLayer.spliceTextByString(text);
+    this.emitCurrentData();
+  }
+
   emitDataChangeEvent(params: CanvasDataChangeParams) {
     this.emit(CanvasEvents.DATA_CHANGE, params);
   }
@@ -123,9 +128,6 @@ class Controller extends EventDispatcher {
   }
 
   emitCurrentData() {
-    // console.log(
-    //   "emitted current data" + JSON.stringify(this.dataLayer.getCopiedData())
-    // );
     this.emitDataChangeEvent({ data: this.dataLayer.getCopiedData() });
   }
 
@@ -148,6 +150,10 @@ class Controller extends EventDispatcher {
       const indexOfOverflowedText = texts.indexOf(overflowedText);
       this.dataLayer.spliceTextByIndex(indexOfOverflowedText);
       this.emitCurrentData();
+    }
+
+    if (texts.length <= 0) {
+      this.setIsPlaying(false);
     }
 
     this.dataLayer.render();

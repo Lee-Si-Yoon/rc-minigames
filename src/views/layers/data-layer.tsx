@@ -2,6 +2,11 @@ import BaseLayer from "./base-layer";
 import { DataLayerConstructor, DataProps, Words } from "./model";
 import Text from "../text/text";
 
+/**
+ * @url https://github.com/hyukson/hangul-util
+ * @description 한글
+ *
+ */
 class DataLayer extends BaseLayer {
   private data: DataProps = { words: [] };
   private texts: Text[] = [];
@@ -50,6 +55,18 @@ class DataLayer extends BaseLayer {
     this.data.words.splice(index, 1);
   }
 
+  spliceTextByString(text: string): void {
+    const stringArrayOfTexts: string[] = [];
+    for (const t of this.texts) {
+      stringArrayOfTexts.push(t.getTextData());
+    }
+    const indexOfParamText = stringArrayOfTexts.indexOf(text);
+    const indexOfWords = this.data.words.indexOf(text);
+    // FIXME unify datasource to one
+    this.texts.splice(indexOfParamText, 1);
+    this.data.words.splice(indexOfWords, 1);
+  }
+
   render(): void {
     const ctx = this.ctx;
     const canvas = { width: this.width, height: this.height };
@@ -69,6 +86,7 @@ class DataLayer extends BaseLayer {
       text.render({ x, y });
 
       // FIXME gravity is now cumulative
+      // FIXME when text is deleted text moves upwards
       text.setVelocity({ x: 0, y: this.gravity });
       text.updatePositionByVelocity();
       this.updateGravity(0.5);

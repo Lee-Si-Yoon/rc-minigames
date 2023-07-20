@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useState } from "react";
+import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import useHandlers from "./use-handlers";
 import { DataProps } from "../layers/model";
 import { CanvasDataChangeHandler, TypingRef } from "../model";
@@ -19,7 +19,15 @@ function useData(ref: MutableRefObject<TypingRef | null>) {
     };
   }, [addDataChangeListener, removeDataChangeListener]);
 
-  return { data };
+  const removeText = useCallback(
+    (text: string) => {
+      if (!ref || ref.current === null) return;
+      ref.current.removeText(text);
+    },
+    [ref]
+  );
+
+  return { data, removeText };
 }
 
 export default useData;

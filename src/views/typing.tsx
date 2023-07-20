@@ -92,6 +92,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
         editor.setIsPlaying(false);
+        // FIXME game is not rendered on resize event
       }
     };
     // on init
@@ -197,6 +198,13 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     };
   }, [editor, dataChangeListeners]);
 
+  const removeText = useCallback(
+    (text: string) => {
+      editor?.removeText(text);
+    },
+    [editor]
+  );
+
   /**
    * @summary CONTROLLER HANDLER
    */
@@ -253,6 +261,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       removeControllerChangeListener,
       setIsPlaying,
       // for useData
+      removeText,
       addDataChangeListener,
       removeDataChangeListener,
       // for canvas element listener
@@ -263,6 +272,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       // for useController
       setIsPlaying,
       // for useData
+      removeText,
       addDataChangeListener,
       removeDataChangeListener,
       // for canvas element listener
