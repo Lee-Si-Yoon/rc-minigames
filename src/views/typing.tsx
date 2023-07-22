@@ -12,6 +12,7 @@ import { CanvasEvents } from "./types";
 import {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
+  Phase,
   TypingProps,
   TypingRef,
 } from "./model";
@@ -74,6 +75,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       initData: props.initData,
     });
     editor.setFps(props.fps || 60);
+    editor.setIsPlaying(Phase.PAUSED);
     setEditor(editor);
 
     return () => {
@@ -91,8 +93,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
-        editor.setIsPlaying(false);
-        // FIXME game is not rendered on resize event
+        editor.setIsPlaying(Phase.PAUSED);
+        editor.playGame();
       }
     };
     // on init
@@ -244,10 +246,12 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     };
   }, [editor, controllerChangeListeners]);
 
-  const setIsPlaying = useCallback(() => {
-    const isPlaying = editor?.getIsPlaying();
-    editor?.setIsPlaying(!isPlaying);
-  }, [editor]);
+  const setIsPlaying = useCallback(
+    (isPlaying: Phase) => {
+      editor?.setIsPlaying(isPlaying);
+    },
+    [editor]
+  );
 
   /**
    * @summary IMPERATIVE HANDLE - makes the ref used in the place that uses the FC component

@@ -16,13 +16,12 @@ class DataLayer extends BaseLayer {
 
     if (initData) {
       this.data = initData;
-      // FIXME extending center canvas, initializing should be called after canvas has width
-      this.initialize();
     }
   }
 
   initialize(): void {
     this.createTexts(this.data.words);
+    this.setPositionsForTexts(this.texts);
   }
 
   getCopiedData(): DataProps {
@@ -38,10 +37,16 @@ class DataLayer extends BaseLayer {
     return this.texts;
   }
 
-  createTexts(words: Words): void {
-    for (const [index, word] of words.entries()) {
+  private createTexts(words: Words): void {
+    for (const word of words) {
       const text = new Text({ data: word, ctx: this.ctx });
       this.texts.push(text);
+    }
+  }
+
+  setPositionsForTexts(texts: Text[]): void {
+    if (!texts) return;
+    for (const [index, text] of texts.entries()) {
       const { width, height } = text.getDimension();
       // FIXME center canvas
       text.setPosition({
@@ -49,7 +54,7 @@ class DataLayer extends BaseLayer {
         // FIXME get correct height
         y: (index + 1) * height * 2,
       });
-      text.setVelocity({ x: 0.5, y: 0.5 });
+      text.setVelocity({ x: 0, y: 0.5 });
     }
   }
 
@@ -70,6 +75,10 @@ class DataLayer extends BaseLayer {
     this.data.words.splice(indexOfWords, 1);
   }
 
+  resetAll(): void {
+    this.texts = [];
+  }
+
   render(): void {
     const ctx = this.ctx;
     const canvas = { width: this.width, height: this.height };
@@ -79,10 +88,7 @@ class DataLayer extends BaseLayer {
 
     for (const text of this.texts) {
       const { x, y } = text.getPosition();
-
       text.render({ x, y });
-
-      text.updatePositionByVelocity();
     }
 
     ctx.restore();

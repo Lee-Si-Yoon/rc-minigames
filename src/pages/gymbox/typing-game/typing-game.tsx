@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
 import Typing from "../../../views/typing";
 import useData from "../../../views/hooks/use-data";
-import { TypingRef } from "../../../views/model";
+import { Phase, TypingRef } from "../../../views/model";
 import useController from "../../../views/hooks/use-controller";
 
 function TypingGame() {
@@ -32,9 +32,20 @@ function TypingGame() {
         height={800}
         initData={{ words: ["all", "this", "boom"] }}
       />
-      <button onClick={setIsPlaying}>
-        {controllerData?.isPlaying ? "stop" : "play"}
-      </button>
+      <div style={{ display: "flex", width: "100%", rowGap: "0.25rem" }}>
+        <button
+          onClick={() =>
+            setIsPlaying(
+              controllerData.isPlaying === Phase.PAUSED
+                ? Phase.PLAYING
+                : Phase.PAUSED
+            )
+          }
+        >
+          {controllerData.isPlaying === Phase.PAUSED ? "play" : "pause"}
+        </button>
+        <button onClick={() => setIsPlaying(Phase.END)}>{Phase.END}</button>
+      </div>
       <form onSubmit={onSubmit}>
         <input
           type="text"

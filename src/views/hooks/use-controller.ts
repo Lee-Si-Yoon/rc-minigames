@@ -1,12 +1,17 @@
 import { MutableRefObject, useCallback, useEffect, useState } from "react";
-import { ControllerChangeHandler, ControllerProps, TypingRef } from "../model";
+import {
+  ControllerChangeHandler,
+  ControllerProps,
+  Phase,
+  TypingRef,
+} from "../model";
 import useHandlers from "./use-handlers";
 
 function useController(ref: MutableRefObject<TypingRef | null>) {
   const { addControllerChangeListener, removeControllerChangeListener } =
     useHandlers(ref);
   const [controllerData, setControllerData] = useState<ControllerProps>({
-    isPlaying: false,
+    isPlaying: Phase.END,
   });
 
   useEffect(() => {
@@ -20,10 +25,13 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     };
   }, [addControllerChangeListener, removeControllerChangeListener]);
 
-  const setIsPlaying = useCallback(() => {
-    if (!ref || ref.current === null) return;
-    ref.current.setIsPlaying();
-  }, [ref]);
+  const setIsPlaying = useCallback(
+    (phase: Phase) => {
+      if (!ref || ref.current === null) return;
+      ref.current.setIsPlaying(phase);
+    },
+    [ref]
+  );
 
   return {
     controllerData,

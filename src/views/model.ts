@@ -1,6 +1,12 @@
 import { ForwardedRef } from "react";
 import { DataProps } from "./layers/model";
 
+enum Phase {
+  PLAYING = "playing",
+  PAUSED = "paused",
+  END = "end",
+}
+
 interface TypingProps {
   width: React.CSSProperties["width"];
   height: React.CSSProperties["height"];
@@ -12,7 +18,7 @@ interface TypingProps {
 
 interface TypingRef {
   // for useController
-  setIsPlaying: () => void;
+  setIsPlaying: (phase: Phase) => void;
   addControllerChangeListener: (listener: ControllerChangeHandler) => void;
   removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
   // for useData
@@ -30,10 +36,12 @@ interface TypingRef {
   ) => void;
 }
 
-type CanvasDataChangeParams = { data: DataProps };
+// TODO specify props for canvas events
+type CanvasProps = DataProps;
+type CanvasDataChangeParams = { data: CanvasProps };
 type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
 
-type ControllerProps = { isPlaying: boolean };
+type ControllerProps = { isPlaying: Phase };
 type ControllerChangeParams = { data: ControllerProps };
 type ControllerChangeHandler = (params: ControllerChangeParams) => void;
 
@@ -45,4 +53,5 @@ export {
   ControllerChangeHandler,
   TypingProps,
   TypingRef,
+  Phase,
 };

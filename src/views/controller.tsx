@@ -3,7 +3,7 @@ import EventDispatcher from "./utils/eventDispatcher";
 import DataLayer from "./layers/data-layer";
 import InteractionLayer from "./layers/interaction-layer";
 import { CanvasEvents } from "./types";
-import { CanvasDataChangeParams, ControllerChangeParams } from "./model";
+import { CanvasDataChangeParams, ControllerChangeParams, Phase } from "./model";
 import { DataProps } from "./layers/model";
 
 interface ControllerConstructor {
@@ -23,8 +23,11 @@ class Controller extends EventDispatcher {
   private dataLayer: DataLayer;
   private interactionLayer: InteractionLayer;
 
-  private isPlaying: boolean = false;
+  private isPlaying: Phase = Phase.END;
+  private timer: number = 0;
+  private lastTime: number = 0;
   private fps: number = 60;
+  private interval: number = 1000 / this.fps;
 
   constructor({
     backgroundLayer,
@@ -58,7 +61,7 @@ class Controller extends EventDispatcher {
     return this.element;
   }
 
-  getIsPlaying(): boolean {
+  getIsPlaying(): Phase {
     return this.isPlaying;
   }
 
@@ -93,13 +96,7 @@ class Controller extends EventDispatcher {
     this.setWidths(width, devicePixelRatio);
     this.setHeights(height, devicePixelRatio);
     this.setDprs(devicePixelRatio ? devicePixelRatio : this.dpr);
-  }
-
-  setIsPlaying(isPlaying: boolean) {
-    this.isPlaying = isPlaying;
-    this.backgroundLayer.render();
-    this.play();
-    this.emitControllerData();
+    this.dataLayer.initialize();
   }
 
   setFps(fps: number) {
@@ -130,10 +127,29 @@ class Controller extends EventDispatcher {
     this.emitControllerChangeEvent({ data: copiedData });
   }
 
-  play() {
-    if (!this.isPlaying) return;
+  setIsPlaying(isPlaying: Phase) {
+    this.isPlaying = isPlaying;
+    this.backgroundLayer.render();
+    this.playFrames();
+    this.emitControllerData();
+  }
+
+  playGame() {
+    if (this.isPlaying === Phase.END) {
+      this.lastTime = 0;
+      const texts = this.dataLayer.getTexts();
+      this.dataLayer.setPositionsForTexts(texts);
+      this.setIsPlaying(Phase.PAUSED);
+    }
+
+    this.dataLayer.render();
 
     const texts = this.dataLayer.getTexts();
+
+    if (this.isPlaying === Phase.PLAYING) {
+      texts.forEach((text) => text.updatePositionByVelocity());
+    }
+
     const overflowedText = texts.find(
       (text) => text.getPosition().y >= this.height
     );
@@ -145,14 +161,32 @@ class Controller extends EventDispatcher {
     }
 
     if (texts.length <= 0) {
-      this.setIsPlaying(false);
+      this.setIsPlaying(Phase.END);
     }
+  }
 
-    this.dataLayer.render();
+  playFrames(): void {
+    const animate = (timeStamp: number) => {
+      /**
+       * @url https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame#examples
+       * timeStamp is automatically allocated
+       */
+      const deltaTime = timeStamp - this.lastTime;
+      this.lastTime = timeStamp;
 
-    setTimeout(() => {
-      requestAnimationFrame(() => this.play());
-    }, 1000 / this.fps);
+      if (this.timer > this.interval) {
+        this.timer = 0;
+        this.playGame();
+      }
+
+      this.timer += deltaTime;
+
+      if (this.isPlaying === Phase.PLAYING) {
+        requestAnimationFrame(animate);
+      }
+    };
+    // this.lastTime is actual timeStamp
+    animate(this.lastTime);
   }
 
   destroy() {
