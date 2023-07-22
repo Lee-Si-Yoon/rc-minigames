@@ -86,7 +86,9 @@ class DataLayer extends BaseLayer {
       text.render({ x, y });
 
       // FIXME gravity is now cumulative
+      // remove gravity and let each Text have own velocity
       // FIXME when text is deleted text moves upwards
+      // do not render by index
       text.setVelocity({ x: 0, y: this.gravity });
       text.updatePositionByVelocity();
       this.updateGravity(0.5);
