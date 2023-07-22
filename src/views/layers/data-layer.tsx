@@ -5,20 +5,18 @@ import Text from "../text/text";
 /**
  * @url https://github.com/hyukson/hangul-util
  * @description 한글
- *
  */
 class DataLayer extends BaseLayer {
   private data: DataProps = { words: [] };
   private texts: Text[] = [];
   private score: number = 0;
 
-  private gravity: number = 0.5;
-
   constructor({ canvas, initData }: DataLayerConstructor) {
     super({ canvas });
 
     if (initData) {
       this.data = initData;
+      // FIXME extending center canvas, initializing should be called after canvas has width
       this.initialize();
     }
   }
@@ -40,16 +38,22 @@ class DataLayer extends BaseLayer {
     return this.texts;
   }
 
-  updateGravity(value: number): void {
-    this.gravity = this.gravity += value;
-  }
-
   createTexts(words: Words): void {
-    for (const word of words) {
-      this.texts.push(new Text({ data: word, ctx: this.ctx }));
+    for (const [index, word] of words.entries()) {
+      const text = new Text({ data: word, ctx: this.ctx });
+      this.texts.push(text);
+      const { width, height } = text.getDimension();
+      // FIXME center canvas
+      text.setPosition({
+        x: this.width / 2 - width / 2,
+        // FIXME get correct height
+        y: (index + 1) * height * 2,
+      });
+      text.setVelocity({ x: 0.5, y: 0.5 });
     }
   }
 
+  // FIXME unify datasource to one
   spliceTextByIndex(index: number): void {
     this.texts.splice(index, 1);
     this.data.words.splice(index, 1);
@@ -62,7 +66,6 @@ class DataLayer extends BaseLayer {
     }
     const indexOfParamText = stringArrayOfTexts.indexOf(text);
     const indexOfWords = this.data.words.indexOf(text);
-    // FIXME unify datasource to one
     this.texts.splice(indexOfParamText, 1);
     this.data.words.splice(indexOfWords, 1);
   }
@@ -74,24 +77,12 @@ class DataLayer extends BaseLayer {
     ctx.font = "24px serif";
     ctx.save();
 
-    for (const [index, text] of this.texts.entries()) {
-      const centerOfCanvas = canvas.width / 2;
+    for (const text of this.texts) {
       const { x, y } = text.getPosition();
-      const { width, height } = text.getDimension();
 
-      text.setPosition({
-        x: centerOfCanvas - width / 2,
-        y: (index + 1) * height * 2,
-      });
       text.render({ x, y });
 
-      // FIXME gravity is now cumulative
-      // remove gravity and let each Text have own velocity
-      // FIXME when text is deleted text moves upwards
-      // do not render by index
-      text.setVelocity({ x: 0, y: this.gravity });
       text.updatePositionByVelocity();
-      this.updateGravity(0.5);
     }
 
     ctx.restore();

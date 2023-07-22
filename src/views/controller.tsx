@@ -54,14 +54,6 @@ class Controller extends EventDispatcher {
     this.emit = this.emit.bind(this);
   }
 
-  getWidth(): number {
-    return this.width;
-  }
-
-  getHeight(): number {
-    return this.height;
-  }
-
   getCanvasElement(): HTMLCanvasElement {
     return this.element;
   }
