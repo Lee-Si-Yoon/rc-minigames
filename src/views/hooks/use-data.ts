@@ -23,15 +23,23 @@ function useData(ref: MutableRefObject<TypingRef | null>) {
     };
   }, [addDataChangeListener, removeDataChangeListener]);
 
-  const removeText = useCallback(
-    (text: string) => {
+  const removeWord = useCallback(
+    (word: string) => {
       if (!ref || ref.current === null) return;
-      ref.current.removeText(text);
+      ref.current.removeWord(word);
     },
     [ref]
   );
 
-  return { data, removeText };
+  const addWord = useCallback(
+    (word: string) => {
+      if (!ref || ref.current === null) return;
+      ref.current.addWord(word);
+    },
+    [ref]
+  );
+
+  return { data, removeWord, addWord };
 }
 
 export default useData;

@@ -1,4 +1,10 @@
-import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Typing from "../../../views/typing";
 import useData from "../../../views/hooks/use-data";
 import { Phase, TypingRef } from "../../../views/model";
@@ -6,7 +12,7 @@ import useController from "../../../views/hooks/use-controller";
 
 function TypingGame() {
   const ref = useRef<TypingRef>(null);
-  const { removeText, data } = useData(ref);
+  const { addWord, removeWord, data } = useData(ref);
   const { setIsPlaying, controllerData } = useController(ref);
 
   const [inputValue, setInputValue] = useState<string>("");
@@ -18,11 +24,24 @@ function TypingGame() {
   };
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    removeText(inputValue);
+    removeWord(inputValue);
     setInputValue("");
   };
 
-  // TODO setup for mobile
+  const [spawnWords, setSpawnWords] = useState<boolean>(false);
+  const spawnRef = useRef<NodeJS.Timer>();
+
+  useEffect(() => {
+    if (spawnWords && controllerData.isPlaying === Phase.PLAYING) {
+      spawnRef.current = setInterval(async () => {
+        const res = await fetch("https://random-data-api.com/api/v2/beers");
+        const jsonData = await res.json();
+        addWord(jsonData.name);
+      }, 2000);
+    }
+    return () => clearInterval(spawnRef.current);
+  }, [spawnWords, controllerData.isPlaying]);
+
   return (
     <div style={{ height: "100%", position: "relative" }}>
       <div
@@ -38,7 +57,15 @@ function TypingGame() {
           zIndex: "99",
         }}
       >
-        <i style={{ fontSize: "0.75rem" }}>{JSON.stringify(data)}</i>
+        <i style={{ fontSize: "0.75rem" }}>{`left words: ${JSON.stringify(
+          data.words
+        )}`}</i>
+        <i style={{ fontSize: "0.75rem" }}>{`failed: ${JSON.stringify(
+          data.failed
+        )}`}</i>
+        <i style={{ fontSize: "0.75rem" }}>{`score: ${JSON.stringify(
+          data.score
+        )}`}</i>
         <i style={{ fontSize: "0.75rem" }}>{JSON.stringify(controllerData)}</i>
         <div
           style={{
@@ -48,6 +75,13 @@ function TypingGame() {
             columnGap: "0.5rem",
           }}
         >
+          <label htmlFor="spawn">spawnWords</label>
+          <input
+            onChange={() => setSpawnWords((prevState) => !prevState)}
+            type="checkbox"
+            id="spawn"
+            checked={spawnWords}
+          />
           <button
             onClick={() =>
               setIsPlaying(

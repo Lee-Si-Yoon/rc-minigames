@@ -1,7 +1,10 @@
 import BaseLayer from "./base-layer";
-import { DataLayerConstructor, DataProps, Words } from "./model";
+import { DataLayerConstructor, DataProps } from "./model";
 import Text from "../text/text";
 
+/**
+ * @remark word is string, text is Text class
+ */
 class DataLayer extends BaseLayer {
   private texts: Text[] = [];
   private data: DataProps = { words: [], failed: [], score: 0 };
@@ -37,11 +40,48 @@ class DataLayer extends BaseLayer {
     return this.texts;
   }
 
-  private createTexts(words: Words): void {
+  addWord(word: string): void {
+    const words = this.data.words;
+
+    this.data = {
+      words: [word, ...words],
+      score: this.data.score,
+      failed: this.data.failed,
+    };
+
+    const newText = new Text({ data: word, ctx: this.ctx });
+    this.texts.push(newText);
+
+    const { width, height } = newText.getDimension();
+    newText.setPosition({
+      x: this.width / 2 - width / 2,
+      y: 1 * height * 2,
+    });
+    newText.setVelocity({ x: 0, y: 1 });
+  }
+
+  private createTexts(words: string[]): void {
     if (words.length <= 0) return;
     for (const word of words) {
       const text = new Text({ data: word, ctx: this.ctx });
       this.texts.push(text);
+    }
+  }
+
+  detectKorean(word: string) {
+    const KOR = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g;
+    return KOR.test(word);
+  }
+
+  updateScore(word: string) {
+    /**
+     * @url https://github.com/hyukson/hangul-util
+     * TODO
+     * 1. extract to independent method
+     * 2. KOR score
+     */
+    if (!this.detectKorean(word)) {
+      this.data.score += word.length;
     }
   }
 
@@ -65,24 +105,18 @@ class DataLayer extends BaseLayer {
     this.data.failed.push(word);
   }
 
-  spliceTextByString(text: string): void {
+  spliceTextByString(word: string): void {
     const stringArrayOfTexts: string[] = this.texts.map((text) =>
       text.getTextData()
     );
-    const indexOfParamText = stringArrayOfTexts.indexOf(text);
+    const indexOfParamText = stringArrayOfTexts.indexOf(word);
     if (indexOfParamText >= 0) {
       this.texts.splice(indexOfParamText, 1);
-
-      /**
-       * @url https://github.com/hyukson/hangul-util
-       * TODO
-       * 1. extract to independent method
-       * 2. KOR score
-       */
-      const KOR = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g;
-      if (!KOR.test(text)) {
-        this.data.score += text.length;
-      }
+      this.updateScore(word);
+    }
+    const indexOfWords = this.data.words.indexOf(word);
+    if (indexOfWords >= 0) {
+      this.data.words.splice(indexOfWords, 1);
     }
   }
 

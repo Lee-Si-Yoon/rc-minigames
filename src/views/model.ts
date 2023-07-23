@@ -22,7 +22,8 @@ interface TypingRef {
   addControllerChangeListener: (listener: ControllerChangeHandler) => void;
   removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
   // for useData
-  removeText: (text: string) => void;
+  addWord: (word: string) => void;
+  removeWord: (word: string) => void;
   addDataChangeListener: (listener: CanvasDataChangeHandler) => void;
   removeDataChangeListener: (listener: CanvasDataChangeHandler) => void;
   // for canvas element event listeners

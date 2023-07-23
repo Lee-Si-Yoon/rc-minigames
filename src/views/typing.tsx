@@ -93,7 +93,6 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
-        // editor.setIsPlaying(Phase.PAUSED);
         editor.playGame();
       }
     };
@@ -200,9 +199,16 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     };
   }, [editor, dataChangeListeners]);
 
-  const removeText = useCallback(
-    (text: string) => {
-      editor?.removeText(text);
+  const removeWord = useCallback(
+    (word: string) => {
+      editor?.removeWord(word);
+    },
+    [editor]
+  );
+
+  const addWord = useCallback(
+    (word: string) => {
+      editor?.addWord(word);
     },
     [editor]
   );
@@ -265,7 +271,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       removeControllerChangeListener,
       setIsPlaying,
       // for useData
-      removeText,
+      addWord,
+      removeWord,
       addDataChangeListener,
       removeDataChangeListener,
       // for canvas element listener
@@ -276,7 +283,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       // for useController
       setIsPlaying,
       // for useData
-      removeText,
+      addWord,
+      removeWord,
       addDataChangeListener,
       removeDataChangeListener,
       // for canvas element listener

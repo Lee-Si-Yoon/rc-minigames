@@ -134,8 +134,14 @@ class Controller extends EventDispatcher {
   /**
    * @summary on keyboard event
    */
-  removeText(text: string) {
-    this.dataLayer.spliceTextByString(text);
+  removeWord(word: string) {
+    this.dataLayer.spliceTextByString(word);
+    this.dataLayer.render();
+    this.emitCurrentData();
+  }
+
+  addWord(word: string) {
+    this.dataLayer.addWord(word);
     this.dataLayer.render();
     this.emitCurrentData();
   }
