@@ -1,5 +1,5 @@
 import { ForwardedRef } from "react";
-import { DataProps } from "./layers/model";
+import { DataProps, Words } from "./layers/model";
 
 enum Phase {
   PLAYING = "playing",
@@ -11,7 +11,7 @@ interface TypingProps {
   width: React.CSSProperties["width"];
   height: React.CSSProperties["height"];
   ref?: ForwardedRef<TypingRef>;
-  initData?: DataProps;
+  initData?: Words;
   style?: React.CSSProperties;
   fps?: number;
 }
@@ -36,12 +36,11 @@ interface TypingRef {
   ) => void;
 }
 
-// TODO specify props for canvas events
-type CanvasProps = DataProps;
-type CanvasDataChangeParams = { data: CanvasProps };
+type CanvasDataChangeParams = { data: DataProps };
 type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
 
-type ControllerProps = { isPlaying: Phase };
+// TODO extract playTime event for performance
+type ControllerProps = { isPlaying: Phase; playTime: number };
 type ControllerChangeParams = { data: ControllerProps };
 type ControllerChangeHandler = (params: ControllerChangeParams) => void;
 

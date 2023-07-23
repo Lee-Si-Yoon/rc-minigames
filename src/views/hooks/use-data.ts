@@ -1,11 +1,15 @@
 import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import useHandlers from "./use-handlers";
-import { DataProps } from "../layers/model";
 import { CanvasDataChangeHandler, TypingRef } from "../model";
+import { DataProps } from "../layers/model";
 
 function useData(ref: MutableRefObject<TypingRef | null>) {
   const { addDataChangeListener, removeDataChangeListener } = useHandlers(ref);
-  const [data, setData] = useState<DataProps>({ words: [] });
+  const [data, setData] = useState<DataProps>({
+    words: [],
+    score: 0,
+    failed: [],
+  });
 
   useEffect(() => {
     const listener: CanvasDataChangeHandler = ({ data: canvasData }) => {

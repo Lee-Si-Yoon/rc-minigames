@@ -93,7 +93,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
-        editor.setIsPlaying(Phase.PAUSED);
+        // editor.setIsPlaying(Phase.PAUSED);
         editor.playGame();
       }
     };
@@ -224,7 +224,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   const removeControllerChangeListener = useCallback(
     (listener: ControllerChangeHandler) => {
       if (!editor) return;
-      editor.removeEventListener(CanvasEvents.DATA_CHANGE, listener);
+      editor.removeEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
       setControllerChangeListeners((listeners) =>
         listeners.filter((l) => l !== listener)
       );
@@ -236,12 +236,12 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     if (!editor) return;
 
     controllerChangeListeners.forEach((listener) => {
-      editor.addEventListener(CanvasEvents.SET_ISPLAYING, listener);
+      editor.addEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
     });
     editor.emitControllerData();
     return () => {
       controllerChangeListeners.forEach((listener) => {
-        editor?.removeEventListener(CanvasEvents.SET_ISPLAYING, listener);
+        editor?.removeEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
       });
     };
   }, [editor, controllerChangeListeners]);

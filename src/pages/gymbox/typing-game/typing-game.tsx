@@ -22,46 +22,56 @@ function TypingGame() {
     setInputValue("");
   };
 
+  // TODO setup for mobile
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        rowGap: "0.5rem",
-      }}
-    >
-      <Typing
-        ref={ref}
-        width="100%"
-        height={300}
-        initData={{ words: ["all", "this", "boom"] }}
-      />
-      <i>{JSON.stringify(data)}</i>
-      <i>{JSON.stringify(controllerData)}</i>
+    <div style={{ height: "100%", position: "relative" }}>
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
+          rowGap: "0.5rem",
+          position: "absolute",
+          alignItems: "flex-end",
+          justifyContent: "flex-end",
           width: "100%",
-          rowGap: "0.25rem",
-          height: "1.5rem",
-          columnGap: "0.5rem",
-          justifyContent: "center",
+          padding: "0.25rem",
+          zIndex: "99",
         }}
       >
-        <button
-          onClick={() =>
-            setIsPlaying(
-              controllerData.isPlaying === Phase.PAUSED
-                ? Phase.PLAYING
-                : Phase.PAUSED
-            )
-          }
+        <i style={{ fontSize: "0.75rem" }}>{JSON.stringify(data)}</i>
+        <i style={{ fontSize: "0.75rem" }}>{JSON.stringify(controllerData)}</i>
+        <div
+          style={{
+            display: "flex",
+            rowGap: "0.25rem",
+            height: "1.5rem",
+            columnGap: "0.5rem",
+          }}
         >
-          {controllerData.isPlaying === Phase.PAUSED ? "play" : "pause"}
-        </button>
-        <button onClick={() => setIsPlaying(Phase.END)}>{Phase.END}</button>
+          <button
+            onClick={() =>
+              setIsPlaying(
+                controllerData.isPlaying === Phase.PAUSED
+                  ? Phase.PLAYING
+                  : Phase.PAUSED
+              )
+            }
+          >
+            {controllerData.isPlaying === Phase.PAUSED ? "play" : "pause"}
+          </button>
+          <button onClick={() => setIsPlaying(Phase.END)}>{Phase.END}</button>
+        </div>
       </div>
-      <form onSubmit={onSubmit}>
+      <Typing
+        ref={ref}
+        width="100%"
+        height="calc(100% - 1.5rem)"
+        initData={["all", "this", "야호"]}
+      />
+      <form
+        onSubmit={onSubmit}
+        style={{ width: "100%", position: "fixed", bottom: "0" }}
+      >
         <input
           type="text"
           autoComplete="off"

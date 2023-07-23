@@ -5,8 +5,8 @@ type Words = string[];
 
 interface DataProps {
   words: Words;
-  score?: number;
-  failed?: Words;
+  failed: Words;
+  score: number;
 }
 
 interface CanvasLayerConstructor {
@@ -14,7 +14,7 @@ interface CanvasLayerConstructor {
 }
 
 interface DataLayerConstructor extends CanvasLayerConstructor {
-  initData?: DataProps;
+  initData?: Words;
   words?: string[];
 }
 
@@ -24,7 +24,6 @@ export { Words, DataProps, CanvasLayerConstructor, DataLayerConstructor };
  * TODO
  * 1. separate what to recieve as props / what to emit
  * 2. after 1, differ listeners
- * 3. add modes, CORS
  *
  * receive as props
  * {

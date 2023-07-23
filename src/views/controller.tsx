@@ -4,13 +4,13 @@ import DataLayer from "./layers/data-layer";
 import InteractionLayer from "./layers/interaction-layer";
 import { CanvasEvents } from "./types";
 import { CanvasDataChangeParams, ControllerChangeParams, Phase } from "./model";
-import { DataProps } from "./layers/model";
+import { Words } from "./layers/model";
 
 interface ControllerConstructor {
   backgroundLayer: HTMLCanvasElement;
   dataLayer: HTMLCanvasElement;
   interactionLayer: HTMLCanvasElement;
-  initData?: DataProps;
+  initData?: Words;
 }
 
 class Controller extends EventDispatcher {
@@ -24,8 +24,7 @@ class Controller extends EventDispatcher {
   private interactionLayer: InteractionLayer;
 
   private isPlaying: Phase = Phase.END;
-  private timer: number = 0;
-  private lastTime: number = 0;
+  private timeStamp: number = 0;
   private fps: number = 60;
   private interval: number = 1000 / this.fps;
 
@@ -42,7 +41,7 @@ class Controller extends EventDispatcher {
     });
     this.dataLayer = new DataLayer({
       canvas: dataLayer,
-      initData,
+      initData: initData,
     });
     this.interactionLayer = new InteractionLayer({
       canvas: interactionLayer,
@@ -78,14 +77,14 @@ class Controller extends EventDispatcher {
     this.interactionLayer.setDpr(dpr);
   }
 
-  setWidths(width: number, devicePixelRatio?: number) {
+  private setWidths(width: number, devicePixelRatio?: number) {
     this.width = width;
     this.backgroundLayer.setWidth(width, devicePixelRatio);
     this.dataLayer.setWidth(width, devicePixelRatio);
     this.interactionLayer.setWidth(width, devicePixelRatio);
   }
 
-  setHeights(height: number, devicePixelRatio?: number) {
+  private setHeights(height: number, devicePixelRatio?: number) {
     this.height = height;
     this.backgroundLayer.setHeight(height, devicePixelRatio);
     this.dataLayer.setHeight(height, devicePixelRatio);
@@ -107,88 +106,94 @@ class Controller extends EventDispatcher {
   }
 
   emitControllerChangeEvent(params: ControllerChangeParams) {
-    this.emit(CanvasEvents.SET_ISPLAYING, params);
+    this.emit(CanvasEvents.CONTROLLER_EVENT, params);
   }
 
   emitCurrentData() {
-    this.emitDataChangeEvent({ data: this.dataLayer.getCopiedData() });
+    this.emitDataChangeEvent({
+      data: this.dataLayer.getCopiedData(),
+    });
   }
 
   emitControllerData() {
     const copiedData = JSON.parse(
-      JSON.stringify({ isPlaying: this.isPlaying })
+      JSON.stringify({
+        isPlaying: this.isPlaying,
+        playTime: (this.timeStamp / 1000).toFixed(2),
+      })
     );
     this.emitControllerChangeEvent({ data: copiedData });
   }
 
-  setIsPlaying(isPlaying: Phase) {
-    this.isPlaying = isPlaying;
+  setIsPlaying(phase: Phase) {
+    this.isPlaying = phase;
     this.backgroundLayer.render();
     this.playFrames();
-    this.emitControllerData();
   }
 
+  /**
+   * @summary on keyboard event
+   */
   removeText(text: string) {
     this.dataLayer.spliceTextByString(text);
+    this.dataLayer.render();
     this.emitCurrentData();
   }
 
   playGame() {
-    if (this.lastTime === 0) {
+    if (this.timeStamp === 0) {
       this.dataLayer.initialize();
     }
-
     const texts = this.dataLayer.getTexts();
 
-    if (this.isPlaying === Phase.END) {
-      this.lastTime = 0;
-      this.dataLayer.setPositionsForTexts(texts);
-      this.setIsPlaying(Phase.PAUSED);
-    }
-
-    this.dataLayer.render();
-
-    if (this.isPlaying === Phase.PLAYING) {
-      texts.forEach((text) => text.updatePositionByVelocity());
-    }
+    texts.forEach((text) => text.updatePositionByVelocity());
 
     const overflowedText = texts.find(
       (text) => text.getPosition().y >= this.height
     );
-
     if (overflowedText) {
-      this.removeText(overflowedText.getTextData());
+      this.dataLayer.spliceTextByString(overflowedText.getTextData());
+      this.dataLayer.moveDataWordToFailed(overflowedText.getTextData());
       this.emitCurrentData();
     }
 
     if (texts.length <= 0) {
       this.setIsPlaying(Phase.END);
-      this.dataLayer.render();
     }
+
+    this.dataLayer.render();
   }
 
   playFrames(): void {
+    let timer = 0;
+    let lastTime = 0;
+    /**
+     * @url https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame#examples
+     * timeStamp is automatically allocated
+     */
     const animate = (timeStamp: number) => {
-      /**
-       * @url https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame#examples
-       * timeStamp is automatically allocated
-       */
-      const deltaTime = timeStamp - this.lastTime;
-      this.lastTime = timeStamp;
+      const deltaTime = timeStamp - lastTime;
+      lastTime = timeStamp;
+      this.timeStamp = lastTime;
 
-      if (this.timer > this.interval) {
-        this.timer = 0;
+      if (timer > this.interval) {
+        timer = 0;
         this.playGame();
       }
 
-      this.timer += deltaTime;
-
       if (this.isPlaying === Phase.PLAYING) {
         requestAnimationFrame(animate);
+        timer += deltaTime;
       }
+
+      this.emitControllerData();
     };
-    /* this.lastTime is actual timeStamp */
-    animate(this.lastTime);
+    if (this.isPlaying === Phase.END) {
+      const texts = this.dataLayer.getTexts();
+      this.dataLayer.setPositionsForTexts(texts);
+      this.dataLayer.render();
+    }
+    animate(this.timeStamp);
   }
 
   destroy() {

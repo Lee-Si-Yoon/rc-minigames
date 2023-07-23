@@ -2,20 +2,15 @@ import BaseLayer from "./base-layer";
 import { DataLayerConstructor, DataProps, Words } from "./model";
 import Text from "../text/text";
 
-/**
- * @url https://github.com/hyukson/hangul-util
- * @description 한글
- */
 class DataLayer extends BaseLayer {
-  private data: DataProps = { words: [] };
   private texts: Text[] = [];
-  private score: number = 0;
+  private data: DataProps = { words: [], failed: [], score: 0 };
 
   constructor({ canvas, initData }: DataLayerConstructor) {
     super({ canvas });
 
     if (initData) {
-      this.data = initData;
+      this.data = { words: initData, failed: [], score: 0 };
     }
   }
 
@@ -56,24 +51,38 @@ class DataLayer extends BaseLayer {
       const { width, height } = text.getDimension();
       // FIXME center canvas
       text.setPosition({
-        x: this.width / 2 - width / 2,
+        x: this.width / 2 - width,
         // FIXME get correct height
         y: (index + 1) * height * 2,
       });
-      text.setVelocity({ x: 0, y: 0.5 });
+      text.setVelocity({ x: 0, y: 1 });
     }
   }
 
+  moveDataWordToFailed(word: string): void {
+    const indexOfWords = this.data.words.indexOf(word);
+    this.data.words.splice(indexOfWords, 1);
+    this.data.failed.push(word);
+  }
+
   spliceTextByString(text: string): void {
-    const stringArrayOfTexts: string[] = [];
-    for (const t of this.texts) {
-      stringArrayOfTexts.push(t.getTextData());
-    }
+    const stringArrayOfTexts: string[] = this.texts.map((text) =>
+      text.getTextData()
+    );
     const indexOfParamText = stringArrayOfTexts.indexOf(text);
-    const indexOfWords = this.data.words.indexOf(text);
-    if (indexOfParamText >= 0 && indexOfWords >= 0) {
+    if (indexOfParamText >= 0) {
       this.texts.splice(indexOfParamText, 1);
-      this.data.words.splice(indexOfWords, 1);
+
+      /**
+       * @url https://github.com/hyukson/hangul-util
+       * TODO
+       * 1. extract to independent method
+       * 2. KOR score
+       */
+      const KOR = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g;
+      if (!KOR.test(text)) {
+        this.data.score += text.length;
+      }
     }
   }
 

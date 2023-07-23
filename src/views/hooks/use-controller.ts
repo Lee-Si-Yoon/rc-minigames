@@ -12,6 +12,7 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     useHandlers(ref);
   const [controllerData, setControllerData] = useState<ControllerProps>({
     isPlaying: Phase.END,
+    playTime: 0,
   });
 
   useEffect(() => {
