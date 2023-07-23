@@ -23,16 +23,31 @@ function TypingGame() {
   };
 
   return (
-    <>
-      <i>{JSON.stringify(data)}</i>
-      <i>{JSON.stringify(controllerData)}</i>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        rowGap: "0.5rem",
+      }}
+    >
       <Typing
         ref={ref}
         width="100%"
-        height={800}
+        height={300}
         initData={{ words: ["all", "this", "boom"] }}
       />
-      <div style={{ display: "flex", width: "100%", rowGap: "0.25rem" }}>
+      <i>{JSON.stringify(data)}</i>
+      <i>{JSON.stringify(controllerData)}</i>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          rowGap: "0.25rem",
+          height: "1.5rem",
+          columnGap: "0.5rem",
+          justifyContent: "center",
+        }}
+      >
         <button
           onClick={() =>
             setIsPlaying(
@@ -51,11 +66,11 @@ function TypingGame() {
           type="text"
           autoComplete="off"
           value={inputValue}
-          style={{ width: "100%" }}
+          style={{ width: "100%", height: "1.5rem" }}
           onChange={onChange}
         />
       </form>
-    </>
+    </div>
   );
 }
 

@@ -96,16 +96,10 @@ class Controller extends EventDispatcher {
     this.setWidths(width, devicePixelRatio);
     this.setHeights(height, devicePixelRatio);
     this.setDprs(devicePixelRatio ? devicePixelRatio : this.dpr);
-    this.dataLayer.initialize();
   }
 
   setFps(fps: number) {
     this.fps = fps;
-  }
-
-  removeText(text: string) {
-    this.dataLayer.spliceTextByString(text);
-    this.emitCurrentData();
   }
 
   emitDataChangeEvent(params: CanvasDataChangeParams) {
@@ -134,17 +128,25 @@ class Controller extends EventDispatcher {
     this.emitControllerData();
   }
 
+  removeText(text: string) {
+    this.dataLayer.spliceTextByString(text);
+    this.emitCurrentData();
+  }
+
   playGame() {
+    if (this.lastTime === 0) {
+      this.dataLayer.initialize();
+    }
+
+    const texts = this.dataLayer.getTexts();
+
     if (this.isPlaying === Phase.END) {
       this.lastTime = 0;
-      const texts = this.dataLayer.getTexts();
       this.dataLayer.setPositionsForTexts(texts);
       this.setIsPlaying(Phase.PAUSED);
     }
 
     this.dataLayer.render();
-
-    const texts = this.dataLayer.getTexts();
 
     if (this.isPlaying === Phase.PLAYING) {
       texts.forEach((text) => text.updatePositionByVelocity());
@@ -155,13 +157,13 @@ class Controller extends EventDispatcher {
     );
 
     if (overflowedText) {
-      const indexOfOverflowedText = texts.indexOf(overflowedText);
-      this.dataLayer.spliceTextByIndex(indexOfOverflowedText);
+      this.removeText(overflowedText.getTextData());
       this.emitCurrentData();
     }
 
     if (texts.length <= 0) {
       this.setIsPlaying(Phase.END);
+      this.dataLayer.render();
     }
   }
 
@@ -185,7 +187,7 @@ class Controller extends EventDispatcher {
         requestAnimationFrame(animate);
       }
     };
-    // this.lastTime is actual timeStamp
+    /* this.lastTime is actual timeStamp */
     animate(this.lastTime);
   }
 

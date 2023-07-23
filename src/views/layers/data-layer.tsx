@@ -19,7 +19,12 @@ class DataLayer extends BaseLayer {
     }
   }
 
+  resetAll(): void {
+    this.texts = [];
+  }
+
   initialize(): void {
+    this.resetAll();
     this.createTexts(this.data.words);
     this.setPositionsForTexts(this.texts);
   }
@@ -38,6 +43,7 @@ class DataLayer extends BaseLayer {
   }
 
   private createTexts(words: Words): void {
+    if (words.length <= 0) return;
     for (const word of words) {
       const text = new Text({ data: word, ctx: this.ctx });
       this.texts.push(text);
@@ -58,12 +64,6 @@ class DataLayer extends BaseLayer {
     }
   }
 
-  // FIXME unify datasource to one
-  spliceTextByIndex(index: number): void {
-    this.texts.splice(index, 1);
-    this.data.words.splice(index, 1);
-  }
-
   spliceTextByString(text: string): void {
     const stringArrayOfTexts: string[] = [];
     for (const t of this.texts) {
@@ -71,12 +71,10 @@ class DataLayer extends BaseLayer {
     }
     const indexOfParamText = stringArrayOfTexts.indexOf(text);
     const indexOfWords = this.data.words.indexOf(text);
-    this.texts.splice(indexOfParamText, 1);
-    this.data.words.splice(indexOfWords, 1);
-  }
-
-  resetAll(): void {
-    this.texts = [];
+    if (indexOfParamText >= 0 && indexOfWords >= 0) {
+      this.texts.splice(indexOfParamText, 1);
+      this.data.words.splice(indexOfWords, 1);
+    }
   }
 
   render(): void {
