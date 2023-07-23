@@ -195,8 +195,11 @@ class Controller extends EventDispatcher {
       this.emitControllerData();
     };
     if (this.isPlaying === Phase.END) {
-      const texts = this.dataLayer.getTexts();
-      this.dataLayer.setPositionsForTexts(texts);
+      if (this.dataLayer.getTexts().length > 0) {
+        this.dataLayer.resetAll();
+        this.emitCurrentData();
+      }
+      this.dataLayer.initialize();
       this.dataLayer.render();
     }
     animate(this.timeStamp);
