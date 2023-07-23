@@ -1,0 +1,8 @@
+{
+  "ignores": [
+    "node-sass",
+    "stylelint-*",
+    "@testing-library/*",
+    "@babel/plugin-proposal-private-property-in-object"
+  ]
+}
