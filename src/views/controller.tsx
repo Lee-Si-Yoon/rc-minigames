@@ -136,6 +136,7 @@ class Controller extends EventDispatcher {
    */
   removeWord(word: string) {
     this.dataLayer.spliceTextByString(word);
+    this.dataLayer.updateScore(word);
     this.dataLayer.render();
     this.emitCurrentData();
   }
@@ -153,6 +154,25 @@ class Controller extends EventDispatcher {
     const texts = this.dataLayer.getTexts();
 
     texts.forEach((text) => text.updatePositionByVelocity());
+
+    texts.forEach((text) => {
+      const self = text;
+      const { x: originalX, y: originalY } = self.getVelocity();
+      if (self.getPosition().x + self.getDimension().width > this.width) {
+        self.setVelocity({ x: -originalX, y: originalY });
+      } else if (self.getPosition().x < 0) {
+        self.setVelocity({
+          x: Math.abs(originalX),
+          y: originalY,
+        });
+      }
+      const exceptSelf = texts.filter((text) => text !== self);
+      exceptSelf.forEach((other) => {
+        if (self.getIsCollided(other)) {
+          self.setVelocity(self.getVelocityAfterCollision(other));
+        }
+      });
+    });
 
     const overflowedText = texts.find(
       (text) => text.getPosition().y >= this.height

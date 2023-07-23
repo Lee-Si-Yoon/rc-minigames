@@ -50,6 +50,10 @@ class Text {
     return this.dimension;
   }
 
+  getVelocity(): Position {
+    return this.velocity;
+  }
+
   getVelocityAfterCollision(collidedText: Text): Position {
     /**
      * @url https://github.com/DongChyeon/JS-Toy-Projects/blob/master/AirHockey/game.js#L22C28-L22C28

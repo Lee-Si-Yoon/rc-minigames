@@ -11,6 +11,8 @@ class DataLayer extends BaseLayer {
   private texts: Text[] = [];
   private data: DataProps = { words: [], failed: [], score: 0 };
 
+  private maxVelocity: number = 2;
+
   constructor({ canvas, initData }: DataLayerConstructor) {
     super({ canvas });
 
@@ -55,14 +57,37 @@ class DataLayer extends BaseLayer {
     };
 
     const newText = new Text({ data: word, ctx: this.ctx });
-    this.texts.push(newText);
-
-    // TODO bin packing to avoid collision
     newText.setPosition({
       x: getRandomArbitrary(0, this.width - newText.getDimension().width),
       y: getRandomArbitrary(-(this.height / 2), 0),
     });
-    newText.setVelocity({ x: 0, y: 1 });
+    this.texts.push(newText);
+
+    let textIndex = 0;
+    while (textIndex < this.texts.length) {
+      let overLapped = false;
+      this.texts.forEach((text) => {
+        if (text !== newText) {
+          if (newText.getIsCollided(text)) {
+            overLapped = true;
+            newText.setPosition({
+              x: getRandomArbitrary(
+                0,
+                this.width - newText.getDimension().width
+              ),
+              y: getRandomArbitrary(-(this.height / 2), 0),
+            });
+          }
+        }
+      });
+      if (!overLapped) {
+        newText.setVelocity({
+          x: getRandomArbitrary(-0.5, 0.5),
+          y: getRandomArbitrary(0.5, this.maxVelocity),
+        });
+        textIndex += 1;
+      }
+    }
   }
 
   createTexts(words: string[]): void {
@@ -116,24 +141,12 @@ class DataLayer extends BaseLayer {
         }
       });
       if (!overLapped) {
-        testObject.setVelocity({ x: 0, y: 1 });
+        testObject.setVelocity({
+          x: getRandomArbitrary(-0.5, 0.5),
+          y: getRandomArbitrary(0.5, this.maxVelocity),
+        });
         textIndex += 1;
       }
-    }
-  }
-
-  setPositionsForTexts(texts: Text[]): void {
-    if (!texts) return;
-
-    for (const [index, text] of texts.entries()) {
-      const { width, height } = text.getDimension();
-      // FIXME center canvas
-      text.setPosition({
-        x: this.width / 2 - width,
-        // FIXME get correct height
-        y: (index + 1) * height * 2,
-      });
-      text.setVelocity({ x: 0, y: 1 });
     }
   }
 
@@ -150,7 +163,6 @@ class DataLayer extends BaseLayer {
     const indexOfParamText = stringArrayOfTexts.indexOf(word);
     if (indexOfParamText >= 0) {
       this.texts.splice(indexOfParamText, 1);
-      this.updateScore(word);
     }
     const indexOfWords = this.data.words.indexOf(word);
     if (indexOfWords >= 0) {
