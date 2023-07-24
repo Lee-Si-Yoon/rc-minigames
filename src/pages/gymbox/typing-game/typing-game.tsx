@@ -100,7 +100,7 @@ function TypingGame() {
         ref={ref}
         width="100%"
         height="calc(100% - 1.5rem)"
-        initData={["all", "this", "야호", "test", "gymbox", "asri", "kethiri"]}
+        initData={["운동했니?", "OHP", "스콰뜨", "짐박스", "gymbox", "asri"]}
       />
       <form
         onSubmit={onSubmit}
