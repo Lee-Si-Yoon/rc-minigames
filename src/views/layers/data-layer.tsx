@@ -2,6 +2,11 @@ import BaseLayer from "./base-layer";
 import { DataLayerConstructor, DataProps } from "./model";
 import { getRandomArbitrary } from "../utils/math";
 import Text from "../text/text";
+import { divideKOR, isKOR } from "./utils/parse-korean";
+import {
+  removeAllPunctuations,
+  removeAllWhiteSpaces,
+} from "./utils/strip-punctuation";
 
 /**
  * @remark word is string, text is Text class
@@ -98,20 +103,21 @@ class DataLayer extends BaseLayer {
     }
   }
 
-  detectKorean(word: string) {
-    const KOR = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g;
-    return KOR.test(word);
+  private validateWord(word: string): boolean {
+    return (
+      this.data.words.includes(word) &&
+      this.texts.map((text) => text.getTextData()).includes(word)
+    );
   }
 
-  updateScore(word: string) {
-    /**
-     * @url https://github.com/hyukson/hangul-util
-     * TODO
-     * 1. extract to independent method
-     * 2. KOR score
-     */
-    if (!this.detectKorean(word)) {
-      this.data.score += word.length;
+  updateScore(word: string): void {
+    if (!this.validateWord(word)) return;
+    const parsedWord = removeAllWhiteSpaces(removeAllPunctuations(word));
+    if (isKOR(parsedWord)) {
+      const splitedKOR = divideKOR(parsedWord);
+      this.data.score += splitedKOR.length;
+    } else {
+      this.data.score += parsedWord.length;
     }
   }
 
