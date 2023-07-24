@@ -135,8 +135,8 @@ class Controller extends EventDispatcher {
    * @summary on keyboard event
    */
   removeWord(word: string) {
-    this.dataLayer.spliceTextByString(word);
     this.dataLayer.updateScore(word);
+    this.dataLayer.spliceTextByString(word);
     this.dataLayer.render();
     this.emitCurrentData();
   }
@@ -152,6 +152,8 @@ class Controller extends EventDispatcher {
       this.dataLayer.initialize();
     }
     const texts = this.dataLayer.getTexts();
+
+    this.dataLayer.render();
 
     texts.forEach((text) => text.updatePositionByVelocity());
 
@@ -186,8 +188,6 @@ class Controller extends EventDispatcher {
     if (texts.length <= 0) {
       this.setIsPlaying(Phase.END);
     }
-
-    this.dataLayer.render();
   }
 
   playFrames(): void {

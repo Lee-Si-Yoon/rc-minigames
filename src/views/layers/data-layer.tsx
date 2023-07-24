@@ -3,6 +3,10 @@ import { DataLayerConstructor, DataProps } from "./model";
 import { getRandomArbitrary } from "../utils/math";
 import Text from "../text/text";
 import { divideKOR, isKOR } from "./utils/parse-korean";
+import {
+  removeAllPunctuations,
+  removeAllWhiteSpaces,
+} from "./utils/strip-punctuation";
 
 /**
  * @remark word is string, text is Text class
@@ -99,13 +103,21 @@ class DataLayer extends BaseLayer {
     }
   }
 
-  updateScore(word: string) {
-    // TODO add validation & strip off punctuations
-    if (isKOR(word)) {
-      const splitedKOR = divideKOR(word);
+  private validateWord(word: string): boolean {
+    return (
+      this.data.words.includes(word) &&
+      this.texts.map((text) => text.getTextData()).includes(word)
+    );
+  }
+
+  updateScore(word: string): void {
+    if (!this.validateWord(word)) return;
+    const parsedWord = removeAllWhiteSpaces(removeAllPunctuations(word));
+    if (isKOR(parsedWord)) {
+      const splitedKOR = divideKOR(parsedWord);
       this.data.score += splitedKOR.length;
     } else {
-      this.data.score += word.length;
+      this.data.score += parsedWord.length;
     }
   }
 
