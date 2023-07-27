@@ -121,7 +121,6 @@ class DataLayer extends BaseLayer {
     }
   }
 
-  // circle packing + brute force
   /**
    * brute force bin packing
    */
