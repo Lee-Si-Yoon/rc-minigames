@@ -24,9 +24,12 @@ class Controller extends EventDispatcher {
   private interactionLayer: InteractionLayer;
 
   private isPlaying: Phase = Phase.END;
+
   private timeStamp: number = 0;
+  private playTime: number = 0;
   private fps: number = 60;
   private interval: number = 1000 / this.fps;
+  private rafId: number = 0;
 
   constructor({
     backgroundLayer,
@@ -119,7 +122,7 @@ class Controller extends EventDispatcher {
     const copiedData = JSON.parse(
       JSON.stringify({
         isPlaying: this.isPlaying,
-        playTime: (this.timeStamp / 1000).toFixed(2),
+        playTime: this.playTime,
       })
     );
     this.emitControllerChangeEvent({ data: copiedData });
@@ -128,7 +131,8 @@ class Controller extends EventDispatcher {
   setIsPlaying(phase: Phase) {
     this.isPlaying = phase;
     this.backgroundLayer.render();
-    this.playFrames();
+    this.playFrames(phase);
+    this.emitControllerData();
   }
 
   /**
@@ -137,32 +141,75 @@ class Controller extends EventDispatcher {
   removeWord(word: string) {
     this.dataLayer.updateScore(word);
     this.dataLayer.spliceTextByString(word);
-    this.dataLayer.render();
+    this.renderAll();
     this.emitCurrentData();
   }
 
   addWord(word: string) {
     this.dataLayer.addWord(word);
-    this.dataLayer.render();
+    this.renderAll();
     this.emitCurrentData();
   }
 
-  playGame() {
-    if (this.timeStamp === 0) {
-      this.dataLayer.initialize();
-    }
-    const texts = this.dataLayer.getTexts();
-
+  renderAll() {
     this.dataLayer.render();
+  }
 
-    texts.forEach((text) => text.updatePositionByVelocity());
+  playFrames(phase: Phase): void {
+    if (phase === Phase.END) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
+      this.playTime = 0;
+
+      this.emitCurrentData();
+      this.dataLayer.initialize();
+    } else if (phase === Phase.PAUSED) {
+      cancelAnimationFrame(this.rafId);
+    } else if (phase === Phase.PLAYING) {
+      let timer = 0;
+      let lastTime = 0;
+
+      const animate = (timeStamp: number) => {
+        this.timeStamp = timeStamp;
+
+        const deltaTime = timeStamp - lastTime;
+        lastTime = timeStamp;
+
+        if (timer > this.interval) {
+          timer = 0;
+          this.playGame();
+        }
+
+        this.rafId = requestAnimationFrame(animate);
+
+        if (this.playTime === 0) {
+          this.dataLayer.initialize();
+        }
+
+        timer += deltaTime;
+        this.playTime += 1;
+
+        this.emitControllerData();
+      };
+
+      animate(this.timeStamp);
+    }
+  }
+
+  playGame() {
+    this.renderAll();
+
+    const texts = this.dataLayer.getTexts();
 
     texts.forEach((text) => {
       const self = text;
       const { x: originalX, y: originalY } = self.getVelocity();
-      if (self.getPosition().x + self.getDimension().width > this.width) {
+      if (
+        self.getPosition().x + self.getDimension().width > this.width &&
+        originalX > 0
+      ) {
         self.setVelocity({ x: -originalX, y: originalY });
-      } else if (self.getPosition().x < 0) {
+      } else if (self.getPosition().x < 0 && originalX < 0) {
         self.setVelocity({
           x: Math.abs(originalX),
           y: originalY,
@@ -185,44 +232,7 @@ class Controller extends EventDispatcher {
       this.emitCurrentData();
     }
 
-    if (texts.length <= 0) {
-      this.setIsPlaying(Phase.END);
-    }
-  }
-
-  playFrames(): void {
-    let timer = 0;
-    let lastTime = 0;
-    /**
-     * @url https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame#examples
-     * timeStamp is automatically allocated
-     */
-    const animate = (timeStamp: number) => {
-      const deltaTime = timeStamp - lastTime;
-      lastTime = timeStamp;
-      this.timeStamp = lastTime;
-
-      if (timer > this.interval) {
-        timer = 0;
-        this.playGame();
-      }
-
-      if (this.isPlaying === Phase.PLAYING) {
-        requestAnimationFrame(animate);
-        timer += deltaTime;
-      }
-
-      this.emitControllerData();
-    };
-    if (this.isPlaying === Phase.END) {
-      if (this.dataLayer.getTexts().length > 0) {
-        this.dataLayer.resetAll();
-        this.emitCurrentData();
-      }
-      this.dataLayer.initialize();
-      this.dataLayer.render();
-    }
-    animate(this.timeStamp);
+    texts.forEach((text) => text.updatePositionByVelocity());
   }
 
   destroy() {

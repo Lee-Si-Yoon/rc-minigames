@@ -93,7 +93,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
-        editor.playGame();
+        editor.renderAll();
       }
     };
     // on init
