@@ -51,11 +51,14 @@ class InteractionLayer extends BaseLayer {
     const animate = () => {
       ctx.clearRect(0, 0, this.width, this.height);
       effect.render();
-      requestAnimationFrame(animate);
+      const isBackToOrigin = effect.getIfAllParticlesPositionedBackToOrigin();
+      if (!isBackToOrigin) {
+        requestAnimationFrame(animate);
+      } else {
+        this.renderDebugMode();
+      }
     };
     animate();
-
-    this.renderDebugMode();
 
     ctx.save();
     ctx.restore();

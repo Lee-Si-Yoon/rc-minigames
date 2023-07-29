@@ -16,7 +16,7 @@ class Effect {
   private maxTextWidth: number = 0;
   private lineHeight: number = 0;
 
-  particles: Particle[] = [];
+  private particles: Particle[] = [];
   gap: number = 3;
 
   constructor({ context, canvasWidth, canvasHeight }: EffectProps) {
@@ -30,6 +30,12 @@ class Effect {
     };
     this.maxTextWidth = this.canvasWidth;
     this.lineHeight = this.fontSize * 0.8;
+  }
+
+  getIfAllParticlesPositionedBackToOrigin(): boolean {
+    return this.particles.every((particle) =>
+      particle.getIfPositionIsBackToOrigin()
+    );
   }
 
   styleText() {
@@ -88,6 +94,7 @@ class Effect {
       this.canvasHeight
     ).data;
 
+    // collect getImageData then clear canvas
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     for (let y = 0; y < this.canvasHeight; y += this.gap) {
@@ -97,16 +104,16 @@ class Effect {
          */
         const index = (y * this.canvasWidth + x) * 4;
         const alpha = pixels[index + 3];
+        // if alpha exitsts, it is not a empty pixel
         if (alpha > 0) {
-          const red = pixels[index];
-          const green = pixels[index + 1];
-          const blue = pixels[index + 2];
-          const color = `rgb(${red}, ${green}, ${blue})`;
+          // const red = pixels[index];
+          // const green = pixels[index + 1];
+          // const blue = pixels[index + 2];
+          // const color = `rgb(${red}, ${green}, ${blue})`;
           this.particles.push(
             new Particle({
               effect: this,
               position: { x, y },
-              color,
             })
           );
         }

@@ -1,43 +1,48 @@
-import { CSSProperties } from "react";
+import { isDifferenceLessThan } from "../../../utils/math";
 import Effect from "./effect";
 
 interface ParticleProps {
   effect: Effect;
   position: { x: number; y: number };
-  color: CSSProperties["color"];
 }
 
 class Particle {
-  effect: Effect | null = null;
+  private effect: Effect;
 
-  private color: CSSProperties["color"] = "none";
+  private originalPosition: { x: number; y: number } = { x: 0, y: 0 };
+  private position: { x: number; y: number } = { x: 0, y: 0 };
+  private deltaPostion: { x: number; y: number } = { x: 0, y: 0 };
+  private size: number = 0;
+  private force: number = 0;
+  private angle: number = 0;
+  private distance: number = 0;
+  private friction: number = Math.random() * 0.6 + 0.15;
+  private ease: number = Math.random() * 0.1 + 0.05;
 
-  originalPosition: { x: number; y: number } = { x: 0, y: 0 };
-  position: { x: number; y: number } = { x: 0, y: 0 };
-  deltaPostion: { x: number; y: number } = { x: 0, y: 0 };
-  vPosition: { x: number; y: number } = { x: 0, y: 0 };
-  size: number = 0;
-  force: number = 0;
-  angle: number = 0;
-  distance: number = 0;
-  friction: number = Math.random() * 0.6 + 0.15;
-  ease: number = Math.random() * 0.1 + 0.005;
+  isPositionBackToOrigin: boolean = false;
 
-  constructor({ effect, position, color }: ParticleProps) {
+  constructor({ effect, position }: ParticleProps) {
     this.effect = effect;
-    this.color = color;
-    this.position = {
-      x: Math.random() * effect.canvasWidth,
-      y: effect.canvasHeight,
-    };
     this.originalPosition = position;
-    this.size = effect.gap - 1;
+    this.position = {
+      x: Math.random() * this.effect.canvasWidth,
+      y: this.effect.canvasHeight,
+    };
+    this.size = this.effect.gap;
+  }
+
+  getIfPositionIsBackToOrigin(): boolean {
+    return this.isPositionBackToOrigin;
+  }
+
+  getPositions() {
+    return {
+      position: this.position,
+      originalPosition: this.originalPosition,
+    };
   }
 
   draw() {
-    if (!this.effect) return;
-    if (this.color) this.effect.context.fillStyle = this.color;
-
     this.effect.context.fillRect(
       this.position.x,
       this.position.y,
@@ -47,8 +52,18 @@ class Particle {
   }
 
   update() {
-    this.position.x += (this.originalPosition.x - this.position.x) * this.ease;
-    this.position.y += (this.originalPosition.y - this.position.y) * this.ease;
+    if (!this.isPositionBackToOrigin) {
+      this.position.x +=
+        (this.originalPosition.x - this.position.x) * this.ease;
+      this.position.y +=
+        (this.originalPosition.y - this.position.y) * this.ease;
+    }
+    if (
+      isDifferenceLessThan(this.position.x, this.originalPosition.x, 0.5) &&
+      isDifferenceLessThan(this.position.y, this.originalPosition.y, 0.5)
+    ) {
+      this.isPositionBackToOrigin = true;
+    }
   }
 }
 
