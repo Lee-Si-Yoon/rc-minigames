@@ -45,14 +45,47 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
     }, []);
 
     /**
+     * @summary PLAINTEXT CANVAS
+     */
+    const [plainTextCanvasRef, setPlainTextCanvasRef] =
+      useState<HTMLCanvasElement | null>(null);
+
+    const getPlainTextRef = useCallback((element: HTMLCanvasElement) => {
+      if (!element) return;
+      element.style["touchAction"] = "none";
+      setPlainTextCanvasRef(element);
+    }, []);
+
+    /**
+     * @summary PARTICLE CANVAS
+     */
+    const [particleCanvasRef, setParticleCanvasRef] =
+      useState<HTMLCanvasElement | null>(null);
+
+    const getParticleRef = useCallback((element: HTMLCanvasElement) => {
+      if (!element) return;
+      element.style["touchAction"] = "none";
+      setParticleCanvasRef(element);
+    }, []);
+
+    /**
      * @summary NEW EDITOR
      * @url https://github.com/ascorbic/react-artboard/blob/main/src/components/Artboard.tsx
      */
     useEffect(() => {
-      if (!backgroundRef || !interactionCanvasRef) return;
+      if (
+        !backgroundRef ||
+        !interactionCanvasRef ||
+        !plainTextCanvasRef ||
+        !particleCanvasRef
+      )
+        return;
       const editor = new Controller({
         backgroundLayer: backgroundRef,
         interactionLayer: interactionCanvasRef,
+        plainTextLayer: plainTextCanvasRef,
+        particleTextLayer: particleCanvasRef,
+        text: props.text,
       });
       editor.setFps(props.fps || 60);
       setEditor(editor);
@@ -72,7 +105,7 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
           const rect = containerRef.current.getBoundingClientRect();
           editor.setSizes(rect.width, rect.height, dpr);
           editor.setScales(dpr, dpr);
-          editor.render();
+          editor.renderStaticLayers();
         }
       };
       // on init
@@ -144,14 +177,10 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
         role="presentation"
         style={{ width: props.width, height: props.height, outline: "none" }}
       >
-        <canvas
-          ref={getBackgroundRef}
-          style={{ position: "absolute", border: "1px solid #555555" }}
-        />
-        <canvas
-          ref={getInteractionRef}
-          style={{ position: "absolute", border: "1px solid #555555" }}
-        />
+        <canvas ref={getBackgroundRef} style={{ position: "absolute" }} />
+        <canvas ref={getPlainTextRef} style={{ position: "absolute" }} />
+        <canvas ref={getParticleRef} style={{ position: "absolute" }} />
+        <canvas ref={getInteractionRef} style={{ position: "absolute" }} />
       </div>
     );
   }

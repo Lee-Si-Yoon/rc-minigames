@@ -19,14 +19,14 @@ class Particle {
   private friction: number = Math.random() * 0.6 + 0.15;
   private ease: number = Math.random() * 0.1 + 0.05;
 
-  isPositionBackToOrigin: boolean = false;
+  private isPositionBackToOrigin: boolean = false;
 
   constructor({ effect, position }: ParticleProps) {
     this.effect = effect;
     this.originalPosition = position;
     this.position = {
       x: Math.random() * this.effect.canvasWidth,
-      y: this.effect.canvasHeight,
+      y: 0,
     };
     this.size = this.effect.gap;
   }

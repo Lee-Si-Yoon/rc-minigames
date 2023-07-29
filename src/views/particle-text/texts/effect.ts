@@ -6,6 +6,9 @@ interface EffectProps {
   canvasHeight: number;
 }
 
+/**
+ * @url https://www.youtube.com/watch?v=2F2t1RJoGt8
+ */
 class Effect {
   context: CanvasRenderingContext2D;
   canvasWidth: number = 0;
@@ -13,6 +16,8 @@ class Effect {
 
   private position: { x: number; y: number } = { x: 0, y: 0 };
   private fontSize: number = 80;
+
+  private padding: number = 20;
   private maxTextWidth: number = 0;
   private lineHeight: number = 0;
 
@@ -24,12 +29,8 @@ class Effect {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
 
-    this.position = {
-      x: this.canvasWidth / 2,
-      y: this.canvasHeight / 2,
-    };
-    this.maxTextWidth = this.canvasWidth;
-    this.lineHeight = this.fontSize * 0.8;
+    this.maxTextWidth = this.canvasWidth - this.padding;
+    this.lineHeight = this.fontSize;
   }
 
   getIfAllParticlesPositionedBackToOrigin(): boolean {
@@ -51,7 +52,7 @@ class Effect {
     gradient.addColorStop(0.7, "purple");
     ctx.fillStyle = gradient;
     ctx.font = `${this.fontSize}px Helvetica`;
-    ctx.textAlign = "center";
+    ctx.textAlign = "left";
     ctx.textBaseline = "middle";
   }
 
@@ -66,16 +67,16 @@ class Effect {
     for (const [index] of texts.entries()) {
       const testLine = line + texts[index] + " ";
       if (ctx.measureText(testLine).width > this.maxTextWidth) {
-        line = texts[index] + "";
+        line = texts[index] + " ";
         lineCounter += 1;
       } else {
         line = testLine;
       }
-      linesArray[lineCounter] = line;
+      linesArray.push(line);
     }
     const textHeight = this.lineHeight * lineCounter;
-    this.position.x = this.canvasWidth / 2;
-    this.position.y = this.canvasHeight / 2 - textHeight / 2;
+    this.position.x = this.padding;
+    this.position.y = this.canvasHeight - textHeight;
 
     linesArray.forEach((line, index) => {
       ctx.fillText(
@@ -87,16 +88,18 @@ class Effect {
   }
 
   convertToParticles() {
+    if (this.canvasWidth < 0 || this.canvasHeight < 0) {
+      console.error("context is not set yet");
+      return;
+    }
     const pixels = this.context.getImageData(
       0,
       0,
       this.canvasWidth,
       this.canvasHeight
     ).data;
-
     // collect getImageData then clear canvas
     this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-
     for (let y = 0; y < this.canvasHeight; y += this.gap) {
       for (let x = 0; x < this.canvasWidth; x += this.gap) {
         /**
@@ -121,7 +124,9 @@ class Effect {
     }
   }
 
-  render() {
+  renderPlainTexts() {}
+
+  renderParticles() {
     this.particles.forEach((particle) => {
       particle.update();
       particle.draw();

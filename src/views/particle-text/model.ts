@@ -4,6 +4,7 @@ import { ControllerChangeHandler } from "./hooks/model";
 interface ParticleTextProps {
   width: React.CSSProperties["width"];
   height: React.CSSProperties["height"];
+  text: string;
   ref?: ForwardedRef<ParticleTextRef>;
   initData?: string;
   style?: React.CSSProperties;
