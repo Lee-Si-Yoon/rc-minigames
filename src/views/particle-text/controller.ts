@@ -89,7 +89,11 @@ class Controller extends EventDispatcher {
     this.emitControllerChangeEvent({ data: copiedData });
   }
 
-  render() {}
+  render() {
+    this.interactionLayer.setDebugMode(true);
+    this.backgroundLayer.render();
+    this.interactionLayer.render();
+  }
 
   destroy() {}
 }

@@ -11,6 +11,8 @@ class BackgroundLayer extends BaseLayer {
   render(): void {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.width, this.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, this.width, this.height);
     ctx.save();
     ctx.restore();
   }
