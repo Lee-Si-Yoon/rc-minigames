@@ -1,12 +1,12 @@
-import BaseLayer from "./base-layer";
+import BaseLayer from "../../../utils/base-layer";
 import { DataLayerConstructor, DataProps } from "./model";
-import { getRandomArbitrary } from "../utils/math";
+import { getRandomArbitrary } from "../../../utils/math";
 import Text from "../text/text";
-import { divideKOR, isKOR } from "./utils/parse-korean";
+import { divideKOR, isKOR } from "../../../utils/parse-korean";
 import {
   removeAllPunctuations,
   removeAllWhiteSpaces,
-} from "./utils/strip-punctuation";
+} from "../../../utils/strip-punctuation";
 
 /**
  * @remark word is string, text is Text class

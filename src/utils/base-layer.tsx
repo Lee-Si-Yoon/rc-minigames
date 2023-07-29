@@ -1,4 +1,4 @@
-import { CanvasLayerConstructor } from "./model";
+import { CanvasLayerConstructor } from "../views/typing/layers/model";
 
 abstract class BaseLayer {
   protected ctx: CanvasRenderingContext2D;

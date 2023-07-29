@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import Controller from "./controller";
-import { CanvasEvents } from "./types";
+import { CanvasEvents } from "./events";
 import {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
