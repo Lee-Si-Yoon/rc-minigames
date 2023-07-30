@@ -103,6 +103,11 @@ class Controller extends EventDispatcher {
     this.setDprs(devicePixelRatio ? devicePixelRatio : this.dpr);
   }
 
+  setInputValue(value: string) {
+    this.plainTextLayer.setInputValue(value);
+    this.plainTextLayer.render();
+  }
+
   emitControllerChangeEvent(params: ControllerChangeParams) {
     this.emit(CanvasEvents.CONTROLLER_EVENT, params);
   }
@@ -119,6 +124,7 @@ class Controller extends EventDispatcher {
   renderStaticLayers() {
     this.backgroundLayer.render();
     this.plainTextLayer.render();
+    // this.particleTextLayer.render();
   }
 
   render() {

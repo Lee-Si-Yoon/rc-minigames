@@ -9,11 +9,16 @@ interface PlainTextLayerProps extends CanvasLayerConstructor {
 class PlainTextLayer extends BaseLayer {
   private renderAlignLines: boolean = false;
   private text: string = "";
+  private inputValue: string = "";
 
   constructor({ canvas, text }: PlainTextLayerProps) {
     super({ canvas });
 
     this.text = text;
+  }
+
+  setInputValue(value: string) {
+    this.inputValue = value;
   }
 
   setDebugMode(bool: boolean) {
@@ -44,16 +49,25 @@ class PlainTextLayer extends BaseLayer {
 
     const effect = new Effect({
       context: ctx,
+      text: this.text,
+      inputValue: this.inputValue,
       canvasWidth: this.width,
       canvasHeight: this.height,
     });
 
-    effect.styleText();
-    effect.wrapText(this.text);
-
-    ctx.save();
-    ctx.restore();
+    effect.wrapText();
+    effect.renderStaticTexts();
   }
 }
 
 export default PlainTextLayer;
+
+/**
+ * {
+ *  value: "text",
+ *  position: {
+ *    x: 0
+ *    y: 0
+ *  }
+ * }[]
+ */

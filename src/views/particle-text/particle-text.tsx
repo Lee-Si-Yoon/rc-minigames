@@ -117,10 +117,6 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
       };
     }, [editor, props.width, props.height]);
 
-    const removeWord = useCallback((word: string) => {
-      console.log(word);
-    }, []);
-
     /**
      * @summary CONTROLLER HANDLER
      */
@@ -159,6 +155,14 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
         });
       };
     }, [editor, controllerChangeListeners]);
+
+    const removeWord = useCallback(
+      (value: string) => {
+        if (!editor) return;
+        editor.setInputValue(value);
+      },
+      [editor]
+    );
 
     useImperativeHandle(
       ref,

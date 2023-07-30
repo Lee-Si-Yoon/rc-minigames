@@ -3,6 +3,8 @@ import { ParticleTextRef } from "../../../views/particle-text/model";
 import ParticleText from "../../../views/particle-text/particle-text";
 import useParticle from "../../../views/particle-text/hooks/use-particle";
 
+const inputHeight = "2rem";
+
 function ParticleGame() {
   const ref = useRef<ParticleTextRef>(null);
   const { removeWord } = useParticle(ref);
@@ -18,10 +20,10 @@ function ParticleGame() {
   return (
     <div style={{ height: "100%", position: "relative" }}>
       <ParticleText
-        text="왼쪽 원판에는 가족의 고충이"
+        text="난 날지 않아. 그거 유산소 잖아"
         ref={ref}
         width="100%"
-        height="calc(100% - 1.5rem)"
+        height={`calc(100% - ${inputHeight})`}
       />
       <input
         type="text"
@@ -29,7 +31,7 @@ function ParticleGame() {
         value={inputValue}
         style={{
           width: "100%",
-          height: "1.5rem",
+          height: inputHeight,
           position: "fixed",
           bottom: "0",
         }}

@@ -21,12 +21,15 @@ class ParticleTextLayer extends BaseLayer {
 
     const effect = new Effect({
       context: ctx,
+      text: this.text,
+      inputValue: "FIXME",
       canvasWidth: this.width,
       canvasHeight: this.height,
     });
 
-    effect.styleText();
-    effect.wrapText(this.text);
+    effect.wrapText();
+    // for initial
+    effect.renderStaticTexts();
     effect.convertToParticles();
 
     const animate = () => {

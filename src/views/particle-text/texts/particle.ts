@@ -1,13 +1,17 @@
 import { isDifferenceLessThan } from "../../../utils/math";
-import Effect from "./effect";
 
 interface ParticleProps {
-  effect: Effect;
   position: { x: number; y: number };
+  context: CanvasRenderingContext2D;
+  canvasWidth: number;
+  canvasHeight: number;
+  size: number;
 }
 
 class Particle {
-  private effect: Effect;
+  private context: CanvasRenderingContext2D;
+  private canvasWidth: number = 0;
+  private canvasHeight: number = 0;
 
   private originalPosition: { x: number; y: number } = { x: 0, y: 0 };
   private position: { x: number; y: number } = { x: 0, y: 0 };
@@ -21,14 +25,20 @@ class Particle {
 
   private isPositionBackToOrigin: boolean = false;
 
-  constructor({ effect, position }: ParticleProps) {
-    this.effect = effect;
+  constructor({
+    context,
+    canvasHeight,
+    canvasWidth,
+    position,
+    size,
+  }: ParticleProps) {
+    this.context = context;
     this.originalPosition = position;
     this.position = {
-      x: Math.random() * this.effect.canvasWidth,
-      y: 0,
+      x: Math.random() * canvasWidth,
+      y: canvasHeight - canvasHeight,
     };
-    this.size = this.effect.gap;
+    this.size = size;
   }
 
   getIfPositionIsBackToOrigin(): boolean {
@@ -43,7 +53,7 @@ class Particle {
   }
 
   draw() {
-    this.effect.context.fillRect(
+    this.context.fillRect(
       this.position.x,
       this.position.y,
       this.size,
@@ -57,8 +67,7 @@ class Particle {
         (this.originalPosition.x - this.position.x) * this.ease;
       this.position.y +=
         (this.originalPosition.y - this.position.y) * this.ease;
-    }
-    if (
+    } else if (
       isDifferenceLessThan(this.position.x, this.originalPosition.x, 0.5) &&
       isDifferenceLessThan(this.position.y, this.originalPosition.y, 0.5)
     ) {
