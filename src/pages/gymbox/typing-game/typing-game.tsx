@@ -5,10 +5,10 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Typing from "../../../views/typing";
-import useData from "../../../views/hooks/use-data";
-import { Phase, TypingRef } from "../../../views/model";
-import useController from "../../../views/hooks/use-controller";
+import Typing from "../../../views/typing/typing";
+import useData from "../../../views/typing/hooks/use-data";
+import { Phase, TypingRef } from "../../../views/typing/model";
+import useController from "../../../views/typing/hooks/use-controller";
 
 function TypingGame() {
   const ref = useRef<TypingRef>(null);

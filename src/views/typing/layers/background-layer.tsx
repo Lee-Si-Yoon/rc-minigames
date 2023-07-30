@@ -1,4 +1,4 @@
-import BaseLayer from "./base-layer";
+import BaseLayer from "../../../utils/base-layer";
 import { CanvasLayerConstructor } from "./model";
 
 class BackgroundLayer extends BaseLayer {

@@ -7,6 +7,7 @@ const defaultPaths = (base: string) => ({
 const gymboxPaths = (base: string) => ({
   ...defaultPaths(base),
   "typing-game": `${base}/typing-game`,
+  "particle-text": `${base}/particle-text`,
 });
 
 const Paths = {

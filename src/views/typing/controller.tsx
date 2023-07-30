@@ -1,8 +1,8 @@
 import BackgroundLayer from "./layers/background-layer";
-import EventDispatcher from "./utils/eventDispatcher";
+import EventDispatcher from "../../utils/eventDispatcher";
 import DataLayer from "./layers/data-layer";
 import InteractionLayer from "./layers/interaction-layer";
-import { CanvasEvents } from "./types";
+import { CanvasEvents } from "./events";
 import { CanvasDataChangeParams, ControllerChangeParams, Phase } from "./model";
 import { Words } from "./layers/model";
 
