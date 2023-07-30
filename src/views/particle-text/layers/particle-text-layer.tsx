@@ -8,11 +8,16 @@ interface ParticleTextLayerProps extends CanvasLayerConstructor {
 
 class ParticleTextLayer extends BaseLayer {
   private text: string = "";
+  private inputValue: string = "";
 
   constructor({ canvas, text }: ParticleTextLayerProps) {
     super({ canvas });
 
     this.text = text;
+  }
+
+  setInputValue(value: string) {
+    this.inputValue = value;
   }
 
   render() {
@@ -22,28 +27,24 @@ class ParticleTextLayer extends BaseLayer {
     const effect = new Effect({
       context: ctx,
       text: this.text,
-      inputValue: "FIXME",
+      inputValue: this.inputValue,
       canvasWidth: this.width,
       canvasHeight: this.height,
     });
 
     effect.wrapText();
-    // for initial
-    effect.renderStaticTexts();
-    effect.convertToParticles();
+    effect.renderFilledTexts();
+    // effect.convertToParticles();
 
-    const animate = () => {
-      ctx.clearRect(0, 0, this.width, this.height);
-      effect.renderParticles();
-      const isBackToOrigin = effect.getIfAllParticlesPositionedBackToOrigin();
-      if (!isBackToOrigin) {
-        requestAnimationFrame(animate);
-      }
-    };
-    animate();
-
-    ctx.save();
-    ctx.restore();
+    // const animate = () => {
+    //   // ctx.clearRect(0, 0, this.width, this.height);
+    //   effect.renderParticles();
+    //   const isBackToOrigin = effect.getIfAllParticlesPositionedBackToOrigin();
+    //   if (!isBackToOrigin) {
+    //     requestAnimationFrame(animate);
+    //   }
+    // };
+    // animate();
   }
 }
 

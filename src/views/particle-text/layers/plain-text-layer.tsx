@@ -61,13 +61,3 @@ class PlainTextLayer extends BaseLayer {
 }
 
 export default PlainTextLayer;
-
-/**
- * {
- *  value: "text",
- *  position: {
- *    x: 0
- *    y: 0
- *  }
- * }[]
- */

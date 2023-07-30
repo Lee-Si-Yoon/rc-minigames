@@ -23,6 +23,7 @@ class Effect {
   private inputValue: string = "";
   private textBoxPosition: Coord = { x: 0, y: 0 };
   private fontSize: number = 64;
+  private lineHeight: number = 1.4;
 
   private padding: number = 16;
   private maxTextWidth: number = 0;
@@ -54,9 +55,10 @@ class Effect {
   }
 
   private styleText(ctx: CanvasRenderingContext2D) {
-    ctx.font = `${this.fontSize}px Helvetica`;
+    ctx.font = `${this.fontSize}px monospace`;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
+    ctx.save();
   }
 
   private gradientFillText(ctx: CanvasRenderingContext2D) {
@@ -101,7 +103,7 @@ class Effect {
           const letterHeight =
             (ctx.measureText(letter).actualBoundingBoxAscent +
               ctx.measureText(letter).actualBoundingBoxDescent) *
-            1.4;
+            this.lineHeight;
 
           this.textArray.push({
             value: letter,
@@ -124,7 +126,7 @@ class Effect {
           const letterHeight =
             (ctx.measureText(letter).actualBoundingBoxAscent +
               ctx.measureText(letter).actualBoundingBoxDescent) *
-            1.4;
+            this.lineHeight;
 
           this.textArray.push({
             value: letter,
@@ -147,12 +149,16 @@ class Effect {
     const maxTextHeight = Math.max(
       ...this.textArray.map((text) => text.height)
     );
+    // const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
+    // const filledRowCount =
+    //   (maxRowCount + 1) * 2 -
+    //   new Set(
+    //     this.textArray.filter((text) => text.filled).map((text) => text.row)
+    //   ).size;
 
-    const filledRowCount = new Set(
-      this.textArray.filter((text) => text.filled).map((text) => text.row)
-    ).size;
+    // this.textBoxPosition.y = this.canvasHeight - maxTextHeight * filledRowCount;
 
-    this.textBoxPosition.y = this.canvasHeight - filledRowCount * maxTextHeight;
+    this.textBoxPosition.y = this.canvasHeight / 2 - maxTextHeight / 2;
 
     this.textArray.forEach((text) => {
       if (text.filled) {
@@ -160,14 +166,16 @@ class Effect {
         ctx.fillText(
           text.value,
           text.position.x,
-          text.position.y + this.textBoxPosition.y
+          text.position.y + this.textBoxPosition.y,
+          text.width
         );
       } else {
         this.gradientFillText(ctx);
         ctx.fillText(
           text.value,
           text.position.x,
-          text.position.y + this.textBoxPosition.y
+          text.position.y + this.textBoxPosition.y,
+          text.width
         );
       }
     });
@@ -179,11 +187,86 @@ class Effect {
     );
   }
 
+  renderFilledTexts() {
+    const ctx = this.context;
+    this.gradientFillText(ctx);
+
+    const maxTextHeight = Math.max(
+      ...this.textArray.map((text) => text.height)
+    );
+
+    if (this.textArray.filter((text) => !text.filled)) {
+      this.textArray.forEach((text) => {
+        if (!text.filled) {
+          ctx.fillText(
+            text.value,
+            text.position.x,
+            text.position.y + this.canvasHeight / 2 - maxTextHeight / 2,
+            text.width
+          );
+
+          const pixels = ctx.getImageData(
+            text.position.x,
+            text.position.y + this.canvasHeight / 2 - maxTextHeight / 2,
+            this.canvasWidth,
+            this.canvasHeight
+          ).data;
+
+          // ctx.putImageData(
+          //   pixels,
+          //   text.position.x,
+          //   text.position.y + this.canvasHeight / 2 - maxTextHeight / 2 + 100
+          // );
+
+          ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+          for (let y = 0; y < this.canvasHeight; y += 1) {
+            for (let x = 0; x < this.canvasWidth; x += 1) {
+              const index = (y * this.canvasWidth + x) * 4;
+              const alpha = pixels[index + 3];
+              if (alpha > 0) {
+                this.particles.push(
+                  new Particle({
+                    context: this.context,
+                    canvasHeight: this.canvasHeight,
+                    canvasWidth: this.canvasWidth,
+                    size: this.gap,
+                    position: { x, y },
+                  })
+                );
+              }
+            }
+          }
+
+          let id: number;
+
+          const animate = () => {
+            ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+            const isBackToOrigin =
+              this.getIfAllParticlesPositionedBackToOrigin();
+            if (!isBackToOrigin) {
+              this.particles.forEach((particle) => {
+                particle.update();
+                particle.draw();
+              });
+              id = requestAnimationFrame(animate);
+            } else {
+              cancelAnimationFrame(id);
+            }
+          };
+          animate();
+        }
+      });
+    }
+  }
+
   convertToParticles() {
     if (this.canvasWidth <= 0 || this.canvasHeight <= 0) {
       console.error("context is not set yet");
       return;
     }
+
     const pixels = this.context.getImageData(
       0,
       0,

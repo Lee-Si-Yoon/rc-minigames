@@ -106,6 +106,8 @@ class Controller extends EventDispatcher {
   setInputValue(value: string) {
     this.plainTextLayer.setInputValue(value);
     this.plainTextLayer.render();
+    this.particleTextLayer.setInputValue(value);
+    this.particleTextLayer.render();
   }
 
   emitControllerChangeEvent(params: ControllerChangeParams) {
@@ -123,8 +125,8 @@ class Controller extends EventDispatcher {
 
   renderStaticLayers() {
     this.backgroundLayer.render();
+    this.particleTextLayer.render();
     this.plainTextLayer.render();
-    // this.particleTextLayer.render();
   }
 
   render() {
