@@ -149,16 +149,18 @@ class Effect {
     const maxTextHeight = Math.max(
       ...this.textArray.map((text) => text.height)
     );
-    // const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
+    const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
+    this.textBoxPosition.y =
+      this.canvasHeight - maxTextHeight * (maxRowCount + 1);
+
     // const filledRowCount =
     //   (maxRowCount + 1) * 2 -
     //   new Set(
     //     this.textArray.filter((text) => text.filled).map((text) => text.row)
     //   ).size;
-
     // this.textBoxPosition.y = this.canvasHeight - maxTextHeight * filledRowCount;
 
-    this.textBoxPosition.y = this.canvasHeight / 2 - maxTextHeight / 2;
+    // this.textBoxPosition.y = this.canvasHeight / 2 - maxTextHeight / 2;
 
     this.textArray.forEach((text) => {
       if (text.filled) {
@@ -194,71 +196,20 @@ class Effect {
     const maxTextHeight = Math.max(
       ...this.textArray.map((text) => text.height)
     );
+    const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
+    this.textBoxPosition.y =
+      this.canvasHeight - maxTextHeight * (maxRowCount + 1);
 
-    if (this.textArray.filter((text) => !text.filled)) {
-      this.textArray.forEach((text) => {
-        if (!text.filled) {
-          ctx.fillText(
-            text.value,
-            text.position.x,
-            text.position.y + this.canvasHeight / 2 - maxTextHeight / 2,
-            text.width
-          );
-
-          const pixels = ctx.getImageData(
-            text.position.x,
-            text.position.y + this.canvasHeight / 2 - maxTextHeight / 2,
-            this.canvasWidth,
-            this.canvasHeight
-          ).data;
-
-          // ctx.putImageData(
-          //   pixels,
-          //   text.position.x,
-          //   text.position.y + this.canvasHeight / 2 - maxTextHeight / 2 + 100
-          // );
-
-          ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-          for (let y = 0; y < this.canvasHeight; y += 1) {
-            for (let x = 0; x < this.canvasWidth; x += 1) {
-              const index = (y * this.canvasWidth + x) * 4;
-              const alpha = pixels[index + 3];
-              if (alpha > 0) {
-                this.particles.push(
-                  new Particle({
-                    context: this.context,
-                    canvasHeight: this.canvasHeight,
-                    canvasWidth: this.canvasWidth,
-                    size: this.gap,
-                    position: { x, y },
-                  })
-                );
-              }
-            }
-          }
-
-          let id: number;
-
-          const animate = () => {
-            ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-            const isBackToOrigin =
-              this.getIfAllParticlesPositionedBackToOrigin();
-            if (!isBackToOrigin) {
-              this.particles.forEach((particle) => {
-                particle.update();
-                particle.draw();
-              });
-              id = requestAnimationFrame(animate);
-            } else {
-              cancelAnimationFrame(id);
-            }
-          };
-          animate();
-        }
-      });
-    }
+    this.textArray.forEach((text) => {
+      if (!text.filled) {
+        ctx.fillText(
+          text.value,
+          text.position.x,
+          text.position.y + this.textBoxPosition.y,
+          text.width
+        );
+      }
+    });
   }
 
   convertToParticles() {
@@ -266,40 +217,53 @@ class Effect {
       console.error("context is not set yet");
       return;
     }
+    const ctx = this.context;
 
-    const pixels = this.context.getImageData(
-      0,
-      0,
-      this.canvasWidth,
-      this.canvasHeight
-    ).data;
+    this.textArray.forEach((text) => {
+      if (!text.filled) {
+        const pixels = ctx.getImageData(
+          text.position.x,
+          text.position.y + this.textBoxPosition.y,
+          text.width,
+          text.height
+        ).data;
 
-    // collect getImageData then clear canvas
-    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        // for debugging
+        // ctx.putImageData(
+        //   pixels,
+        //   text.position.x,
+        //   text.position.y + this.textBoxPosition.y + 100
+        // );
 
-    for (let y = 0; y < this.canvasHeight; y += this.gap) {
-      for (let x = 0; x < this.canvasWidth; x += this.gap) {
-        //  [red, green, blue, alpha] is one pixel
-        const index = (y * this.canvasWidth + x) * 4;
-        const alpha = pixels[index + 3];
-        // if alpha exitsts, it is not a empty pixel
-        if (alpha > 0) {
-          // const red = pixels[index];
-          // const green = pixels[index + 1];
-          // const blue = pixels[index + 2];
-          // const color = `rgb(${red}, ${green}, ${blue})`;
-          this.particles.push(
-            new Particle({
-              context: this.context,
-              canvasHeight: this.canvasHeight,
-              canvasWidth: this.canvasWidth,
-              size: this.gap,
-              position: { x, y },
-            })
-          );
+        ctx.clearRect(
+          text.position.x,
+          text.position.y + this.textBoxPosition.y,
+          text.width,
+          text.height
+        );
+
+        for (let y = 0; y < text.height; y += this.gap) {
+          for (let x = 0; x < text.width; x += this.gap) {
+            const index = (y * text.width + x) * 4;
+            const alpha = pixels[index + 3];
+            if (alpha > 0) {
+              this.particles.push(
+                new Particle({
+                  context: this.context,
+                  canvasHeight: this.canvasHeight,
+                  canvasWidth: this.canvasWidth,
+                  size: this.gap,
+                  position: {
+                    x: text.position.x + x,
+                    y: text.position.y + this.textBoxPosition.y + y,
+                  },
+                })
+              );
+            }
+          }
         }
       }
-    }
+    });
   }
 
   renderParticles() {
