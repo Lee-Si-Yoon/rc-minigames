@@ -222,29 +222,17 @@ class Effect {
     this.textArray.forEach((text) => {
       if (!text.filled) {
         const pixels = ctx.getImageData(
-          text.position.x,
-          text.position.y + this.textBoxPosition.y,
-          text.width,
-          text.height
+          0,
+          0,
+          this.canvasWidth,
+          this.canvasHeight
         ).data;
 
-        // for debugging
-        // ctx.putImageData(
-        //   pixels,
-        //   text.position.x,
-        //   text.position.y + this.textBoxPosition.y + 100
-        // );
+        ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-        ctx.clearRect(
-          text.position.x,
-          text.position.y + this.textBoxPosition.y,
-          text.width,
-          text.height
-        );
-
-        for (let y = 0; y < text.height; y += this.gap) {
-          for (let x = 0; x < text.width; x += this.gap) {
-            const index = (y * text.width + x) * 4;
+        for (let y = 0; y < this.canvasHeight; y += this.gap) {
+          for (let x = 0; x < this.canvasWidth; x += this.gap) {
+            const index = (y * this.canvasWidth + x) * 4;
             const alpha = pixels[index + 3];
             if (alpha > 0) {
               this.particles.push(
@@ -254,14 +242,55 @@ class Effect {
                   canvasWidth: this.canvasWidth,
                   size: this.gap,
                   position: {
-                    x: text.position.x + x,
-                    y: text.position.y + this.textBoxPosition.y + y,
+                    x,
+                    y,
                   },
                 })
               );
             }
           }
         }
+        // for debugging
+        // ctx.putImageData(
+        //   pixels,
+        //   text.position.x,
+        //   text.position.y + this.textBoxPosition.y + 100
+        // );
+
+        // const pixels = ctx.getImageData(
+        //   text.position.x,
+        //   text.position.y + this.textBoxPosition.y,
+        //   text.width,
+        //   text.height
+        // ).data;
+
+        // ctx.clearRect(
+        //   text.position.x,
+        //   text.position.y + this.textBoxPosition.y,
+        //   text.width,
+        //   text.height
+        // );
+
+        // for (let y = 0; y < text.height; y += this.gap) {
+        //   for (let x = 0; x < text.width; x += this.gap) {
+        //     const index = (y * text.width + x) * 4;
+        //     const alpha = pixels[index + 3];
+        //     if (alpha > 0) {
+        //       this.particles.push(
+        //         new Particle({
+        //           context: this.context,
+        //           canvasHeight: this.canvasHeight,
+        //           canvasWidth: this.canvasWidth,
+        //           size: this.gap,
+        //           position: {
+        //             x: text.position.x + x,
+        //             y: text.position.y + this.textBoxPosition.y + y,
+        //           },
+        //         })
+        //       );
+        //     }
+        //   }
+        // }
       }
     });
   }
