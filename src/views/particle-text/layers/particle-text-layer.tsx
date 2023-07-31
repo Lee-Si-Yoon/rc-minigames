@@ -34,17 +34,17 @@ class ParticleTextLayer extends BaseLayer {
 
     effect.wrapText();
     effect.renderFilledTexts();
-    // effect.convertToParticles();
+    effect.convertToParticles();
 
-    // const animate = () => {
-    //   // ctx.clearRect(0, 0, this.width, this.height);
-    //   effect.renderParticles();
-    //   const isBackToOrigin = effect.getIfAllParticlesPositionedBackToOrigin();
-    //   if (!isBackToOrigin) {
-    //     requestAnimationFrame(animate);
-    //   }
-    // };
-    // animate();
+    const animate = () => {
+      ctx.clearRect(0, 0, this.width, this.height);
+      effect.renderParticles();
+      const isBackToOrigin = effect.getIfAllParticlesPositionedBackToOrigin();
+      if (!isBackToOrigin) {
+        requestAnimationFrame(animate);
+      }
+    };
+    animate();
   }
 }
 
