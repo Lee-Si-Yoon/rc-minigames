@@ -201,15 +201,45 @@ class Effect {
       this.canvasHeight - maxTextHeight * (maxRowCount + 1);
 
     this.textArray.forEach((text) => {
-      if (!text.filled) {
-        ctx.fillText(
-          text.value,
-          text.position.x,
-          text.position.y + this.textBoxPosition.y,
-          text.width
-        );
-      }
+      // if (!text.filled) {
+      ctx.fillText(
+        text.value,
+        text.position.x,
+        text.position.y + this.textBoxPosition.y,
+        text.width
+      );
+      // }
     });
+
+    const pixels = ctx.getImageData(
+      0,
+      0,
+      this.canvasWidth,
+      this.canvasHeight
+    ).data;
+
+    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    for (let y = 0; y < this.canvasHeight; y += this.gap) {
+      for (let x = 0; x < this.canvasWidth; x += this.gap) {
+        const index = (y * this.canvasWidth + x) * 4;
+        const alpha = pixels[index + 3];
+        if (alpha > 0) {
+          this.particles.push(
+            new Particle({
+              context: this.context,
+              canvasHeight: this.canvasHeight,
+              canvasWidth: this.canvasWidth,
+              size: this.gap,
+              position: {
+                x,
+                y,
+              },
+            })
+          );
+        }
+      }
+    }
   }
 
   convertToParticles() {

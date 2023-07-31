@@ -44,6 +44,7 @@ class ParticleTextLayer extends BaseLayer {
         requestAnimationFrame(animate);
       }
     };
+
     animate();
   }
 }
