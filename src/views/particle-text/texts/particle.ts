@@ -14,7 +14,7 @@ class Particle {
   private canvasHeight: number = 0;
 
   private originalPosition: { x: number; y: number } = { x: 0, y: 0 };
-  private position: { x: number; y: number } = { x: 0, y: 0 };
+  position: { x: number; y: number } = { x: 0, y: 0 };
   private deltaPostion: { x: number; y: number } = { x: 0, y: 0 };
   private size: number = 0;
   private force: number = 0;
