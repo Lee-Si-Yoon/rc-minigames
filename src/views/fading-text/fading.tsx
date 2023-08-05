@@ -4,7 +4,6 @@ export interface FadingProp {
   texts: string[];
   width: CSSProperties["width"];
   height: CSSProperties["height"];
-  backgroundColor?: CSSProperties["backgroundColor"];
   textColor?: {
     R?: number;
     G?: number;
@@ -14,6 +13,10 @@ export interface FadingProp {
   cooldownTime?: number;
   fontSize?: CSSProperties["fontSize"];
   fontFamily?: CSSProperties["fontFamily"];
+  background?: {
+    enabled: boolean;
+    color?: CSSProperties["backgroundColor"];
+  };
 }
 
 function Fading(props: FadingProp) {
@@ -30,19 +33,21 @@ function Fading(props: FadingProp) {
     fontSize: props.fontSize || "6rem",
     fontFamily:
       `${props.fontFamily ? `${props.fontFamily},` : ""}` + "Hevletica",
+    userSelect: "none",
   };
 
   const {
-    backgroundColor = "white",
+    background = {
+      enabled: false,
+    },
     textColor = { R: 0, G: 0, B: 0 },
     texts,
+    morphTime = 1,
+    cooldownTime = 0.25,
   } = props;
 
   useEffect(() => {
     if (!text1Ref.current || !text2Ref.current) return;
-
-    const morphTime = props.morphTime || 1;
-    const cooldownTime = props.cooldownTime || 0.25;
 
     let textIndex = texts.length - 1;
     let morph = 0;
@@ -133,14 +138,16 @@ function Fading(props: FadingProp) {
         position: "relative",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          backgroundColor,
-        }}
-      />
+      {background.enabled && (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+            backgroundColor: background.color || "black",
+          }}
+        />
+      )}
       <div
         style={{
           width: "100%",
@@ -159,9 +166,9 @@ function Fading(props: FadingProp) {
             <feColorMatrix
               in="SourceGraphic"
               type="matrix"
-              values={`1 0 0 0 ${textColor.R}
-                0 1 0 0 ${textColor.G}
-                0 0 1 0 ${textColor.B}
+              values={`1 0 0 0 ${textColor.R ? textColor.R / 255 : 0}
+                0 1 0 0 ${textColor.G ? textColor.G / 255 : 0}
+                0 0 1 0 ${textColor.B ? textColor.B / 255 : 0}
                 0 0 0 255 -100`}
             />
           </filter>
