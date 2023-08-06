@@ -5,8 +5,8 @@ import { Paths } from "../../routes/paths";
 function Root() {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <Link to={Paths.gymbox["typing-game"]}>typing game</Link>
-      <Link to={Paths.gymbox["particle-text"]}>particle-text</Link>
+      <Link to={Paths.gymboxx["typing-game"]}>typing game</Link>
+      <Link to={Paths.gymboxx.fading}>fading</Link>
     </div>
   );
 }

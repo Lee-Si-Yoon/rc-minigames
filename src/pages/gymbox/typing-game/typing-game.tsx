@@ -7,13 +7,13 @@ import React, {
 } from "react";
 import Typing from "../../../views/typing/typing";
 import useData from "../../../views/typing/hooks/use-data";
-import { Phase, TypingRef } from "../../../views/typing/model";
+import { Level, Phase, TypingRef } from "../../../views/typing/model";
 import useController from "../../../views/typing/hooks/use-controller";
 
 function TypingGame() {
   const ref = useRef<TypingRef>(null);
   const { addWord, removeWord, data } = useData(ref);
-  const { setIsPlaying, controllerData } = useController(ref);
+  const { setIsPlaying, setLevel, controllerData } = useController(ref);
 
   const [inputValue, setInputValue] = useState<string>("");
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +28,7 @@ function TypingGame() {
     setInputValue("");
   };
 
-  const [spawnWords, setSpawnWords] = useState<boolean>(false);
+  const [spawnWords, setSpawnWords] = useState<boolean>(true);
   const spawnRef = useRef<NodeJS.Timer>();
 
   useEffect(() => {
@@ -36,7 +36,11 @@ function TypingGame() {
       spawnRef.current = setInterval(async () => {
         const res = await fetch("https://random-data-api.com/api/v2/beers");
         const jsonData = await res.json();
-        addWord(jsonData.name);
+        const word = String(jsonData.name).slice(
+          0,
+          Math.ceil(Math.random() * 6) || 1
+        );
+        addWord({ data: word });
       }, 2000);
     }
     return () => clearInterval(spawnRef.current);
@@ -82,6 +86,11 @@ function TypingGame() {
             id="spawn"
             checked={spawnWords}
           />
+          <select onChange={(e) => setLevel(e.target.value as Level)}>
+            {Object.values(Level).map((level) => (
+              <option key={level}>{level}</option>
+            ))}
+          </select>
           <button
             onClick={() =>
               setIsPlaying(
@@ -100,7 +109,7 @@ function TypingGame() {
         ref={ref}
         width="100%"
         height="calc(100% - 1.5rem)"
-        initData={["운동했니?", "OHP", "스콰뜨", "짐박스", "gymbox", "asri"]}
+        initData={["break", "the", "limit", "gymboxx"]}
       />
       <form
         onSubmit={onSubmit}

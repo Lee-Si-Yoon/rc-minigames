@@ -3,8 +3,14 @@ import EventDispatcher from "../../utils/eventDispatcher";
 import DataLayer from "./layers/data-layer";
 import InteractionLayer from "./layers/interaction-layer";
 import { CanvasEvents } from "./events";
-import { CanvasDataChangeParams, ControllerChangeParams, Phase } from "./model";
+import {
+  CanvasDataChangeParams,
+  ControllerChangeParams,
+  Level,
+  Phase,
+} from "./model";
 import { Words } from "./layers/model";
+import { TextProps } from "./text/text";
 
 interface ControllerConstructor {
   backgroundLayer: HTMLCanvasElement;
@@ -23,7 +29,8 @@ class Controller extends EventDispatcher {
   private dataLayer: DataLayer;
   private interactionLayer: InteractionLayer;
 
-  private isPlaying: Phase = Phase.END;
+  private isPlaying: Phase = Phase.PAUSED;
+  private level: Level = Level.EASY;
 
   private timeStamp: number = 0;
   private playTime: number = 0;
@@ -82,16 +89,16 @@ class Controller extends EventDispatcher {
 
   private setWidths(width: number, devicePixelRatio?: number) {
     this.width = width;
-    this.backgroundLayer.setWidth(width, devicePixelRatio);
-    this.dataLayer.setWidth(width, devicePixelRatio);
-    this.interactionLayer.setWidth(width, devicePixelRatio);
+    this.backgroundLayer.setWidth(width || this.width, devicePixelRatio);
+    this.dataLayer.setWidth(width || this.width, devicePixelRatio);
+    this.interactionLayer.setWidth(width || this.width, devicePixelRatio);
   }
 
   private setHeights(height: number, devicePixelRatio?: number) {
     this.height = height;
-    this.backgroundLayer.setHeight(height, devicePixelRatio);
-    this.dataLayer.setHeight(height, devicePixelRatio);
-    this.interactionLayer.setHeight(height, devicePixelRatio);
+    this.backgroundLayer.setHeight(height || this.height, devicePixelRatio);
+    this.dataLayer.setHeight(height || this.height, devicePixelRatio);
+    this.interactionLayer.setHeight(height || this.height, devicePixelRatio);
   }
 
   setSizes(width: number, height: number, devicePixelRatio?: number) {
@@ -123,6 +130,7 @@ class Controller extends EventDispatcher {
       JSON.stringify({
         isPlaying: this.isPlaying,
         playTime: this.playTime,
+        level: this.level,
       })
     );
     this.emitControllerChangeEvent({ data: copiedData });
@@ -130,8 +138,23 @@ class Controller extends EventDispatcher {
 
   setIsPlaying(phase: Phase) {
     this.isPlaying = phase;
-    this.backgroundLayer.render();
-    this.playFrames(phase);
+
+    if (phase === Phase.END) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
+      this.playTime = 0;
+    } else if (phase === Phase.PAUSED) {
+      cancelAnimationFrame(this.rafId);
+    } else if (phase === Phase.PLAYING) {
+      this.playFrames();
+    }
+
+    this.emitControllerData();
+  }
+
+  setLevel(level: Level) {
+    this.level = level;
+    this.dataLayer.setLevel(level);
     this.emitControllerData();
   }
 
@@ -140,99 +163,56 @@ class Controller extends EventDispatcher {
    */
   removeWord(word: string) {
     this.dataLayer.updateScore(word);
-    this.dataLayer.spliceTextByString(word);
-    this.renderAll();
+    this.dataLayer.removeViaInput(word);
     this.emitCurrentData();
   }
 
-  addWord(word: string) {
-    this.dataLayer.addWord(word);
-    this.renderAll();
+  addWord(textProps: Omit<TextProps, "ctx">) {
+    this.dataLayer.addWord(textProps);
     this.emitCurrentData();
+  }
+
+  playFrames(): void {
+    let timer = 0;
+    let lastTime = 0;
+
+    const animate = (timeStamp: number) => {
+      this.timeStamp = timeStamp;
+
+      const deltaTime = timeStamp - lastTime;
+      lastTime = timeStamp;
+
+      if (timer > this.interval) {
+        timer = 0;
+        this.playGame();
+      }
+
+      this.rafId = requestAnimationFrame(animate);
+
+      if (this.playTime === 0) {
+        this.dataLayer.initialize();
+      }
+
+      timer += deltaTime;
+      this.playTime += 1;
+    };
+
+    animate(this.timeStamp);
+  }
+
+  playGame() {
+    // const prevData = JSON.stringify(this.dataLayer.getCopiedData());
+    this.dataLayer.update();
+    // const updatedData = JSON.stringify(this.dataLayer.getCopiedData());
+    // if (prevData !== updatedData) this.emitControllerData();
+    this.emitControllerData();
+    this.dataLayer.render();
   }
 
   renderAll() {
     this.dataLayer.render();
-  }
-
-  playFrames(phase: Phase): void {
-    if (phase === Phase.END) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = 0;
-      this.playTime = 0;
-
-      this.emitCurrentData();
-      this.dataLayer.initialize();
-    } else if (phase === Phase.PAUSED) {
-      cancelAnimationFrame(this.rafId);
-    } else if (phase === Phase.PLAYING) {
-      let timer = 0;
-      let lastTime = 0;
-
-      const animate = (timeStamp: number) => {
-        this.timeStamp = timeStamp;
-
-        const deltaTime = timeStamp - lastTime;
-        lastTime = timeStamp;
-
-        if (timer > this.interval) {
-          timer = 0;
-          this.playGame();
-        }
-
-        this.rafId = requestAnimationFrame(animate);
-
-        if (this.playTime === 0) {
-          this.dataLayer.initialize();
-        }
-
-        timer += deltaTime;
-        this.playTime += 1;
-
-        this.emitControllerData();
-      };
-
-      animate(this.timeStamp);
-    }
-  }
-
-  playGame() {
-    this.renderAll();
-
-    const texts = this.dataLayer.getTexts();
-
-    texts.forEach((text) => {
-      const self = text;
-      const { x: originalX, y: originalY } = self.getVelocity();
-      if (
-        self.getPosition().x + self.getDimension().width > this.width &&
-        originalX > 0
-      ) {
-        self.setVelocity({ x: -originalX, y: originalY });
-      } else if (self.getPosition().x < 0 && originalX < 0) {
-        self.setVelocity({
-          x: Math.abs(originalX),
-          y: originalY,
-        });
-      }
-      const exceptSelf = texts.filter((text) => text !== self);
-      exceptSelf.forEach((other) => {
-        if (self.getIsCollided(other)) {
-          self.setVelocity(self.getVelocityAfterCollision(other));
-        }
-      });
-    });
-
-    const overflowedText = texts.find(
-      (text) => text.getPosition().y >= this.height
-    );
-    if (overflowedText) {
-      this.dataLayer.spliceTextByString(overflowedText.getTextData());
-      this.dataLayer.moveDataWordToFailed(overflowedText.getTextData());
-      this.emitCurrentData();
-    }
-
-    texts.forEach((text) => text.updatePositionByVelocity());
+    this.backgroundLayer.render();
+    this.interactionLayer.render();
   }
 
   destroy() {

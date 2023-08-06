@@ -2,6 +2,7 @@ import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import {
   ControllerChangeHandler,
   ControllerProps,
+  Level,
   Phase,
   TypingRef,
 } from "../model";
@@ -12,6 +13,7 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     useHandlers(ref);
   const [controllerData, setControllerData] = useState<ControllerProps>({
     isPlaying: Phase.END,
+    level: Level.EASY,
     playTime: 0,
   });
 
@@ -34,9 +36,18 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     [ref]
   );
 
+  const setLevel = useCallback(
+    (level: Level) => {
+      if (!ref || ref.current === null) return;
+      ref.current.setLevel(level);
+    },
+    [ref]
+  );
+
   return {
     controllerData,
     setIsPlaying,
+    setLevel,
   };
 }
 

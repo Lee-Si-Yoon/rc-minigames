@@ -8,7 +8,7 @@ abstract class BaseLayer {
   protected height: number = 0;
 
   constructor({ canvas }: CanvasLayerConstructor) {
-    this.ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+    this.ctx = canvas.getContext("2d", { willReadFrequently: true})!;
     this.element = canvas;
   }
 

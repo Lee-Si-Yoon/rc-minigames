@@ -8,12 +8,13 @@ const gymboxPaths = (base: string) => ({
   ...defaultPaths(base),
   "typing-game": `${base}/typing-game`,
   "particle-text": `${base}/particle-text`,
+  fading: `${base}/fading`,
 });
 
 const Paths = {
   ...defaultPaths(`/`),
 
-  gymbox: gymboxPaths(`/gymbox`),
+  gymboxx: gymboxPaths(`/gymboxx`),
 };
 
 export { Paths };

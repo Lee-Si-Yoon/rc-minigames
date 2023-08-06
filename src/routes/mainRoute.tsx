@@ -1,10 +1,9 @@
-import React from "react";
-
 import { RouteObject, createBrowserRouter } from "react-router-dom";
 import Root from "../pages/root/root";
 import { Paths } from "./paths";
 import TypingGame from "../pages/gymbox/typing-game/typing-game";
-import ParticleGame from "../pages/gymbox/particle-text/particle-text";
+import Fading from "../pages/gymbox/fading/fading";
+// import ParticleGame from "../pages/gymbox/particle-text/particle-text";
 
 const routerConfig: RouteObject[] = [
   {
@@ -12,23 +11,27 @@ const routerConfig: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Root />,
+        Component: Root,
       },
       {
         path: "*",
-        element: <Root />,
+        Component: Root,
       },
       {
-        path: Paths.gymbox.default,
+        path: Paths.gymboxx.default,
         children: [
           {
-            path: Paths.gymbox["typing-game"],
-            element: <TypingGame />,
+            path: Paths.gymboxx["typing-game"],
+            Component: TypingGame,
           },
           {
-            path: Paths.gymbox["particle-text"],
-            element: <ParticleGame />,
+            path: Paths.gymboxx.fading,
+            Component: Fading,
           },
+          // {
+          //   path: Paths.gymboxx["particle-text"],
+          //   element: <ParticleGame />,
+          // },
         ],
       },
     ],
