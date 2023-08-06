@@ -12,6 +12,7 @@ import { CanvasEvents } from "./events";
 import {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
+  Level,
   Phase,
   TypingProps,
   TypingRef,
@@ -259,6 +260,11 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     [editor]
   );
 
+  const setLevel = useCallback(
+    (level: Level) => editor?.setLevel(level),
+    [editor]
+  );
+
   /**
    * @summary IMPERATIVE HANDLE - makes the ref used in the place that uses the FC component
    * We will make our TypingRef manipulatable with the following functions
@@ -267,9 +273,10 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     ref,
     () => ({
       // for useController
+      setIsPlaying,
+      setLevel,
       addControllerChangeListener,
       removeControllerChangeListener,
-      setIsPlaying,
       // for useData
       addWord,
       removeWord,
@@ -282,6 +289,9 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     [
       // for useController
       setIsPlaying,
+      setLevel,
+      addControllerChangeListener,
+      removeControllerChangeListener,
       // for useData
       addWord,
       removeWord,

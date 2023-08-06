@@ -35,7 +35,7 @@ class Text {
       data: string
     ): TextMetrics => ctx.measureText(data);
 
-    this.dimension.width = getTextMetrics(ctx, data).width;
+    this.dimension.width = getTextMetrics(ctx, data).width * 1;
     this.dimension.height =
       (getTextMetrics(ctx, data).actualBoundingBoxAscent +
         getTextMetrics(ctx, data).actualBoundingBoxDescent) *
@@ -100,18 +100,21 @@ class Text {
     this.velocity = velocity;
   }
 
-  updatePositionByVelocity(): void {
-    if (this.velocity.x === 0 && this.velocity.y === 0) return;
+  update(): void {
     this.nextPosition.x = this.position.x + this.velocity.x;
     this.nextPosition.y = this.position.y + this.velocity.y;
-
-    // TODO fill up if
 
     this.position.x = this.nextPosition.x;
     this.position.y = this.nextPosition.y;
   }
 
   render(position: Position): void {
+    this.ctx.strokeRect(
+      position.x,
+      position.y,
+      this.dimension.width,
+      this.dimension.height
+    );
     this.ctx.fillText(this.data, position.x, position.y);
   }
 }

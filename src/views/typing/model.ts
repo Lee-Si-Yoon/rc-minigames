@@ -7,6 +7,12 @@ enum Phase {
   END = "end",
 }
 
+enum Level {
+  EASY = "easy",
+  NORMAL = "normal",
+  HARD = "hard",
+}
+
 interface TypingProps {
   width: React.CSSProperties["width"];
   height: React.CSSProperties["height"];
@@ -19,6 +25,7 @@ interface TypingProps {
 interface TypingRef {
   // for useController
   setIsPlaying: (phase: Phase) => void;
+  setLevel: (level: Level) => void;
   addControllerChangeListener: (listener: ControllerChangeHandler) => void;
   removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
   // for useData
@@ -41,7 +48,7 @@ type CanvasDataChangeParams = { data: DataProps };
 type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
 
 // TODO extract playTime event for performance
-type ControllerProps = { isPlaying: Phase; playTime: number };
+type ControllerProps = { isPlaying: Phase; level: Level; playTime: number };
 type ControllerChangeParams = { data: ControllerProps };
 type ControllerChangeHandler = (params: ControllerChangeParams) => void;
 
@@ -54,4 +61,5 @@ export {
   TypingProps,
   TypingRef,
   Phase,
+  Level,
 };
