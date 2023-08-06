@@ -1,5 +1,6 @@
 import { ForwardedRef } from "react";
 import { DataProps, Words } from "./layers/model";
+import { TextProps } from "./text/text";
 
 enum Phase {
   PLAYING = "playing",
@@ -29,7 +30,7 @@ interface TypingRef {
   addControllerChangeListener: (listener: ControllerChangeHandler) => void;
   removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
   // for useData
-  addWord: (word: string) => void;
+  addWord: (textProps: Omit<TextProps, "ctx">) => void;
   removeWord: (word: string) => void;
   addDataChangeListener: (listener: CanvasDataChangeHandler) => void;
   removeDataChangeListener: (listener: CanvasDataChangeHandler) => void;

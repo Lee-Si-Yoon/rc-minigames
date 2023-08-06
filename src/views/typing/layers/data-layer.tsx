@@ -1,12 +1,7 @@
 import BaseLayer from "../../../utils/base-layer";
 import { DataLayerConstructor, DataProps } from "./model";
 import { getRandomArbitrary } from "../../../utils/math";
-import Text from "../text/text";
-import { divideKOR, isKOR } from "../../../utils/parse-korean";
-import {
-  removeAllPunctuations,
-  removeAllWhiteSpaces,
-} from "../../../utils/strip-punctuation";
+import Text, { TextProps, TextState } from "../text/text";
 import { Level } from "../model";
 
 /**
@@ -40,7 +35,7 @@ class DataLayer extends BaseLayer {
 
   initialize(): void {
     this.resetAll();
-    this.data.words.forEach((word) => this.addWord(word));
+    this.data.words.forEach((word) => this.addWord({ data: word }));
   }
 
   setLevel(level: Level) {
@@ -52,19 +47,18 @@ class DataLayer extends BaseLayer {
     return data;
   }
 
-  addWord(word: string): void {
+  addWord(textProps: Omit<TextProps, "ctx">): void {
+    const { data: word, ...rest } = textProps;
     if (this.texts.some((text) => text.getTextData() === word)) return;
+    if (this.data.failed.some((failed) => failed === word)) return;
 
     this.data.words = this.data.words.includes(word)
       ? [...this.data.words]
       : [word, ...this.data.words];
 
     const canvas = { width: this.width, height: this.height };
-    this.ctx.textAlign = "left";
-    this.ctx.textBaseline = "top";
-    this.ctx.font = "24px Arial";
 
-    const self = new Text({ data: word, ctx: this.ctx });
+    const self = new Text({ data: word, ctx: this.ctx, ...rest });
     const { width } = self.getDimension();
     self.setPosition({
       x: getRandomArbitrary(0, canvas.width - width),
@@ -88,14 +82,16 @@ class DataLayer extends BaseLayer {
         });
         if (!overLapped) {
           if (this.level === Level.EASY) {
-            self.setVelocity({
-              x: 0,
-              y: getRandomArbitrary(0.5, this.maxVelocity),
-            });
-          } else if (this.level === Level.NORMAL || this.level === Level.HARD) {
+            self.setVelocity({ x: 0, y: 1 });
+          } else if (this.level === Level.NORMAL) {
             self.setVelocity({
               x: getRandomArbitrary(-0.5, 0.5),
               y: getRandomArbitrary(0.5, this.maxVelocity),
+            });
+          } else if (this.level === Level.HARD) {
+            self.setVelocity({
+              x: getRandomArbitrary(-0.5, 0.5),
+              y: getRandomArbitrary(1, this.maxVelocity * 1.5),
             });
           }
           textIndex += 1;
@@ -105,6 +101,7 @@ class DataLayer extends BaseLayer {
   }
 
   private validateWord(word: string): boolean {
+    // data.word can exist without being rendered
     return (
       this.data.words.includes(word) &&
       this.texts.map((text) => text.getTextData()).includes(word)
@@ -113,13 +110,8 @@ class DataLayer extends BaseLayer {
 
   updateScore(word: string): void {
     if (!this.validateWord(word)) return;
-    const parsedWord = removeAllWhiteSpaces(removeAllPunctuations(word));
-    if (isKOR(parsedWord)) {
-      const splitedKOR = divideKOR(parsedWord);
-      this.data.score += splitedKOR.length;
-    } else {
-      this.data.score += parsedWord.length;
-    }
+    this.data.score +=
+      this.texts.find((text) => text.getTextData() === word)?.getScore() || 0;
   }
 
   moveWordToFailed(word: string): void {
@@ -128,13 +120,13 @@ class DataLayer extends BaseLayer {
     this.data.failed.push(word);
   }
 
-  removeWordAndText(word: string): void {
+  removeViaInput(word: string): void {
     const stringArrayOfTexts: string[] = this.texts.map((text) =>
       text.getTextData()
     );
     const indexOfParamText = stringArrayOfTexts.indexOf(word);
     if (indexOfParamText >= 0) {
-      this.texts.splice(indexOfParamText, 1);
+      this.texts[indexOfParamText].setIsAlive(TextState.PARTICLED);
     }
     const indexOfWords = this.data.words.indexOf(word);
     if (indexOfWords >= 0) {
@@ -162,7 +154,9 @@ class DataLayer extends BaseLayer {
       // bottom fall
       if (y >= canvas.height) {
         this.moveWordToFailed(word);
-        this.removeWordAndText(word);
+        this.removeViaInput(word);
+        const targetTextIndex = this.texts.indexOf(text);
+        this.texts.splice(targetTextIndex, 1);
       }
 
       // collision
@@ -199,6 +193,10 @@ class DataLayer extends BaseLayer {
     const ctx = this.ctx;
     const canvas = { width: this.width, height: this.height };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = "24px Arial";
+    ctx.save();
 
     for (const text of this.texts) {
       const { x, y } = text.getPosition();
@@ -209,9 +207,11 @@ class DataLayer extends BaseLayer {
         x > 0 &&
         y > 0
       ) {
-        text.render({ x, y });
+        text.render();
+        text.renderParticles();
       }
     }
+    ctx.restore();
   }
 }
 

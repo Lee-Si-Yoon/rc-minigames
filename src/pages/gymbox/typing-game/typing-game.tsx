@@ -28,7 +28,7 @@ function TypingGame() {
     setInputValue("");
   };
 
-  const [spawnWords, setSpawnWords] = useState<boolean>(false);
+  const [spawnWords, setSpawnWords] = useState<boolean>(true);
   const spawnRef = useRef<NodeJS.Timer>();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ function TypingGame() {
           0,
           Math.ceil(Math.random() * 6) || 1
         );
-        addWord(word);
+        addWord({ data: word });
       }, 2000);
     }
     return () => clearInterval(spawnRef.current);
@@ -109,7 +109,7 @@ function TypingGame() {
         ref={ref}
         width="100%"
         height="calc(100% - 1.5rem)"
-        initData={["운동했니?", "OHP", "스콰뜨", "짐박스", "gymbox", "asri"]}
+        initData={["break", "the", "limit", "gymboxx"]}
       />
       <form
         onSubmit={onSubmit}

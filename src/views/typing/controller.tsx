@@ -10,6 +10,7 @@ import {
   Phase,
 } from "./model";
 import { Words } from "./layers/model";
+import { TextProps } from "./text/text";
 
 interface ControllerConstructor {
   backgroundLayer: HTMLCanvasElement;
@@ -88,16 +89,16 @@ class Controller extends EventDispatcher {
 
   private setWidths(width: number, devicePixelRatio?: number) {
     this.width = width;
-    this.backgroundLayer.setWidth(width, devicePixelRatio);
-    this.dataLayer.setWidth(width, devicePixelRatio);
-    this.interactionLayer.setWidth(width, devicePixelRatio);
+    this.backgroundLayer.setWidth(width || this.width, devicePixelRatio);
+    this.dataLayer.setWidth(width || this.width, devicePixelRatio);
+    this.interactionLayer.setWidth(width || this.width, devicePixelRatio);
   }
 
   private setHeights(height: number, devicePixelRatio?: number) {
     this.height = height;
-    this.backgroundLayer.setHeight(height, devicePixelRatio);
-    this.dataLayer.setHeight(height, devicePixelRatio);
-    this.interactionLayer.setHeight(height, devicePixelRatio);
+    this.backgroundLayer.setHeight(height || this.height, devicePixelRatio);
+    this.dataLayer.setHeight(height || this.height, devicePixelRatio);
+    this.interactionLayer.setHeight(height || this.height, devicePixelRatio);
   }
 
   setSizes(width: number, height: number, devicePixelRatio?: number) {
@@ -162,12 +163,12 @@ class Controller extends EventDispatcher {
    */
   removeWord(word: string) {
     this.dataLayer.updateScore(word);
-    this.dataLayer.removeWordAndText(word);
+    this.dataLayer.removeViaInput(word);
     this.emitCurrentData();
   }
 
-  addWord(word: string) {
-    this.dataLayer.addWord(word);
+  addWord(textProps: Omit<TextProps, "ctx">) {
+    this.dataLayer.addWord(textProps);
     this.emitCurrentData();
   }
 

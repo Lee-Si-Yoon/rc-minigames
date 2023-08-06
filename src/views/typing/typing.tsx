@@ -17,6 +17,7 @@ import {
   TypingProps,
   TypingRef,
 } from "./model";
+import { TextProps } from "./text/text";
 
 const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   props: TypingProps,
@@ -208,8 +209,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   );
 
   const addWord = useCallback(
-    (word: string) => {
-      editor?.addWord(word);
+    (textProps: Omit<TextProps, "ctx">) => {
+      editor?.addWord(textProps);
     },
     [editor]
   );
