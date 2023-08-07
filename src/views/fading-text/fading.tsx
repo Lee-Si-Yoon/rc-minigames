@@ -12,11 +12,13 @@ export interface FadingProp {
   morphTime?: number;
   cooldownTime?: number;
   fontSize?: CSSProperties["fontSize"];
+  fontWeight?: CSSProperties["fontWeight"];
   fontFamily?: CSSProperties["fontFamily"];
   background?: {
     enabled: boolean;
     color?: CSSProperties["backgroundColor"];
   };
+  style?: CSSProperties;
 }
 
 function Fading(props: FadingProp) {
@@ -32,7 +34,9 @@ function Fading(props: FadingProp) {
     width: "100%",
     fontSize: props.fontSize || "6rem",
     fontFamily:
-      `${props.fontFamily ? `${props.fontFamily},` : ""}` + "Hevletica",
+      `${props.fontFamily ? `${props.fontFamily},` : ""}` +
+      "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,  Cantarell,  sans-serif",
+    fontWeight: props.fontWeight || "800",
     userSelect: "none",
   };
 
@@ -136,6 +140,7 @@ function Fading(props: FadingProp) {
         outline: "none",
         touchAction: "none",
         position: "relative",
+        ...props.style,
       }}
     >
       {background.enabled && (

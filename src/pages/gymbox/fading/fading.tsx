@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import Fading, { FadingProp } from "../../../views/fading-text/fading";
+import RadiallGradient from "./radiall-gradient";
 
 const basicTexts = ["나는", "날지", "않아", "그건", "유산소거든"];
 
@@ -45,17 +46,73 @@ function FadingPage() {
   }
 
   const fadingProps: FadingProp = {
-    width: "100vw",
+    width: "100%",
     height: "100%",
     fontSize: qsFontSize || "6rem",
     textColor: parseRGBColor(qsFontColor) || { R: 255, G: 255, B: 255 },
     background: {
       enabled: Boolean(qsBackground) || true,
-      color: qsBackgroundColor || "#171719",
+      color: qsBackgroundColor || "tranparent",
     },
     texts: qsTexts || basicTexts,
+    style: {
+      position: "absolute",
+    },
   };
-  return <Fading {...fadingProps} />;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [radiallGradientRef, setRadiallGradientRef] =
+    useState<HTMLCanvasElement | null>(null);
+  const [radiallGradient, setRadiallGradient] =
+    useState<RadiallGradient | null>(null);
+
+  const getCanvasRef = useCallback((element: HTMLCanvasElement) => {
+    if (!element) return;
+    element.style["touchAction"] = "none";
+    setRadiallGradientRef(element);
+  }, []);
+
+  useEffect(() => {
+    if (!radiallGradientRef) return;
+    const canvas = new RadiallGradient({
+      canvas: radiallGradientRef,
+    });
+    setRadiallGradient(canvas);
+  }, [radiallGradientRef]);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (containerRef.current && radiallGradient) {
+        const dpr = window.devicePixelRatio;
+        const rect = containerRef.current.getBoundingClientRect();
+        radiallGradient.setSize(rect.width, rect.height);
+        radiallGradient.scale(dpr, dpr);
+        radiallGradient.playFrames();
+      }
+    };
+    onResize();
+    window.addEventListener("resize", onResize, false);
+    return () => {
+      window.removeEventListener("resize", onResize, false);
+    };
+  }, [radiallGradient]);
+
+  return (
+    <div style={{ width: "100vw", height: "100%", position: "relative" }}>
+      <div
+        ref={containerRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          outline: "none",
+          position: "absolute",
+        }}
+      >
+        <canvas ref={getCanvasRef} style={{ position: "absolute" }} />
+      </div>
+      <Fading {...fadingProps} />
+    </div>
+  );
 }
 
 FadingPage.displayName = "FadingPage";
