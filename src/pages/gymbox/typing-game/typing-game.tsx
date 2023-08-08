@@ -7,8 +7,10 @@ import React, {
 } from "react";
 import Typing from "../../../views/typing/typing";
 import useData from "../../../views/typing/hooks/use-data";
-import { Level, Phase, TypingRef } from "../../../views/typing/model";
+import { Phase, TypingRef } from "../../../views/typing/model";
 import useController from "../../../views/typing/hooks/use-controller";
+import { combinedArray } from "./mock-data";
+import Debugger from "./debugger";
 
 function TypingGame() {
   const ref = useRef<TypingRef>(null);
@@ -33,93 +35,74 @@ function TypingGame() {
 
   useEffect(() => {
     if (spawnWords && controllerData.isPlaying === Phase.PLAYING) {
-      spawnRef.current = setInterval(async () => {
-        const res = await fetch("https://random-data-api.com/api/v2/beers");
-        const jsonData = await res.json();
-        const word = String(jsonData.name).slice(
-          0,
-          Math.ceil(Math.random() * 6) || 1
-        );
+      if (combinedArray.length <= 0) return;
+      spawnRef.current = setInterval(() => {
+        const index = Math.floor(Math.random() * combinedArray.length);
+        const word = combinedArray[index];
         addWord({ data: word });
+        combinedArray.splice(index, 1);
       }, 2000);
     }
     return () => clearInterval(spawnRef.current);
   }, [spawnWords, controllerData.isPlaying]);
 
+  const [debugMode, setDebugMode] = useState<boolean>(true);
+
   return (
     <div style={{ height: "100%", position: "relative" }}>
-      <div
+      <button
         style={{
+          all: "unset",
+          width: "4rem",
+          height: "2.5rem",
           display: "flex",
-          flexDirection: "column",
-          rowGap: "0.5rem",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: debugMode ? "black" : "white",
+          color: debugMode ? "white" : "black",
+          border: "0.0625rem solid black",
           position: "absolute",
-          alignItems: "flex-end",
-          justifyContent: "flex-end",
-          width: "100%",
-          padding: "0.25rem",
           zIndex: "99",
+          cursor: "pointer",
         }}
+        onClick={() => setDebugMode((prev) => !prev)}
       >
-        <i style={{ fontSize: "0.75rem" }}>{`left words: ${JSON.stringify(
-          data.words
-        )}`}</i>
-        <i style={{ fontSize: "0.75rem" }}>{`failed: ${JSON.stringify(
-          data.failed
-        )}`}</i>
-        <i style={{ fontSize: "0.75rem" }}>{`score: ${JSON.stringify(
-          data.score
-        )}`}</i>
-        <i style={{ fontSize: "0.75rem" }}>{JSON.stringify(controllerData)}</i>
-        <div
-          style={{
-            display: "flex",
-            rowGap: "0.25rem",
-            height: "1.5rem",
-            columnGap: "0.5rem",
-          }}
-        >
-          <label htmlFor="spawn">spawnWords</label>
-          <input
-            onChange={() => setSpawnWords((prevState) => !prevState)}
-            type="checkbox"
-            id="spawn"
-            checked={spawnWords}
-          />
-          <select onChange={(e) => setLevel(e.target.value as Level)}>
-            {Object.values(Level).map((level) => (
-              <option key={level}>{level}</option>
-            ))}
-          </select>
-          <button
-            onClick={() =>
-              setIsPlaying(
-                controllerData.isPlaying === Phase.PAUSED
-                  ? Phase.PLAYING
-                  : Phase.PAUSED
-              )
-            }
-          >
-            {controllerData.isPlaying === Phase.PAUSED ? "play" : "pause"}
-          </button>
-          <button onClick={() => setIsPlaying(Phase.END)}>{Phase.END}</button>
-        </div>
-      </div>
+        debug
+      </button>
+      {debugMode && (
+        <Debugger
+          data={data}
+          controllerData={controllerData}
+          setIsPlaying={setIsPlaying}
+          setLevel={setLevel}
+          spawnWords={spawnWords}
+          setSpawnWords={setSpawnWords}
+        />
+      )}
       <Typing
         ref={ref}
         width="100%"
-        height="calc(100% - 1.5rem)"
-        initData={["break", "the", "limit", "gymboxx"]}
+        height="calc(100% - 2.5rem)"
+        initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
       />
       <form
         onSubmit={onSubmit}
-        style={{ width: "100%", position: "fixed", bottom: "0" }}
+        style={{
+          width: "100%",
+          position: "fixed",
+          bottom: "0",
+        }}
       >
         <input
           type="text"
           autoComplete="off"
           value={inputValue}
-          style={{ width: "100%", height: "1.5rem" }}
+          style={{
+            all: "unset",
+            width: "100%",
+            height: "2.5rem",
+            borderTop: "0.0625rem solid black",
+          }}
           onChange={onChange}
         />
       </form>
