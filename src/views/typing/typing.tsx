@@ -310,18 +310,9 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       tabIndex={-1}
       style={{ width: props.width, height: props.height, outline: "none" }}
     >
-      <canvas
-        ref={getBackgroundRef}
-        style={{ position: "absolute", border: "1px solid #555555" }}
-      />
-      <canvas
-        ref={getDataRef}
-        style={{ position: "absolute", border: "1px solid #555555" }}
-      />
-      <canvas
-        ref={getInteractionRef}
-        style={{ position: "absolute", border: "1px solid #555555" }}
-      />
+      <canvas ref={getBackgroundRef} style={{ position: "absolute" }} />
+      <canvas ref={getDataRef} style={{ position: "absolute" }} />
+      <canvas ref={getInteractionRef} style={{ position: "absolute" }} />
     </div>
   );
 });

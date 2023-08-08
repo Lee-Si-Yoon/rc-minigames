@@ -6,7 +6,7 @@ function Root() {
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <Link to={Paths.gymboxx["typing-game"]}>typing game</Link>
-      <Link to={Paths.gymboxx.fading}>fading</Link>
+      <Link to={Paths.gymboxx.playground}>playground</Link>
     </div>
   );
 }

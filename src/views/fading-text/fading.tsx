@@ -1,14 +1,11 @@
 import React, { CSSProperties, useEffect, useRef } from "react";
+import { RGB } from "../../utils/types";
 
 export interface FadingProp {
   texts: string[];
   width: CSSProperties["width"];
   height: CSSProperties["height"];
-  textColor?: {
-    R?: number;
-    G?: number;
-    B?: number;
-  };
+  textColor?: RGB;
   morphTime?: number;
   cooldownTime?: number;
   fontSize?: CSSProperties["fontSize"];
@@ -44,7 +41,7 @@ function Fading(props: FadingProp) {
     background = {
       enabled: false,
     },
-    textColor = { R: 0, G: 0, B: 0 },
+    textColor = { r: 0, g: 0, b: 0 },
     texts,
     morphTime = 1,
     cooldownTime = 0.25,
@@ -171,9 +168,9 @@ function Fading(props: FadingProp) {
             <feColorMatrix
               in="SourceGraphic"
               type="matrix"
-              values={`1 0 0 0 ${textColor.R ? textColor.R / 255 : 0}
-                0 1 0 0 ${textColor.G ? textColor.G / 255 : 0}
-                0 0 1 0 ${textColor.B ? textColor.B / 255 : 0}
+              values={`1 0 0 0 ${textColor.r ? textColor.r / 255 : 0}
+                0 1 0 0 ${textColor.g ? textColor.g / 255 : 0}
+                0 0 1 0 ${textColor.b ? textColor.b / 255 : 0}
                 0 0 0 255 -100`}
             />
           </filter>
