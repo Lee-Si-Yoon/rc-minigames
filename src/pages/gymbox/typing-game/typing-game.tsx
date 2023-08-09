@@ -81,11 +81,16 @@ function TypingGame() {
           <div
             style={{
               backgroundColor: greyColorHex.black,
-              width: "100%",
-              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+              fontSize: "4.25rem",
+              fontWeight: 800,
+              fontFeatureSettings: "clig 'off', liga 'off'",
             }}
           >
-            hidsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+            <span className={classes.Jitter}>56’11’’</span>
           </div>
         }
       />

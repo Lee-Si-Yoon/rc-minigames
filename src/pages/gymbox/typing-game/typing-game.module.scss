@@ -41,3 +41,49 @@
   height: 100%;
   position: relative;
 }
+
+.Jitter {
+  animation: jitter 1s linear infinite;
+}
+
+@keyframes jitter {
+  10% {
+    transform: translate(-0.125rem, -0.1875rem) scale(1.01, 1.01);
+  }
+
+  20% {
+    transform: translate(0.1875rem, 0.125rem) scale(0.99, 0.99);
+  }
+
+  30% {
+    transform: translate(-0.25rem, -0.3125rem) scale(1.01, 1.01);
+  }
+
+  40% {
+    transform: translate(0.125rem, 0.1875rem) scale(1, 1);
+  }
+
+  50% {
+    transform: translate(-0.0625rem, -0.125rem) scale(0.98, 0.98);
+  }
+
+  60% {
+    transform: translate(0, 0.1875rem) scale(1.02, 1.02);
+  }
+
+  70% {
+    transform: translate(-0.125rem, -0.25rem) scale(1, 1);
+  }
+
+  80% {
+    transform: translate(0.1875rem, 0.3125rem) scale(0.99, 0.99);
+  }
+
+  90% {
+    transform: translate(-0.3125rem, -0.1875rem) scale(1.1, 1.1);
+  }
+
+  100% {
+    transform: translate(0.1875rem, 0.0625rem) scale(0.95, 0.95);
+  }
+}
