@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import Fading, { FadingProp } from "../../../views/fading-text/fading";
 import RadialGradient, {
@@ -21,24 +21,23 @@ const basicColors: RGB[] = [
 ];
 
 function Playground() {
+  const [textValues, setTextValues] = useState<string>(basicTexts.join(","));
   const fadingProps: FadingProp = {
-    width: 500,
-    height: 500,
-    fontSize: "6rem",
+    width: 300,
+    height: 300,
+    fontSize: "4rem",
     textColor: { r: 255, g: 255, b: 255 },
     background: {
       enabled: true,
       color: "black",
     },
-    texts: basicTexts,
+    texts: textValues.split(","),
   };
 
-  // const [colors, setColors] = useState<RGB[]>(basicColors);
-
   const radialGradientProps: RadialGradientProp = {
-    width: 500,
-    height: 500,
-    particleRadius: { min: 10, max: 100 },
+    width: 300,
+    height: 300,
+    particleRadius: { min: 10, max: 80 },
     velocity: { x: Math.random() * 1.2, y: Math.random() * 1.2 },
     totalParticles: 5,
     style: {
@@ -59,7 +58,7 @@ function Playground() {
         style={{
           display: "grid",
           gap: "1rem",
-          gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
         }}
       >
         <div
@@ -68,9 +67,22 @@ function Playground() {
           <RadialGradient {...radialGradientProps} />
           <i>radial gradient</i>
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", rowGap: "0.5rem" }}
+        >
           <Fading {...fadingProps} />
           <i>morphing text</i>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="texts">texts</label>
+            <input
+              value={textValues.replace(/\s+/g, ",")}
+              onChange={(e) => setTextValues(e.target.value.replace(" ", ","))}
+              type="text"
+              name="texts"
+              id="texts"
+              style={{ width: "18.75rem", height: "2rem" }}
+            />
+          </div>
         </div>
         <div style={{ position: "relative" }}>
           <RadialGradient

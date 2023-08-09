@@ -5,12 +5,15 @@ import React, {
   useRef,
   useState,
 } from "react";
+
+import classes from "./typing-game.module.scss";
 import Typing from "../../../views/typing/typing";
 import useData from "../../../views/typing/hooks/use-data";
 import { Phase, TypingRef } from "../../../views/typing/model";
 import useController from "../../../views/typing/hooks/use-controller";
 import { combinedArray } from "./mock-data";
 import Debugger from "./debugger";
+import { greyColorHex } from "../../../utils/colors";
 
 function TypingGame() {
   const ref = useRef<TypingRef>(null);
@@ -49,23 +52,13 @@ function TypingGame() {
   const [debugMode, setDebugMode] = useState<boolean>(true);
 
   return (
-    <div style={{ height: "100%", position: "relative" }}>
+    <div className={classes.Container}>
       <button
-        style={{
-          all: "unset",
-          width: "4rem",
-          height: "2.5rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: debugMode ? "black" : "white",
-          color: debugMode ? "white" : "black",
-          border: "0.0625rem solid black",
-          position: "absolute",
-          zIndex: "99",
-          cursor: "pointer",
-        }}
+        className={classes.DebugButton}
         onClick={() => setDebugMode((prev) => !prev)}
+        style={{
+          color: debugMode ? "#EA251F" : "white",
+        }}
       >
         debug
       </button>
@@ -84,25 +77,25 @@ function TypingGame() {
         width="100%"
         height="calc(100% - 2.5rem)"
         initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
+        backgroundComponent={
+          <div
+            style={{
+              backgroundColor: greyColorHex.black,
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            hidsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          </div>
+        }
       />
-      <form
-        onSubmit={onSubmit}
-        style={{
-          width: "100%",
-          position: "fixed",
-          bottom: "0",
-        }}
-      >
+      <form onSubmit={onSubmit} className={classes.Form}>
         <input
           type="text"
           autoComplete="off"
+          placeholder="타자도 손가락 운동이다"
           value={inputValue}
-          style={{
-            all: "unset",
-            width: "100%",
-            height: "2.5rem",
-            borderTop: "0.0625rem solid black",
-          }}
+          className={classes.Input}
           onChange={onChange}
         />
       </form>

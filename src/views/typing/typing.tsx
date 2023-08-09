@@ -1,6 +1,9 @@
 import React, {
   ForwardedRef,
+  ReactElement,
+  cloneElement,
   forwardRef,
+  isValidElement,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -25,19 +28,6 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [editor, setEditor] = useState<Controller | null>(null);
-
-  /**
-   * @summary BACKGROUND CANVAS
-   */
-  const [backgroundRef, setBackgroundRef] = useState<HTMLCanvasElement | null>(
-    null
-  );
-
-  const getBackgroundRef = useCallback((element: HTMLCanvasElement) => {
-    if (!element) return;
-    element.style["touchAction"] = "none";
-    setBackgroundRef(element);
-  }, []);
 
   /**
    * @summary DATA CANVAS
@@ -69,9 +59,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    * @url https://github.com/ascorbic/react-artboard/blob/main/src/components/Artboard.tsx
    */
   useEffect(() => {
-    if (!backgroundRef || !dataCanvasRef || !interactionCanvasRef) return;
+    if (!dataCanvasRef || !interactionCanvasRef) return;
     const editor = new Controller({
-      backgroundLayer: backgroundRef,
       dataLayer: dataCanvasRef,
       interactionLayer: interactionCanvasRef,
       initData: props.initData,
@@ -83,7 +72,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     return () => {
       editor.destroy();
     };
-  }, [backgroundRef, dataCanvasRef, interactionCanvasRef]);
+  }, [dataCanvasRef, interactionCanvasRef]);
 
   /**
    * @summary RESIZE EVENTS
@@ -310,7 +299,18 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       tabIndex={-1}
       style={{ width: props.width, height: props.height, outline: "none" }}
     >
-      <canvas ref={getBackgroundRef} style={{ position: "absolute" }} />
+      {isValidElement(props.backgroundComponent) &&
+        cloneElement(props.backgroundComponent as ReactElement, {
+          ...props.backgroundComponent.props,
+          style: {
+            width: props.width,
+            height: props.height,
+            position: "absolute",
+            outline: "none",
+            touchAction: "none",
+            ...props.backgroundComponent.props.style,
+          },
+        })}
       <canvas ref={getDataRef} style={{ position: "absolute" }} />
       <canvas ref={getInteractionRef} style={{ position: "absolute" }} />
     </div>
