@@ -51,6 +51,21 @@ function TypingGame() {
 
   const [debugMode, setDebugMode] = useState<boolean>(true);
 
+  const [height, setHeight] = useState<number>(0);
+
+  useEffect(() => {
+    const viewportHandler = () => {
+      if (window.visualViewport && window.visualViewport.offsetTop >= 0) {
+        setHeight(window.visualViewport.height - 40);
+      }
+    };
+    viewportHandler();
+
+    window.visualViewport?.addEventListener("resize", viewportHandler);
+    return () =>
+      window.visualViewport?.removeEventListener("resize", viewportHandler);
+  }, [window.visualViewport]);
+
   return (
     <div className={classes.Container}>
       <button
@@ -75,7 +90,7 @@ function TypingGame() {
       <Typing
         ref={ref}
         width="100%"
-        height="calc(100% - 2.5rem)"
+        height={height}
         initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
         backgroundComponent={
           <div
