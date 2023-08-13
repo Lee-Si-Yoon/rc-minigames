@@ -6,7 +6,6 @@ import RadialGradient, {
 } from "../../../views/radial-gradient/radial-gradient";
 import { greyColorRGB, tintColorRGB } from "../../../utils/colors";
 import { RGB } from "../../../utils/types";
-import VirtualScroll from "../../../views/virtual-scroll/virtual-scroll";
 
 const basicTexts = ["나는", "날지", "않아", "그건", "유산소거든"];
 
@@ -95,9 +94,6 @@ function Playground() {
             style={{ position: "absolute" }}
             background={{ enabled: true, color: "transparent" }}
           />
-        </div>
-        <div>
-          <VirtualScroll />
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@ const gymboxPaths = (base: string) => ({
   "typing-game": `${base}/typing-game`,
   "particle-text": `${base}/particle-text`,
   playground: `${base}/playground`,
+  timer: `${base}/timer`,
 });
 
 const Paths = {
