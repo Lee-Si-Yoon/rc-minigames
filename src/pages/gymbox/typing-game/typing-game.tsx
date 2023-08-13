@@ -14,8 +14,14 @@ import useController from "../../../views/typing/hooks/use-controller";
 import { combinedArray } from "./mock-data";
 import Debugger from "./debugger";
 import { greyColorHex } from "../../../utils/colors";
+import { useSearchParams } from "react-router-dom";
 
 function TypingGame() {
+  document.body.style.backgroundColor = "black";
+  const [searchParams] = useSearchParams();
+  const time = searchParams.get("time");
+  const timer = Number(time) * 1000;
+
   const ref = useRef<TypingRef>(null);
   const { addWord, removeWord, data } = useData(ref);
   const { setIsPlaying, setLevel, controllerData } = useController(ref);
@@ -105,7 +111,9 @@ function TypingGame() {
               fontFeatureSettings: "clig 'off', liga 'off'",
             }}
           >
-            <span className={classes.Jitter}>56’11’’</span>
+            <span className={classes.Jitter}>
+              {timer / 1000}’{String(timer).slice(-2)}’’
+            </span>
           </div>
         }
       />

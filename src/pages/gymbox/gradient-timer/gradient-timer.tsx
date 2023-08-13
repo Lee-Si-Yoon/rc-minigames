@@ -53,8 +53,8 @@ function GdTimer() {
     if (Number(time) <= 0) return;
 
     timerRef.current = setTimeout(() => {
-      navigate(Paths.gymboxx.timer);
-    }, Number(time) * 1000);
+      navigate(Paths.gymboxx.timer, { replace: true });
+    }, Number(time) * 1000 + 1000);
 
     return () => clearTimeout(timerRef.current);
   }, [time, timerRef.current]);

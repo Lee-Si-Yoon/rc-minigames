@@ -25,11 +25,15 @@ function Timer() {
   const navigate = useNavigate();
 
   const handleOnGDClick = () => {
-    navigate(`${Paths.gymboxx.gradientTimer}?time=${minutes * 60 + seconds}`);
+    navigate(`${Paths.gymboxx.gradientTimer}?time=${minutes * 60 + seconds}`, {
+      replace: true,
+    });
   };
 
   const handleOnClick = () => {
-    console.log(minutes * 60 + seconds);
+    navigate(`${Paths.gymboxx["typing-game"]}?time=${minutes * 60 + seconds}`, {
+      replace: true,
+    });
   };
 
   return (
