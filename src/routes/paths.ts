@@ -10,6 +10,7 @@ const gymboxPaths = (base: string) => ({
   "particle-text": `${base}/particle-text`,
   playground: `${base}/playground`,
   timer: `${base}/timer`,
+  gradientTimer: `${base}/gdTimer`,
 });
 
 const Paths = {

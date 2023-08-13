@@ -1,6 +1,8 @@
 import React from "react";
 import classes from "./timer.module.scss";
 import ScrollPicker from "../../../views/scroll-picker/scroll-picker";
+import { useNavigate } from "react-router-dom";
+import { Paths } from "../../../routes/paths";
 
 const Seconds = (length: number) =>
   Array.from({ length }).map((_, i) => Number(i * 10));
@@ -18,6 +20,12 @@ function Timer() {
     color: "rgba(255, 255, 255, 0.9)",
     fontSize: "2rem",
     fontWeight: "600",
+  };
+
+  const navigate = useNavigate();
+
+  const handleOnGDClick = () => {
+    navigate(`${Paths.gymboxx.gradientTimer}?time=${minutes * 60 + seconds}`);
   };
 
   const handleOnClick = () => {
@@ -62,13 +70,30 @@ function Timer() {
         style={{
           display: "flex",
           justifyContent: "center",
+          bottom: "3.5rem",
+          position: "absolute",
+          width: "100%",
+        }}
+      >
+        <button
+          className={classes.Button}
+          style={{ backgroundColor: "#404044" }}
+          onClick={handleOnGDClick}
+        >
+          gdTimer
+        </button>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
           bottom: 0,
           position: "absolute",
           width: "100%",
         }}
       >
         <button className={classes.Button} onClick={handleOnClick}>
-          시작
+          Typing
         </button>
       </div>
     </div>
