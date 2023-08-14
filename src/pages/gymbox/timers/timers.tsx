@@ -29,7 +29,7 @@ function Timers() {
         <div style={{ border: "1px solid black" }}>
           <MobilePicker
             itemHeight={100}
-            height={500}
+            height={400}
             getValue={setMobileValue}
           />
         </div>

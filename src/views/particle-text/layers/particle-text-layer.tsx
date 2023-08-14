@@ -34,9 +34,10 @@ class ParticleTextLayer extends BaseLayer {
     });
 
     effect.wrapText();
-    effect.renderInputText(this.inputValue);
+    effect.renderStaticTexts();
+    // effect.renderInputText(this.inputValue);
     // effect.renderFilledTexts();
-    // effect.convertToParticles();
+    effect.convertToParticles();
 
     const animate = () => {
       ctx.clearRect(0, 0, this.width, this.height);

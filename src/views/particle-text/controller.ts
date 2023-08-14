@@ -126,9 +126,9 @@ class Controller extends EventDispatcher {
 
   renderStaticLayers() {
     this.backgroundLayer.render();
-    // this.particleTextLayer.render();
+    this.particleTextLayer.render();
     // this.plainTextLayer.render();
-    this.particleTextLayer.test();
+    // this.particleTextLayer.test();
   }
 
   render() {

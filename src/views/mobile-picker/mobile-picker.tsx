@@ -107,10 +107,9 @@ function PickerColumn(props: PickerColumnProps) {
       Math.min(maxTranslate, scrollerTranslate + Math.round(event.deltaY ?? 0))
     );
 
-    postWheel();
-
     setScrollerTranslate(newTranslate);
     setScrollTimer(Date.now());
+    postWheel();
   };
 
   const handleItemClick = (option: string) => {

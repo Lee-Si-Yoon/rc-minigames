@@ -20,6 +20,7 @@ function Root() {
       <Link to={Paths.gymboxx.playground}>playground</Link>
       <Link to={Paths.gymboxx.timer}>timer</Link>
       <Link to={Paths.gymboxx.timers}>timers</Link>
+      <Link to={Paths.gymboxx["particle-text"]}>particle game</Link>
     </div>
   );
 }

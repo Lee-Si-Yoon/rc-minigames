@@ -185,18 +185,18 @@ class Effect {
     );
   }
 
-  renderInputText(input: string) {
+  convertToParticles() {
     const ctx = this.context;
-    const width = 50;
-
-    ctx.fillText("A", 100, 0);
-
-    const pixels2 = ctx.getImageData(100, 0, width, width).data;
-
-    for (let x = 0; x < width; x += this.gap) {
-      for (let y = 0; y < width; y += this.gap) {
-        const index = (y * width + x) * 4;
-        if (pixels2[index + 4] > 0) {
+    const pixels = ctx.getImageData(
+      0,
+      0,
+      this.canvasWidth,
+      this.canvasHeight
+    ).data;
+    for (let y = 0; y < this.canvasHeight; y += this.gap) {
+      for (let x = 0; x < this.canvasWidth; x += this.gap) {
+        const index = (y * this.canvasWidth + x) * 4;
+        if (pixels[index] > 0) {
           this.particles.push(
             new Particle({
               context: this.context,
@@ -204,7 +204,7 @@ class Effect {
               canvasWidth: this.canvasWidth,
               size: this.gap,
               position: {
-                x: x + 100,
+                x,
                 y,
               },
             })
@@ -212,165 +212,6 @@ class Effect {
         }
       }
     }
-
-    this.inputValue = input;
-
-    const maxTextHeight = Math.max(
-      ...this.textArray.map((text) => text.height)
-    );
-    const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
-    this.textBoxPosition.y =
-      this.canvasHeight - maxTextHeight * (maxRowCount + 1);
-
-    const targetText = this.textArray.find(
-      (text) => text.value === this.inputValue
-    );
-
-    if (!targetText) return;
-
-    this.gradientFillText(ctx);
-
-    ctx.fillText(
-      targetText.value,
-      targetText.position.x,
-      targetText.position.y + this.textBoxPosition.y
-    );
-
-    const pixels = ctx.getImageData(
-      targetText.position.x,
-      targetText.position.y + this.textBoxPosition.y,
-      targetText.width,
-      targetText.height
-    );
-
-    ctx.putImageData(
-      pixels,
-      targetText.position.x + 100,
-      targetText.position.y + this.textBoxPosition.y
-    );
-
-    for (let y = 0; y < targetText.height; y += this.gap) {
-      for (let x = 0; x < targetText.width; x += this.gap) {
-        const index = (y * targetText.width + x) * 4;
-        if (pixels.data[index + 4] > 0) {
-          ctx.fillRect(
-            x + targetText.position.x + 200,
-            y + targetText.position.y + this.textBoxPosition.y,
-            1,
-            1
-          );
-          const newParticle = new Particle({
-            context: this.context,
-            canvasHeight: this.canvasHeight,
-            canvasWidth: this.canvasWidth,
-            size: this.gap,
-            position: {
-              x: x + targetText.position.x + 200,
-              y: y + targetText.position.y + this.textBoxPosition.y,
-            },
-          });
-          this.particles.push(newParticle);
-          // console.log(newParticle);
-        }
-      }
-    }
-  }
-
-  renderFilledTexts() {
-    // const maxTextHeight = Math.max(
-    //   ...this.textArray.map((text) => text.height)
-    // );
-    // const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
-    // this.textBoxPosition.y =
-    //   this.canvasHeight - maxTextHeight * (maxRowCount + 1);
-    // this.textArray.forEach((text) => {
-    //   // if (!text.filled) {
-    //   ctx.fillText(
-    //     text.value,
-    //     text.position.x,
-    //     text.position.y + this.textBoxPosition.y,
-    //     text.width
-    //   );
-    //   // }
-    // });
-    // const pixels = ctx.getImageData(
-    //   0,
-    //   0,
-    //   this.canvasWidth,
-    //   this.canvasHeight
-    // ).data;
-    // ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    // for (let y = 0; y < this.canvasHeight; y += this.gap) {
-    //   for (let x = 0; x < this.canvasWidth; x += this.gap) {
-    //     const index = (y * this.canvasWidth + x) * 3;
-    //     const r = pixels[index];
-    //     const g = pixels[index+1];
-    //     const b = pixels[index+2];
-    //     ctx.fillText(`${r}`, x , y )
-    //     if (r> 0 || g > 0 || b > 0){
-    //           this.particles.push(
-    //   new Particle({
-    //     context: this.context,
-    //     canvasHeight: this.canvasHeight,
-    //     canvasWidth: this.canvasWidth,
-    //     size: this.gap,
-    //     position: {
-    //       x,
-    //       y,
-    //     },
-    //   })
-    // );
-    //     }
-    //   }
-    // }
-  }
-
-  convertToParticles() {
-    if (this.canvasWidth <= 0 || this.canvasHeight <= 0) {
-      console.error("context is not set yet");
-      return;
-    }
-    // for debugging
-    // ctx.putImageData(
-    //   pixels,
-    //   text.position.x,
-    //   text.position.y + this.textBoxPosition.y + 100
-    // );
-
-    // const pixels = ctx.getImageData(
-    //   text.position.x,
-    //   text.position.y + this.textBoxPosition.y,
-    //   text.width,
-    //   text.height
-    // ).data;
-
-    // ctx.clearRect(
-    //   text.position.x,
-    //   text.position.y + this.textBoxPosition.y,
-    //   text.width,
-    //   text.height
-    // );
-
-    // for (let y = 0; y < text.height; y += this.gap) {
-    //   for (let x = 0; x < text.width; x += this.gap) {
-    //     const index = (y * text.width + x) * 4;
-    //     const alpha = pixels[index + 3];
-    //     if (alpha > 0) {
-    //       this.particles.push(
-    //         new Particle({
-    //           context: this.context,
-    //           canvasHeight: this.canvasHeight,
-    //           canvasWidth: this.canvasWidth,
-    //           size: this.gap,
-    //           position: {
-    //             x: text.position.x + x,
-    //             y: text.position.y + this.textBoxPosition.y + y,
-    //           },
-    //         })
-    //       );
-    //     }
-    //   }
-    // }
   }
 
   renderParticles() {
@@ -378,8 +219,6 @@ class Effect {
       particle.update();
       particle.draw();
     });
-
-    // this.context.fillText(JSON.stringify(this.particles[0].position), 0, 0);
   }
 }
 
