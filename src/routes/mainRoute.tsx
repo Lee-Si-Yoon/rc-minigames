@@ -5,6 +5,7 @@ import TypingGame from "../pages/gymbox/typing-game/typing-game";
 import Playground from "../pages/gymbox/playground/playground";
 import Timer from "../pages/gymbox/timer/timer";
 import GdTimer from "../pages/gymbox/gradient-timer/gradient-timer";
+import Timers from "../pages/gymbox/timers/timers";
 // import ParticleGame from "../pages/gymbox/particle-text/particle-text";
 
 const routerConfig: RouteObject[] = [
@@ -37,6 +38,10 @@ const routerConfig: RouteObject[] = [
           {
             path: Paths.gymboxx.gradientTimer,
             Component: GdTimer,
+          },
+          {
+            path: Paths.gymboxx.timers,
+            Component: Timers,
           },
           // {
           //   path: Paths.gymboxx["particle-text"],

@@ -11,6 +11,7 @@ const gymboxPaths = (base: string) => ({
   playground: `${base}/playground`,
   timer: `${base}/timer`,
   gradientTimer: `${base}/gdTimer`,
+  timers: `${base}/timers`,
 });
 
 const Paths = {

@@ -19,6 +19,7 @@ function Root() {
       <Link to={Paths.gymboxx["typing-game"]}>typing game</Link>
       <Link to={Paths.gymboxx.playground}>playground</Link>
       <Link to={Paths.gymboxx.timer}>timer</Link>
+      <Link to={Paths.gymboxx.timers}>timers</Link>
     </div>
   );
 }
