@@ -1,4 +1,4 @@
-import { ForwardedRef } from "react";
+import { ForwardedRef, ReactNode } from "react";
 import { DataProps, Words } from "./layers/model";
 import { TextProps } from "./text/text";
 
@@ -21,6 +21,7 @@ interface TypingProps {
   initData?: Words;
   style?: React.CSSProperties;
   fps?: number;
+  backgroundComponent?: ReactNode;
 }
 
 interface TypingRef {

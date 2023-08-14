@@ -1,0 +1,24 @@
+.Debugger {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+  position: absolute;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 0.25rem;
+  z-index: 1;
+
+  .Controller {
+    display: flex;
+    height: 1.5rem;
+    column-gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+.Info {
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 400;
+}

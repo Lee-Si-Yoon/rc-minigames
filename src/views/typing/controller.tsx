@@ -1,4 +1,3 @@
-import BackgroundLayer from "./layers/background-layer";
 import EventDispatcher from "../../utils/eventDispatcher";
 import DataLayer from "./layers/data-layer";
 import InteractionLayer from "./layers/interaction-layer";
@@ -13,7 +12,6 @@ import { Words } from "./layers/model";
 import { TextProps } from "./text/text";
 
 interface ControllerConstructor {
-  backgroundLayer: HTMLCanvasElement;
   dataLayer: HTMLCanvasElement;
   interactionLayer: HTMLCanvasElement;
   initData?: Words;
@@ -25,7 +23,6 @@ class Controller extends EventDispatcher {
   private dpr: number = 1;
   private element: HTMLCanvasElement;
 
-  private backgroundLayer: BackgroundLayer;
   private dataLayer: DataLayer;
   private interactionLayer: InteractionLayer;
 
@@ -39,16 +36,12 @@ class Controller extends EventDispatcher {
   private rafId: number = 0;
 
   constructor({
-    backgroundLayer,
     dataLayer,
     interactionLayer,
     initData,
   }: ControllerConstructor) {
     super();
 
-    this.backgroundLayer = new BackgroundLayer({
-      canvas: backgroundLayer,
-    });
     this.dataLayer = new DataLayer({
       canvas: dataLayer,
       initData: initData,
@@ -75,28 +68,24 @@ class Controller extends EventDispatcher {
   }
 
   setScales(x: number, y: number) {
-    this.backgroundLayer.scale(x, y);
     this.dataLayer.scale(x, y);
     this.interactionLayer.scale(x, y);
   }
 
   setDprs(dpr: number) {
     this.dpr = dpr;
-    this.backgroundLayer.setDpr(dpr);
     this.dataLayer.setDpr(dpr);
     this.interactionLayer.setDpr(dpr);
   }
 
   private setWidths(width: number, devicePixelRatio?: number) {
     this.width = width;
-    this.backgroundLayer.setWidth(width || this.width, devicePixelRatio);
     this.dataLayer.setWidth(width || this.width, devicePixelRatio);
     this.interactionLayer.setWidth(width || this.width, devicePixelRatio);
   }
 
   private setHeights(height: number, devicePixelRatio?: number) {
     this.height = height;
-    this.backgroundLayer.setHeight(height || this.height, devicePixelRatio);
     this.dataLayer.setHeight(height || this.height, devicePixelRatio);
     this.interactionLayer.setHeight(height || this.height, devicePixelRatio);
   }
@@ -211,7 +200,6 @@ class Controller extends EventDispatcher {
 
   renderAll() {
     this.dataLayer.render();
-    this.backgroundLayer.render();
     this.interactionLayer.render();
   }
 

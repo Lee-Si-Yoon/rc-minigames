@@ -5,14 +5,23 @@ import React, {
   useRef,
   useState,
 } from "react";
+
+import classes from "./typing-game.module.scss";
 import Typing from "../../../views/typing/typing";
 import useData from "../../../views/typing/hooks/use-data";
 import { Phase, TypingRef } from "../../../views/typing/model";
 import useController from "../../../views/typing/hooks/use-controller";
 import { combinedArray } from "./mock-data";
 import Debugger from "./debugger";
+import { greyColorHex } from "../../../utils/colors";
+import { useSearchParams } from "react-router-dom";
 
 function TypingGame() {
+  document.body.style.backgroundColor = "black";
+  const [searchParams] = useSearchParams();
+  const time = searchParams.get("time");
+  const timer = Number(time) * 1000;
+
   const ref = useRef<TypingRef>(null);
   const { addWord, removeWord, data } = useData(ref);
   const { setIsPlaying, setLevel, controllerData } = useController(ref);
@@ -48,24 +57,29 @@ function TypingGame() {
 
   const [debugMode, setDebugMode] = useState<boolean>(true);
 
+  const [height, setHeight] = useState<number>(0);
+
+  useEffect(() => {
+    const viewportHandler = () => {
+      if (window.visualViewport && window.visualViewport.offsetTop >= 0) {
+        setHeight(window.visualViewport.height - 40);
+      }
+    };
+    viewportHandler();
+
+    window.visualViewport?.addEventListener("resize", viewportHandler);
+    return () =>
+      window.visualViewport?.removeEventListener("resize", viewportHandler);
+  }, [window.visualViewport]);
+
   return (
-    <div style={{ height: "100%", position: "relative" }}>
+    <div className={classes.Container}>
       <button
-        style={{
-          all: "unset",
-          width: "4rem",
-          height: "2.5rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: debugMode ? "black" : "white",
-          color: debugMode ? "white" : "black",
-          border: "0.0625rem solid black",
-          position: "absolute",
-          zIndex: "99",
-          cursor: "pointer",
-        }}
+        className={classes.DebugButton}
         onClick={() => setDebugMode((prev) => !prev)}
+        style={{
+          color: debugMode ? "#EA251F" : "white",
+        }}
       >
         debug
       </button>
@@ -82,27 +96,34 @@ function TypingGame() {
       <Typing
         ref={ref}
         width="100%"
-        height="calc(100% - 2.5rem)"
+        height={height}
         initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
+        backgroundComponent={
+          <div
+            style={{
+              backgroundColor: greyColorHex.black,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+              fontSize: "4.25rem",
+              fontWeight: 800,
+              fontFeatureSettings: "clig 'off', liga 'off'",
+            }}
+          >
+            <span className={classes.Jitter}>
+              {timer / 1000}’{String(timer).slice(-2)}’’
+            </span>
+          </div>
+        }
       />
-      <form
-        onSubmit={onSubmit}
-        style={{
-          width: "100%",
-          position: "fixed",
-          bottom: "0",
-        }}
-      >
+      <form onSubmit={onSubmit} className={classes.Form}>
         <input
           type="text"
           autoComplete="off"
+          placeholder="타자도 손가락 운동이다"
           value={inputValue}
-          style={{
-            all: "unset",
-            width: "100%",
-            height: "2.5rem",
-            borderTop: "0.0625rem solid black",
-          }}
+          className={classes.Input}
           onChange={onChange}
         />
       </form>

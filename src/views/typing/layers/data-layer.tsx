@@ -195,7 +195,9 @@ class DataLayer extends BaseLayer {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.font = "24px Arial";
+    ctx.font =
+      "bold 24px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif";
+    ctx.fillStyle = "white";
     ctx.save();
 
     for (const text of this.texts) {

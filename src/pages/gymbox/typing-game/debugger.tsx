@@ -1,4 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
+
+import classes from "./debugger.module.scss";
 import { ControllerProps, Level, Phase } from "../../../views/typing/model";
 import { DataProps } from "../../../views/typing/layers/model";
 
@@ -20,38 +22,17 @@ function Debugger({
   setSpawnWords,
 }: DebuggerProps) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        rowGap: "0.5rem",
-        position: "absolute",
-        alignItems: "flex-end",
-        justifyContent: "flex-end",
-        width: "100%",
-        padding: "0.25rem",
-        zIndex: "1",
-      }}
-    >
-      <i style={{ fontSize: "0.75rem" }}>{`left words: ${JSON.stringify(
+    <div className={classes.Debugger}>
+      <i className={classes.Info}>{`left words: ${JSON.stringify(
         data.words
       )}`}</i>
-      <i style={{ fontSize: "0.75rem" }}>{`failed: ${JSON.stringify(
-        data.failed
-      )}`}</i>
-      <i style={{ fontSize: "0.75rem" }}>{`score: ${JSON.stringify(
-        data.score
-      )}`}</i>
-      <i style={{ fontSize: "0.75rem" }}>{JSON.stringify(controllerData)}</i>
-      <div
-        style={{
-          display: "flex",
-          rowGap: "0.25rem",
-          height: "1.5rem",
-          columnGap: "0.5rem",
-        }}
-      >
-        <label htmlFor="spawn">spawnWords</label>
+      <i className={classes.Info}>{`failed: ${JSON.stringify(data.failed)}`}</i>
+      <i className={classes.Info}>{`score: ${JSON.stringify(data.score)}`}</i>
+      <i className={classes.Info}>{JSON.stringify(controllerData)}</i>
+      <div className={classes.Controller}>
+        <label htmlFor="spawn" className={classes.Info}>
+          spawnWords
+        </label>
         <input
           onChange={() => setSpawnWords((prevState) => !prevState)}
           type="checkbox"

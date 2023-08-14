@@ -1,0 +1,77 @@
+.PickerContainer {
+  user-select: none;
+
+  &,
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  .PickerInner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    font-size: 1.2rem;
+    -webkit-mask-box-image: linear-gradient(
+      to top,
+      transparent,
+      transparent 5%,
+      white 20%,
+      white 80%,
+      transparent 95%,
+      transparent
+    );
+  }
+}
+
+.PickerColumn {
+  overflow: hidden;
+  text-align: center;
+  width: 100%;
+
+  .PickerItem {
+    position: relative;
+    width: 100%;
+    white-space: nowrap;
+    color: #999;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .Selected {
+    font-weight: 700;
+    color: #222;
+  }
+}
+
+.PickerHighLight {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+
+  &::before,
+  &::after {
+    content: " ";
+    position: absolute;
+    left: 0;
+    right: auto;
+    display: block;
+    width: 100%;
+    height: 0.0625rem;
+    background-color: #d9d9d9;
+  }
+
+  &::before {
+    top: 0;
+    bottom: auto;
+  }
+
+  &::after {
+    bottom: 0;
+    top: auto;
+  }
+}

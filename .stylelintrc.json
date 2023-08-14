@@ -5,7 +5,7 @@
     "stylelint-config-prettier-scss"
   ],
   "rules": {
-    "unit-allowed-list": ["rem", "deg", "vh", "vw", "%"],
+    "unit-allowed-list": ["rem", "deg", "vh", "vw", "%", "s"],
     "block-no-empty": true,
     "selector-class-pattern": null,
     "keyframes-name-pattern": null
