@@ -48,7 +48,7 @@ function TypingGame() {
       spawnRef.current = setInterval(() => {
         const index = Math.floor(Math.random() * combinedArray.length);
         const word = combinedArray[index];
-        addWord({ data: word });
+        if (word) addWord({ data: word });
         combinedArray.splice(index, 1);
       }, 2000);
     }
