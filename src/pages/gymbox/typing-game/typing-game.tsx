@@ -12,11 +12,18 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Paths } from "../../../routes/paths";
 
 function TypingGame() {
-  document.body.style.backgroundColor = "black";
+  /** BACKGROUND */
+
+  React.useLayoutEffect(() => {
+    document.body.style.backgroundColor = "black";
+  }, []);
+
+  /** GAME */
 
   const ref = useRef<TypingRef>(null);
   const { addWord, removeWord, data } = useData(ref);
-  const { setIsPlaying, setLevel, controllerData } = useController(ref);
+  const { setIsPlaying, setLevel, controllerData, timerData } =
+    useController(ref);
 
   const [inputValue, setInputValue] = useState<string>("");
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +54,11 @@ function TypingGame() {
     return () => clearInterval(spawnRef.current);
   }, [spawnWords, controllerData.isPlaying]);
 
+  /** DEBUGGER */
+
   const [debugMode, setDebugMode] = useState<boolean>(true);
+
+  /** VIEWPORT */
 
   const [height, setHeight] = useState<number>(0);
 
@@ -64,35 +75,32 @@ function TypingGame() {
       window.visualViewport?.removeEventListener("resize", viewportHandler);
   }, [window.visualViewport]);
 
+  /** TIMER */
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const paramMinute = searchParams.get("m");
   const paramSecond = searchParams.get("s");
+  const totalTime = (Number(paramMinute) * 60 + Number(paramSecond)) * 100;
 
-  const [minutes, setMinutes] = React.useState<number>(Number(paramMinute));
-  const [seconds, setSeconds] = React.useState<number>(Number(paramSecond));
+  const parseMs = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 100);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    console.log(totalSeconds, minutes, seconds);
 
-  React.useEffect(() => {
-    const countDown = setInterval(() => {
-      if (seconds > 0) {
-        setSeconds((prevState) => prevState - 1);
-      }
-      if (seconds <= 0) {
-        if (minutes <= 0) {
-          clearInterval(countDown);
-        } else {
-          setMinutes((prevState) => prevState - 1);
-          setSeconds(59);
-        }
-      }
-    }, 1000);
-    return () => clearInterval(countDown);
-  }, [minutes, seconds]);
+    return {
+      minutes: minutes.toString().padStart(2, "0"),
+      seconds: seconds.toString().padStart(2, "0"),
+    };
+  };
 
   React.useEffect(() => {
-    if (minutes + seconds <= 0)
+    if (totalTime <= timerData.playTime) {
+      setIsPlaying(Phase.END);
       navigate(Paths.gymboxx.timer, { replace: true });
-  }, [minutes, seconds]);
+    }
+  }, [timerData.playTime, totalTime]);
 
   return (
     <div className={classes.Container}>
@@ -108,6 +116,7 @@ function TypingGame() {
       {debugMode && (
         <Debugger
           data={data}
+          timerData={timerData}
           controllerData={controllerData}
           setIsPlaying={setIsPlaying}
           setLevel={setLevel}
@@ -134,7 +143,8 @@ function TypingGame() {
             }}
           >
             <span className={classes.Jitter}>
-              {minutes}’{seconds}’’
+              {parseMs(totalTime - timerData.playTime).minutes}’
+              {parseMs(totalTime - timerData.playTime).seconds}’’
             </span>
           </div>
         }

@@ -15,6 +15,7 @@ import { CanvasEvents } from "./events";
 import {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
+  TimerChangeHandler,
   Level,
   Phase,
   TypingProps,
@@ -242,6 +243,42 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   );
 
   /**
+   * @summary TIMER HANDLER
+   */
+  const [timerChangeListeners, setTimerChangeListeners] = useState<
+    TimerChangeHandler[]
+  >([]);
+
+  const addTimerChangeListener = useCallback((listener: TimerChangeHandler) => {
+    setTimerChangeListeners((listeners) => [...listeners, listener]);
+  }, []);
+
+  const removeTimerChangeListener = useCallback(
+    (listener: TimerChangeHandler) => {
+      if (!editor) return;
+      editor.removeEventListener(CanvasEvents.TIMER_CHANGE, listener);
+      setTimerChangeListeners((listeners) =>
+        listeners.filter((l) => l !== listener)
+      );
+    },
+    [editor]
+  );
+
+  useEffect(() => {
+    if (!editor) return;
+
+    timerChangeListeners.forEach((listener) => {
+      editor.addEventListener(CanvasEvents.TIMER_CHANGE, listener);
+    });
+    editor.emitControllerData();
+    return () => {
+      timerChangeListeners.forEach((listener) => {
+        editor?.removeEventListener(CanvasEvents.TIMER_CHANGE, listener);
+      });
+    };
+  }, [editor, timerChangeListeners]);
+
+  /**
    * @summary IMPERATIVE HANDLE - makes the ref used in the place that uses the FC component
    * We will make our TypingRef manipulatable with the following functions
    */
@@ -253,6 +290,8 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       setLevel,
       addControllerChangeListener,
       removeControllerChangeListener,
+      addTimerChangeListener,
+      removeTimerChangeListener,
       // for useData
       addWord,
       removeWord,

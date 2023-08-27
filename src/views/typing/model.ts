@@ -30,6 +30,8 @@ interface TypingRef {
   setLevel: (level: Level) => void;
   addControllerChangeListener: (listener: ControllerChangeHandler) => void;
   removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
+  addTimerChangeListener: (listener: TimerChangeHandler) => void;
+  removeTimerChangeListener: (listener: TimerChangeHandler) => void;
   // for useData
   addWord: (textProps: Omit<TextProps, "ctx">) => void;
   removeWord: (word: string) => void;
@@ -53,11 +55,16 @@ type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
 type ControllerProps = {
   isPlaying: Phase;
   level: Level;
-  playTime: number;
   score: number;
 };
 type ControllerChangeParams = { data: ControllerProps };
 type ControllerChangeHandler = (params: ControllerChangeParams) => void;
+
+type TimerProps = {
+  playTime: number;
+};
+type TimerChangeParams = { data: TimerProps };
+type TimerChangeHandler = (params: TimerChangeParams) => void;
 
 export {
   CanvasDataChangeParams,
@@ -65,6 +72,9 @@ export {
   ControllerProps,
   ControllerChangeParams,
   ControllerChangeHandler,
+  TimerProps,
+  TimerChangeParams,
+  TimerChangeHandler,
   TypingProps,
   TypingRef,
   Phase,

@@ -2,6 +2,8 @@ import { MutableRefObject, useCallback, useEffect, useState } from "react";
 import {
   ControllerChangeHandler,
   ControllerProps,
+  TimerChangeHandler,
+  TimerProps,
   Level,
   Phase,
   TypingRef,
@@ -9,13 +11,20 @@ import {
 import useHandlers from "./use-handlers";
 
 function useController(ref: MutableRefObject<TypingRef | null>) {
-  const { addControllerChangeListener, removeControllerChangeListener } =
-    useHandlers(ref);
+  const {
+    addControllerChangeListener,
+    removeControllerChangeListener,
+    addTimerChangeListener,
+    removeTimerChangeListener,
+  } = useHandlers(ref);
   const [controllerData, setControllerData] = useState<ControllerProps>({
     isPlaying: Phase.END,
     level: Level.EASY,
-    playTime: 0,
     score: 0,
+  });
+
+  const [timerData, setTimerData] = useState<TimerProps>({
+    playTime: 0,
   });
 
   useEffect(() => {
@@ -28,6 +37,17 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
       removeControllerChangeListener(listener);
     };
   }, [addControllerChangeListener, removeControllerChangeListener]);
+
+  useEffect(() => {
+    const listener: TimerChangeHandler = ({ data: timerData }) => {
+      setTimerData(timerData);
+    };
+    addTimerChangeListener(listener);
+
+    return () => {
+      removeTimerChangeListener(listener);
+    };
+  }, [addTimerChangeListener, removeTimerChangeListener]);
 
   const setIsPlaying = useCallback(
     (phase: Phase) => {
@@ -46,6 +66,7 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
   );
 
   return {
+    timerData,
     controllerData,
     setIsPlaying,
     setLevel,

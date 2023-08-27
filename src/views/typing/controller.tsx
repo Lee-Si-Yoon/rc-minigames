@@ -7,6 +7,7 @@ import {
   ControllerChangeParams,
   Level,
   Phase,
+  TimerChangeParams,
 } from "./model";
 import { Words } from "./layers/model";
 import { TextProps } from "./text/text";
@@ -100,6 +101,10 @@ class Controller extends EventDispatcher {
     this.emit(CanvasEvents.CONTROLLER_EVENT, params);
   }
 
+  emitTimerChangeEvent(params: TimerChangeParams) {
+    this.emit(CanvasEvents.TIMER_CHANGE, params);
+  }
+
   emitCurrentData() {
     this.emitDataChangeEvent({
       data: this.dataLayer.getCopiedData(),
@@ -110,12 +115,20 @@ class Controller extends EventDispatcher {
     const copiedData = JSON.parse(
       JSON.stringify({
         isPlaying: this.isPlaying,
-        playTime: this.playTime,
         level: this.level,
         score: this.score,
       })
     );
     this.emitControllerChangeEvent({ data: copiedData });
+  }
+
+  emitTimerData() {
+    const copiedData = JSON.parse(
+      JSON.stringify({
+        playTime: this.playTime,
+      })
+    );
+    this.emitTimerChangeEvent({ data: copiedData });
   }
 
   /** GAME STATES */
@@ -191,6 +204,7 @@ class Controller extends EventDispatcher {
 
         this.updateFrame();
         this.renderFrame();
+        this.emitTimerData();
       }
 
       this.rafId = requestAnimationFrame(animate);
@@ -221,8 +235,6 @@ class Controller extends EventDispatcher {
     }
 
     this.renderLayer.update();
-
-    this.emitControllerData();
   }
 
   renderFrame() {
