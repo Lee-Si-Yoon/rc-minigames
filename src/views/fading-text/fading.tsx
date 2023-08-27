@@ -1,5 +1,5 @@
 import React, { CSSProperties, useEffect, useRef } from "react";
-import { RGB } from "../../utils/types";
+import { RGB } from "../../utils/colors";
 
 export interface FadingProp {
   texts: string[];

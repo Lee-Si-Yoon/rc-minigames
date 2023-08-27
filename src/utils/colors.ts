@@ -1,5 +1,4 @@
-import { RGB } from "./types";
-
+type RGB = { r: number; g: number; b: number };
 type HexColors = { [key: string]: string };
 type RGBColors = { [key: string]: RGB };
 
@@ -67,10 +66,16 @@ function parseRGBColor(rgbString: string | null): RGBColor | null {
   return null;
 }
 
+function rgaToHex(rgb: RGB) {
+  return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+}
+
 export {
   tintColorHex,
   tintColorRGB,
   greyColorHex,
   greyColorRGB,
   parseRGBColor,
+  rgaToHex,
+  RGB,
 };

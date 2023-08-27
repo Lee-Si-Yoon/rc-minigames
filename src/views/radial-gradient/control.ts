@@ -1,6 +1,6 @@
 import BaseLayer from "../../utils/base-layer";
-import { Coord, RGB } from "../../utils/types";
-import { tintColorRGB, greyColorRGB } from "../../utils/colors";
+import { Coord } from "../../utils/types";
+import { tintColorRGB, greyColorRGB, RGB } from "../../utils/colors";
 import GlowParticle from "./particle";
 
 interface ControllerProps {

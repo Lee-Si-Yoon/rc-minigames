@@ -6,7 +6,8 @@ import React, {
   useState,
 } from "react";
 import Controller from "./control";
-import { Coord, RGB } from "../../utils/types";
+import { Coord } from "../../utils/types";
+import { RGB } from "../../utils/colors";
 
 export interface RadialGradientProp {
   width: CSSProperties["width"];

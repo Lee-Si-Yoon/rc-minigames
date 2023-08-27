@@ -4,8 +4,7 @@ import Fading, { FadingProp } from "../../../views/fading-text/fading";
 import RadialGradient, {
   RadialGradientProp,
 } from "../../../views/radial-gradient/radial-gradient";
-import { greyColorRGB, tintColorRGB } from "../../../utils/colors";
-import { RGB } from "../../../utils/types";
+import { RGB, greyColorRGB, tintColorRGB } from "../../../utils/colors";
 
 const basicTexts = ["나는", "날지", "않아", "그건", "유산소거든"];
 
