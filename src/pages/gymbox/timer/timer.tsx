@@ -24,14 +24,8 @@ function Timer() {
 
   const navigate = useNavigate();
 
-  const handleOnGDClick = () => {
-    navigate(`${Paths.gymboxx.gradientTimer}?time=${minutes * 60 + seconds}`, {
-      replace: true,
-    });
-  };
-
   const handleOnClick = () => {
-    navigate(`${Paths.gymboxx["typing-game"]}?time=${minutes * 60 + seconds}`, {
+    navigate(`${Paths.gymboxx["typing-game"]}?m=${minutes}&s=${seconds}`, {
       replace: true,
     });
   };
@@ -69,23 +63,6 @@ function Timer() {
         />
         <span className={classes.Legend}>초</span>
         <div className={classes.HighLight} />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          bottom: "3.5rem",
-          position: "absolute",
-          width: "100%",
-        }}
-      >
-        <button
-          className={classes.Button}
-          style={{ backgroundColor: "#404044" }}
-          onClick={handleOnGDClick}
-        >
-          gdTimer
-        </button>
       </div>
       <div
         style={{

@@ -41,27 +41,23 @@ abstract class Rect {
     this.updateEdge();
   }
 
-  get getContext() {
+  get context() {
     return this.ctx;
   }
 
-  get getWidth() {
-    return this.width;
+  get dimension() {
+    return { width: this.width, height: this.height };
   }
 
-  get getHeight() {
-    return this.height;
-  }
-
-  get getVertex() {
-    return this.vertex;
-  }
-
-  get getEdge() {
+  get edges() {
     return this.edge;
   }
 
-  rectCollision(collidedRect: Rect) {
+  get vertexs() {
+    return this.vertex;
+  }
+
+  rectCollision(collidedRect: Rect): boolean {
     const collided =
       this.x < collidedRect.x + collidedRect.width &&
       this.x + this.width > collidedRect.x &&
@@ -71,7 +67,7 @@ abstract class Rect {
     return collided;
   }
 
-  updateEdge() {
+  updateEdge(): void {
     for (let i = 0; i < this.vertex.length; i++) {
       // e.g. i = 0 -> i = leftTop, nextNumber = rightTop
       const nextNumber = (i + 1) % this.vertex.length;
@@ -83,7 +79,7 @@ abstract class Rect {
     }
   }
 
-  updateVertex() {
+  updateVertex(): void {
     const radian = (Math.PI / 180) * this.degree;
     const sin = Math.sin(radian);
     const cos = Math.cos(radian);
