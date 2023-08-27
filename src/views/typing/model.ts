@@ -50,7 +50,12 @@ type CanvasDataChangeParams = { data: DataProps };
 type CanvasDataChangeHandler = (params: CanvasDataChangeParams) => void;
 
 // TODO extract playTime event for performance
-type ControllerProps = { isPlaying: Phase; level: Level; playTime: number };
+type ControllerProps = {
+  isPlaying: Phase;
+  level: Level;
+  playTime: number;
+  score: number;
+};
 type ControllerChangeParams = { data: ControllerProps };
 type ControllerChangeHandler = (params: ControllerChangeParams) => void;
 

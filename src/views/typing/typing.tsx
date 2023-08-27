@@ -30,28 +30,15 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   const [editor, setEditor] = useState<Controller | null>(null);
 
   /**
-   * @summary DATA CANVAS
+   * @summary RENDER LAYER
    */
-  const [dataCanvasRef, setDataCanvasRef] = useState<HTMLCanvasElement | null>(
-    null
-  );
-
-  const getDataRef = useCallback((element: HTMLCanvasElement) => {
-    if (!element) return;
-    element.style["touchAction"] = "none";
-    setDataCanvasRef(element);
-  }, []);
-
-  /**
-   * @summary INTERACTION CANVAS
-   */
-  const [interactionCanvasRef, setInteractionCanvasRef] =
+  const [renderCanvasRef, setRenderCanvasRef] =
     useState<HTMLCanvasElement | null>(null);
 
-  const getInteractionRef = useCallback((element: HTMLCanvasElement) => {
+  const getRenderLayerRef = useCallback((element: HTMLCanvasElement) => {
     if (!element) return;
     element.style["touchAction"] = "none";
-    setInteractionCanvasRef(element);
+    setRenderCanvasRef(element);
   }, []);
 
   /**
@@ -59,10 +46,9 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    * @url https://github.com/ascorbic/react-artboard/blob/main/src/components/Artboard.tsx
    */
   useEffect(() => {
-    if (!dataCanvasRef || !interactionCanvasRef) return;
+    if (!renderCanvasRef) return;
     const editor = new Controller({
-      dataLayer: dataCanvasRef,
-      interactionLayer: interactionCanvasRef,
+      renderLayer: renderCanvasRef,
       initData: props.initData,
     });
     editor.setFps(props.fps || 60);
@@ -72,7 +58,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     return () => {
       editor.destroy();
     };
-  }, [dataCanvasRef, interactionCanvasRef]);
+  }, [renderCanvasRef]);
 
   /**
    * @summary RESIZE EVENTS
@@ -84,7 +70,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
         editor.setScales(dpr, dpr);
-        editor.renderAll();
+        editor.renderFrame();
       }
     };
     // on init
@@ -311,8 +297,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
             ...props.backgroundComponent.props.style,
           },
         })}
-      <canvas ref={getDataRef} style={{ position: "absolute" }} />
-      <canvas ref={getInteractionRef} style={{ position: "absolute" }} />
+      <canvas ref={getRenderLayerRef} style={{ position: "absolute" }} />
     </div>
   );
 });

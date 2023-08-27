@@ -1,6 +1,6 @@
 import EventDispatcher from "../../utils/eventDispatcher";
+import RenderLayer from "./layers/render-layer";
 import DataLayer from "./layers/data-layer";
-import InteractionLayer from "./layers/interaction-layer";
 import { CanvasEvents } from "./events";
 import {
   CanvasDataChangeParams,
@@ -12,8 +12,7 @@ import { Words } from "./layers/model";
 import { TextProps } from "./text/text";
 
 interface ControllerConstructor {
-  dataLayer: HTMLCanvasElement;
-  interactionLayer: HTMLCanvasElement;
+  renderLayer: HTMLCanvasElement;
   initData?: Words;
 }
 
@@ -22,40 +21,39 @@ class Controller extends EventDispatcher {
   private height: number = 0;
   private dpr: number = 1;
   private element: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
 
+  private renderLayer: RenderLayer;
   private dataLayer: DataLayer;
-  private interactionLayer: InteractionLayer;
 
   private isPlaying: Phase = Phase.PAUSED;
   private level: Level = Level.EASY;
+  private score: number = 0;
 
   private timeStamp: number = 0;
   private playTime: number = 0;
   private fps: number = 60;
-  private interval: number = 1000 / this.fps;
+  private interval: number = 1000 / this.fps; // 16fps
   private rafId: number = 0;
 
-  constructor({
-    dataLayer,
-    interactionLayer,
-    initData,
-  }: ControllerConstructor) {
+  constructor({ renderLayer, initData }: ControllerConstructor) {
     super();
 
+    this.renderLayer = new RenderLayer({
+      canvas: renderLayer,
+    });
     this.dataLayer = new DataLayer({
-      canvas: dataLayer,
+      canvas: renderLayer,
       initData: initData,
     });
-    this.interactionLayer = new InteractionLayer({
-      canvas: interactionLayer,
-    });
 
-    this.element = interactionLayer;
+    this.element = renderLayer;
+    this.ctx = this.element.getContext("2d", { willReadFrequently: true })!;
 
     this.initialize();
   }
 
-  initialize() {
+  private initialize() {
     this.emit = this.emit.bind(this);
   }
 
@@ -63,31 +61,27 @@ class Controller extends EventDispatcher {
     return this.element;
   }
 
-  getIsPlaying(): Phase {
-    return this.isPlaying;
-  }
-
   setScales(x: number, y: number) {
+    this.renderLayer.scale(x, y);
     this.dataLayer.scale(x, y);
-    this.interactionLayer.scale(x, y);
   }
 
   setDprs(dpr: number) {
     this.dpr = dpr;
+    this.renderLayer.setDpr(dpr);
     this.dataLayer.setDpr(dpr);
-    this.interactionLayer.setDpr(dpr);
   }
 
   private setWidths(width: number, devicePixelRatio?: number) {
     this.width = width;
-    this.dataLayer.setWidth(width || this.width, devicePixelRatio);
-    this.interactionLayer.setWidth(width || this.width, devicePixelRatio);
+    this.renderLayer.setWidth(width ?? this.width, devicePixelRatio);
+    this.dataLayer.setWidth(width ?? this.width, devicePixelRatio);
   }
 
   private setHeights(height: number, devicePixelRatio?: number) {
     this.height = height;
-    this.dataLayer.setHeight(height || this.height, devicePixelRatio);
-    this.interactionLayer.setHeight(height || this.height, devicePixelRatio);
+    this.renderLayer.setHeight(height ?? this.height, devicePixelRatio);
+    this.dataLayer.setHeight(height ?? this.height, devicePixelRatio);
   }
 
   setSizes(width: number, height: number, devicePixelRatio?: number) {
@@ -96,9 +90,7 @@ class Controller extends EventDispatcher {
     this.setDprs(devicePixelRatio ? devicePixelRatio : this.dpr);
   }
 
-  setFps(fps: number) {
-    this.fps = fps;
-  }
+  /** EMITTERS */
 
   emitDataChangeEvent(params: CanvasDataChangeParams) {
     this.emit(CanvasEvents.DATA_CHANGE, params);
@@ -120,9 +112,20 @@ class Controller extends EventDispatcher {
         isPlaying: this.isPlaying,
         playTime: this.playTime,
         level: this.level,
+        score: this.score,
       })
     );
     this.emitControllerChangeEvent({ data: copiedData });
+  }
+
+  /** GAME STATES */
+
+  getIsPlaying(): Phase {
+    return this.isPlaying;
+  }
+
+  setFps(fps: number) {
+    this.fps = fps;
   }
 
   setIsPlaying(phase: Phase) {
@@ -143,22 +146,34 @@ class Controller extends EventDispatcher {
 
   setLevel(level: Level) {
     this.level = level;
-    this.dataLayer.setLevel(level);
+    this.dataLayer.level = level;
+    this.renderLayer.level = level;
     this.emitControllerData();
+  }
+
+  updateScore(word: string): void {
+    if (!this.dataLayer.validateWord(word)) return;
+    this.score +=
+      this.dataLayer.texts.find((text) => text.textData === word)?.getScore ??
+      0;
   }
 
   /**
    * @summary on keyboard event
    */
   removeWord(word: string) {
-    this.dataLayer.updateScore(word);
     this.dataLayer.removeViaInput(word);
+    this.updateScore(word);
     this.emitCurrentData();
+
+    this.renderLayer.texts = this.dataLayer.texts;
   }
 
   addWord(textProps: Omit<TextProps, "ctx">) {
     this.dataLayer.addWord(textProps);
     this.emitCurrentData();
+
+    this.renderLayer.texts = this.dataLayer.texts;
   }
 
   playFrames(): void {
@@ -173,7 +188,9 @@ class Controller extends EventDispatcher {
 
       if (timer > this.interval) {
         timer = 0;
-        this.playGame();
+
+        this.updateFrame();
+        this.renderFrame();
       }
 
       this.rafId = requestAnimationFrame(animate);
@@ -189,23 +206,30 @@ class Controller extends EventDispatcher {
     animate(this.timeStamp);
   }
 
-  playGame() {
-    // const prevData = JSON.stringify(this.dataLayer.getCopiedData());
-    this.dataLayer.update();
-    // const updatedData = JSON.stringify(this.dataLayer.getCopiedData());
-    // if (prevData !== updatedData) this.emitControllerData();
+  updateFrame() {
+    const texts = this.dataLayer.texts;
+
+    for (const text of texts) {
+      const { y } = text.getPosition;
+
+      if (y >= this.ctx.canvas.height) {
+        this.dataLayer.moveWordToFailed(text.textData);
+        this.dataLayer.removeViaInput(text.textData);
+        const targetTextIndex = texts.indexOf(text);
+        texts.splice(targetTextIndex, 1);
+      }
+    }
+
+    this.renderLayer.update();
+
     this.emitControllerData();
-    this.dataLayer.render();
   }
 
-  renderAll() {
-    this.dataLayer.render();
-    this.interactionLayer.render();
+  renderFrame() {
+    this.renderLayer.render();
   }
 
-  destroy() {
-    // remove eventListners
-  }
+  destroy() {}
 }
 
 export default Controller;

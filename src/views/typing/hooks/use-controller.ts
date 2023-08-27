@@ -15,6 +15,7 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     isPlaying: Phase.END,
     level: Level.EASY,
     playTime: 0,
+    score: 0,
   });
 
   useEffect(() => {

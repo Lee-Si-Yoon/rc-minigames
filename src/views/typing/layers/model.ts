@@ -6,7 +6,6 @@ type Words = string[];
 interface DataProps {
   words: Words;
   failed: Words;
-  score: number;
 }
 
 interface CanvasLayerConstructor {

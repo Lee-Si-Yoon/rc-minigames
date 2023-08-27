@@ -27,7 +27,6 @@ function Debugger({
         data.words
       )}`}</i>
       <i className={classes.Info}>{`failed: ${JSON.stringify(data.failed)}`}</i>
-      <i className={classes.Info}>{`score: ${JSON.stringify(data.score)}`}</i>
       <i className={classes.Info}>{JSON.stringify(controllerData)}</i>
       <div className={classes.Controller}>
         <label htmlFor="spawn" className={classes.Info}>

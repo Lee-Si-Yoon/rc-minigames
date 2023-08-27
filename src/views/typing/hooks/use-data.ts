@@ -8,7 +8,6 @@ function useData(ref: MutableRefObject<TypingRef | null>) {
   const { addDataChangeListener, removeDataChangeListener } = useHandlers(ref);
   const [data, setData] = useState<DataProps>({
     words: [],
-    score: 0,
     failed: [],
   });
 
