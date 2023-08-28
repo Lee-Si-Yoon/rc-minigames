@@ -5,6 +5,7 @@ import TypingGame from "../pages/gymbox/typing-game/typing-game";
 import Playground from "../pages/gymbox/playground/playground";
 import Timer from "../pages/gymbox/timer/timer";
 import ParticleGame from "../pages/gymbox/particle-text/particle-text";
+import Score from "../pages/gymbox/score/score";
 
 const routerConfig: RouteObject[] = [
   {
@@ -36,6 +37,10 @@ const routerConfig: RouteObject[] = [
           {
             path: Paths.gymboxx["particle-text"],
             Component: ParticleGame,
+          },
+          {
+            path: Paths.gymboxx.score,
+            Component: Score,
           },
         ],
       },

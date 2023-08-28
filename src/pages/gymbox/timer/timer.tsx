@@ -1,7 +1,7 @@
 import React from "react";
 import classes from "./timer.module.scss";
 import ScrollPicker from "../../../views/scroll-picker/scroll-picker";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Paths } from "../../../routes/paths";
 
 const Seconds = (length: number) =>
@@ -11,10 +11,22 @@ const Minutes = (length: number) =>
   Array.from({ length }).map((_, i) => Number(i));
 
 function Timer() {
-  document.body.style.backgroundColor = "black";
+  /** BACKGROUND */
+  React.useLayoutEffect(() => {
+    document.body.style.backgroundColor = "black";
+  }, []);
 
   const [minutes, setMinutes] = React.useState<number>(0);
   const [seconds, setSeconds] = React.useState<number>(0);
+
+  const [searchParams] = useSearchParams();
+  const paramMinute = searchParams.get("m");
+  const paramSecond = searchParams.get("s");
+
+  React.useEffect(() => {
+    setMinutes(Number(paramMinute));
+    setSeconds(Number(paramSecond));
+  }, [paramMinute, paramSecond]);
 
   const fontStyle = {
     color: "rgba(255, 255, 255, 0.9)",
@@ -50,6 +62,7 @@ function Timer() {
           columnGap: "1.5rem",
         }}
       >
+        {/* TODO: change to mobile picker */}
         <ScrollPicker
           item={Minutes(6)}
           getValue={setMinutes}

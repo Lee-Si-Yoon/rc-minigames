@@ -1,6 +1,9 @@
+$nav-height: 3.125rem;
+
 .DebugButton {
   all: unset;
   position: absolute;
+  top: $nav-height;
   display: inline-flex;
   padding: 0.3125rem 0.75rem;
   justify-content: center;
@@ -36,8 +39,42 @@
 }
 
 .Container {
-  height: 100%;
+  height: calc(100% - 2.5rem);
   position: relative;
+}
+
+.Mask {
+  mask-border: linear-gradient(
+    to top,
+    transparent,
+    transparent 10%,
+    white 30%,
+    white 70%,
+    transparent 90%,
+    transparent
+  );
+}
+
+.Navigation {
+  height: $nav-height;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 0 0.5rem;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5rem;
+
+  .BackButton {
+    all: unset;
+  }
+
+  .TimerText {
+    font-feature-settings: "clig 'off', liga 'off'";
+  }
 }
 
 .Jitter1 {

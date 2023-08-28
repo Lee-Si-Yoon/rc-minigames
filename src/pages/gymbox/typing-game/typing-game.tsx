@@ -3,7 +3,7 @@ import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
 import classes from "./typing-game.module.scss";
 import Typing from "../../../views/typing/typing";
 import useData from "../../../views/typing/hooks/use-data";
-import { Phase, TypingRef } from "../../../views/typing/model";
+import { Level, Phase, TypingRef } from "../../../views/typing/model";
 import useController from "../../../views/typing/hooks/use-controller";
 import { combinedArray } from "./mock-data";
 import Debugger from "./debugger";
@@ -11,16 +11,34 @@ import { greyColorRGB, rgaToHex, tintColorRGB } from "../../../utils/colors";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Paths } from "../../../routes/paths";
 import { lerp, getPoint } from "../../../utils/math";
+import { removeAllWhiteSpaces } from "../../../utils/strip-punctuation";
 
 function TypingGame() {
   /** BACKGROUND */
-
   React.useLayoutEffect(() => {
     document.body.style.backgroundColor = "black";
   }, []);
 
-  /** GAME */
+  /** DEBUGGER */
+  const [debugMode, setDebugMode] = useState<boolean>(true);
 
+  /** VIEWPORT */
+  const [height, setHeight] = useState<number>(0);
+
+  React.useEffect(() => {
+    const viewportHandler = () => {
+      if (window.visualViewport && window.visualViewport.offsetTop >= 0) {
+        setHeight(window.visualViewport.height - 40 - 50);
+      }
+    };
+    viewportHandler();
+
+    window.visualViewport?.addEventListener("resize", viewportHandler);
+    return () =>
+      window.visualViewport?.removeEventListener("resize", viewportHandler);
+  }, [window.visualViewport]);
+
+  /** GAME */
   const ref = useRef<TypingRef>(null);
   const { addWord, removeWord, data } = useData(ref);
   const { setIsPlaying, setLevel, controllerData, timerData } =
@@ -47,7 +65,7 @@ function TypingGame() {
       if (combinedArray.length <= 0) return;
       spawnRef.current = setInterval(() => {
         const index = Math.floor(Math.random() * combinedArray.length);
-        const word = combinedArray[index];
+        const word = removeAllWhiteSpaces(combinedArray[index]);
         if (word) addWord({ data: word });
         combinedArray.splice(index, 1);
       }, 2000);
@@ -55,29 +73,19 @@ function TypingGame() {
     return () => clearInterval(spawnRef.current);
   }, [spawnWords, controllerData.isPlaying]);
 
-  /** DEBUGGER */
-
-  const [debugMode, setDebugMode] = useState<boolean>(true);
-
-  /** VIEWPORT */
-
-  const [height, setHeight] = useState<number>(0);
+  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    const viewportHandler = () => {
-      if (window.visualViewport && window.visualViewport.offsetTop >= 0) {
-        setHeight(window.visualViewport.height - 40);
+    if (isInputFocused) {
+      if (controllerData.isPlaying !== Phase.PLAYING) {
+        setIsPlaying(Phase.PLAYING);
       }
-    };
-    viewportHandler();
-
-    window.visualViewport?.addEventListener("resize", viewportHandler);
-    return () =>
-      window.visualViewport?.removeEventListener("resize", viewportHandler);
-  }, [window.visualViewport]);
+    } else {
+      setIsPlaying(Phase.PAUSED);
+    }
+  }, [isInputFocused, controllerData]);
 
   /** TIMER */
-
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const paramMinute = searchParams.get("m");
@@ -97,7 +105,10 @@ function TypingGame() {
   React.useEffect(() => {
     if (totalTime <= timerData.playTime) {
       setIsPlaying(Phase.END);
-      navigate(Paths.gymboxx.timer, { replace: true });
+      navigate(
+        `/${Paths.gymboxx.score}&score=${controllerData.score}?failed=${data.failed}`,
+        { replace: true }
+      );
     }
   }, [timerData.playTime, totalTime]);
 
@@ -121,17 +132,45 @@ function TypingGame() {
     setBgColor(lerpedColor);
   }, [timerData.playTime, totalTime]);
 
+  React.useEffect(() => {
+    timerData.playTime / totalTime > 0.5
+      ? timerData.playTime / totalTime > 0.75
+        ? setLevel(Level.HARD)
+        : setLevel(Level.NORMAL)
+      : setLevel(Level.EASY);
+  }, [timerData.playTime, totalTime]);
+
   return (
     <div className={classes.Container}>
-      <button
-        className={classes.DebugButton}
-        onClick={() => setDebugMode((prev) => !prev)}
-        style={{
-          color: debugMode ? "#EA251F" : "white",
-        }}
-      >
-        debug
-      </button>
+      <nav className={classes.Navigation}>
+        <button
+          className={classes.BackButton}
+          onClick={() =>
+            navigate(
+              `${Paths.gymboxx.timer}?m=${
+                parseMs(totalTime - timerData.playTime).minutes
+              }&s=${parseMs(totalTime - timerData.playTime).seconds}`,
+              { replace: true }
+            )
+          }
+        >
+          X
+        </button>
+        <span
+          className={[
+            timerData.playTime / totalTime > 0.75
+              ? timerData.playTime / totalTime > 0.9
+                ? classes.Jitter1
+                : classes.Jitter2
+              : "",
+            classes.TimerText,
+          ].join(" ")}
+        >
+          {parseMs(totalTime - timerData.playTime).minutes}’
+          {parseMs(totalTime - timerData.playTime).seconds}’’
+        </span>
+        <span>{controllerData.score}점</span>
+      </nav>
       {debugMode && (
         <Debugger
           data={data}
@@ -143,37 +182,27 @@ function TypingGame() {
           setSpawnWords={setSpawnWords}
         />
       )}
+      <button
+        className={classes.DebugButton}
+        onClick={() => setDebugMode((prev) => !prev)}
+        style={{
+          color: debugMode ? "#EA251F" : "white",
+        }}
+      >
+        debug
+      </button>
       <Typing
         ref={ref}
-        width="100%"
+        width="100vw"
         height={height}
         initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
         backgroundComponent={
           <div
+            className={classes.Mask}
             style={{
               backgroundColor: bgColor,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "white",
-              fontSize: "4.25rem",
-              fontWeight: 800,
-              fontFeatureSettings: "clig 'off', liga 'off'",
             }}
-          >
-            <span
-              className={[
-                timerData.playTime / totalTime > 0.75
-                  ? timerData.playTime / totalTime > 0.9
-                    ? classes.Jitter1
-                    : classes.Jitter2
-                  : "",
-              ].join(" ")}
-            >
-              {parseMs(totalTime - timerData.playTime).minutes}’
-              {parseMs(totalTime - timerData.playTime).seconds}’’
-            </span>
-          </div>
+          />
         }
       />
       <form onSubmit={onSubmit} className={classes.Form}>
@@ -184,6 +213,8 @@ function TypingGame() {
           value={inputValue}
           className={classes.Input}
           onChange={onChange}
+          onFocus={() => setIsInputFocused(true)}
+          onBlur={() => setIsInputFocused(false)}
         />
       </form>
     </div>
