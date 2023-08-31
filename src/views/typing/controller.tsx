@@ -226,7 +226,7 @@ class Controller extends EventDispatcher {
     for (const text of texts) {
       const { y } = text.getPosition;
 
-      if (y >= this.ctx.canvas.height) {
+      if (y >= this.height) {
         this.dataLayer.moveWordToFailed(text.textData);
         this.dataLayer.removeViaInput(text.textData);
         const targetTextIndex = texts.indexOf(text);

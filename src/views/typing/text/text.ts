@@ -44,10 +44,10 @@ class Text {
 
     this.data = data;
 
-    this.position = position || { x: 0, y: 0 };
-    this.velocity = velocity || { x: 0, y: 0 };
-    this.mass = mass || 1;
-    this.special = special || 1;
+    this.position = position ?? { x: 0, y: 0 };
+    this.velocity = velocity ?? { x: 0, y: 0 };
+    this.mass = mass ?? 1;
+    this.special = special ?? 1;
 
     const getTextMetrics = (
       ctx: CanvasRenderingContext2D,
@@ -172,14 +172,6 @@ class Text {
       this.position.x += this.velocity.x + this.collideVelocity.x;
       this.position.y += this.velocity.y + this.collideVelocity.y;
 
-      if (this.position.x + this.dimension.width > this.ctx.canvas.width) {
-        this.position.x -= 1;
-        this.velocity.x = this.velocity.x * -1;
-      } else if (this.position.x < 0) {
-        this.position.x += 1;
-        this.velocity.x = this.velocity.x * -1;
-      }
-
       if (this.collideVelocity.x > 0.1) this.collideVelocity.x *= 0.6;
       if (this.collideVelocity.y > 0.1) this.collideVelocity.y *= 0.6;
     }
@@ -209,16 +201,24 @@ class Text {
   render(): void {
     if (this.state !== TextState.INIT) return;
     this.ctx.save();
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "top";
+    this.ctx.font =
+      "bold 12px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif";
+    this.ctx.fillStyle = "white";
+
     this.ctx.translate(
       this.position.x + this.dimension.width / 2,
       this.position.y + this.dimension.height / 2
     );
+
     this.ctx.strokeRect(
       -this.dimension.width / 2,
       -this.dimension.height / 2,
       this.dimension.width,
       this.dimension.height
     );
+
     if (this.special > 1) {
       this.ctx.rotate(Math.PI);
     }

@@ -51,49 +51,71 @@ class DataLayer extends BaseLayer {
   }
 
   addWord(textProps: Omit<TextProps, "ctx">): void {
-    const ctx = this.ctx;
     const { data: word, ...rest } = textProps;
     if (!word) throw new Error("invalid word");
     const self = new Text({ data: word, ctx: this.ctx, ...rest });
 
-    this.data.words = [word, ...this.data.words];
-    this.texts.push(self);
-
     const { width } = self.getDimension;
+
     self.setPosition = {
-      x: getRandomArbitrary(0, ctx.canvas.width - width),
-      y: getRandomArbitrary(-(ctx.canvas.height / 2), 0),
+      x: getRandomArbitrary(0, this.width - width),
+      y: getRandomArbitrary(-(this.height / 4), 0),
     };
 
-    let textIndex = 0;
+    // let textIndex = 0;
 
-    while (textIndex < this.texts.length || textIndex < this.maxIndex) {
-      let overLapped = false;
-      this.texts.forEach((text) => {
-        if (text !== self && self.getIsCollided(text)) {
-          overLapped = true;
-          self.setPosition = {
-            x: getRandomArbitrary(0, ctx.canvas.width - width),
-            y: getRandomArbitrary(-(ctx.canvas.height / 2), 0),
-          };
-        }
-      });
-      if (overLapped) break;
-      if (this._level === Level.EASY) {
-        self.setVelocity = { x: 0, y: 1 };
-      } else if (this._level === Level.NORMAL) {
-        self.setVelocity = {
-          x: getRandomArbitrary(-0.25, 0.25),
-          y: 1.25,
-        };
-      } else if (this._level === Level.HARD) {
-        self.setVelocity = {
-          x: getRandomArbitrary(-0.5, 0.5),
-          y: 1.5,
-        };
-      }
-      textIndex += 1;
+    // while (textIndex < this.texts.length || textIndex < this.maxIndex) {
+    //   let overLapped = false;
+    //   this.texts.forEach((text) => {
+    //     const { x } = text.getPosition;
+    //     if (
+    //       (text !== self && self.getIsCollided(text)) ||
+    //       x < 0 ||
+    //       x + width > this.width
+    //     ) {
+    //       overLapped = true;
+    //       self.setPosition = {
+    //         x: getRandomArbitrary(0, ctx.canvas.width - width),
+    //         y: getRandomArbitrary(
+    //           -(ctx.canvas.height / 4),
+    //           ctx.canvas.height / 2
+    //         ),
+    //       };
+    //     }
+    //   });
+    //   if (overLapped) break;
+    //   if (this._level === Level.EASY) {
+    //     self.setVelocity = { x: 0, y: getRandomArbitrary(0.5, 1) };
+    //   } else if (this._level === Level.NORMAL) {
+    //     self.setVelocity = {
+    //       x: getRandomArbitrary(0, 0.25),
+    //       y: getRandomArbitrary(0.75, 1),
+    //     };
+    //   } else if (this._level === Level.HARD) {
+    //     self.setVelocity = {
+    //       x: getRandomArbitrary(0, 0.5),
+    //       y: getRandomArbitrary(1, 1.25),
+    //     };
+    //   }
+    //   textIndex += 1;
+    // }
+
+    if (this._level === Level.EASY) {
+      self.setVelocity = { x: 0, y: getRandomArbitrary(0.5, 1) };
+    } else if (this._level === Level.NORMAL) {
+      self.setVelocity = {
+        x: getRandomArbitrary(0, 0.25),
+        y: getRandomArbitrary(0.75, 1),
+      };
+    } else if (this._level === Level.HARD) {
+      self.setVelocity = {
+        x: getRandomArbitrary(0, 0.5),
+        y: getRandomArbitrary(1, 1.25),
+      };
     }
+
+    this.data.words = [word, ...this.data.words];
+    this.texts.push(self);
   }
 
   validateWord(word: string): boolean {

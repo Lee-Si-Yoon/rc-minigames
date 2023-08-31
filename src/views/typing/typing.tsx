@@ -81,7 +81,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     return () => {
       window.removeEventListener("resize", onResize);
     };
-  }, [editor, props.width, props.height]);
+  }, [editor, containerRef.current, props.width, props.height]);
 
   /**
    * @summary CANVAS EVENTS

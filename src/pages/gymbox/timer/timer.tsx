@@ -31,7 +31,7 @@ function Timer() {
 
   const fontStyle = {
     color: "rgba(255, 255, 255, 0.9)",
-    fontSize: "2rem",
+    fontSize: "1.5rem",
     fontWeight: "600",
   };
 
@@ -56,11 +56,12 @@ function Timer() {
       <div
         style={{
           display: "flex",
-          width: "100%",
+          width: "calc(100% + 1.5rem)",
           justifyContent: "center",
           alignItems: "center",
           position: "relative",
-          columnGap: "1.5rem",
+          columnGap: "1.25rem",
+          marginLeft: "-1.5rem",
         }}
       >
         <ScrollPicker
@@ -78,7 +79,7 @@ function Timer() {
         <div className={classes.HighLight} />
       </div>
       <button className={classes.Button} onClick={handleOnClick}>
-        Typing
+        GAME START
       </button>
     </div>
   );

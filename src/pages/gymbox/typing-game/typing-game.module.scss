@@ -71,10 +71,9 @@ $nav-height: 3.125rem;
   .BackButton {
     all: unset;
     cursor: pointer;
-  }
-
-  .TimerText {
-    font-feature-settings: "clig 'off', liga 'off'";
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 

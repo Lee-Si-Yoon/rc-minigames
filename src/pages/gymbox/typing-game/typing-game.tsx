@@ -26,11 +26,10 @@ function TypingGame() {
   }, []);
 
   /** DEBUGGER */
-  const [debugMode, setDebugMode] = useState<boolean>(true);
+  const [debugMode, setDebugMode] = useState<boolean>(false);
 
   /** VIEWPORT */
   const [height, setHeight] = useState<number>(0);
-
   React.useEffect(() => {
     const viewportHandler = () => {
       if (window.visualViewport && window.visualViewport.offsetTop >= 0) {
@@ -198,7 +197,7 @@ function TypingGame() {
       </button>
       <Typing
         ref={ref}
-        width="100vw"
+        width={"100vw"}
         height={height}
         initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
         backgroundComponent={
