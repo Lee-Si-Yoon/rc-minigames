@@ -1,6 +1,5 @@
 import EventDispatcher from "../../utils/eventDispatcher";
 import RenderLayer from "./layers/render-layer";
-import DataLayer from "./layers/data-layer";
 import { CanvasEvents } from "./events";
 import {
   CanvasDataChangeParams,
@@ -22,10 +21,8 @@ class Controller extends EventDispatcher {
   private height: number = 0;
   private dpr: number = 1;
   private element: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
 
   private renderLayer: RenderLayer;
-  private dataLayer: DataLayer;
 
   private isPlaying: Phase = Phase.PAUSED;
   private level: Level = Level.EASY;
@@ -42,14 +39,10 @@ class Controller extends EventDispatcher {
 
     this.renderLayer = new RenderLayer({
       canvas: renderLayer,
-    });
-    this.dataLayer = new DataLayer({
-      canvas: renderLayer,
       initData: initData,
     });
 
     this.element = renderLayer;
-    this.ctx = this.element.getContext("2d", { willReadFrequently: true })!;
 
     this.initialize();
   }
@@ -62,27 +55,23 @@ class Controller extends EventDispatcher {
     return this.element;
   }
 
-  setScales(x: number, y: number) {
+  scale(x: number, y: number) {
     this.renderLayer.scale(x, y);
-    this.dataLayer.scale(x, y);
   }
 
   setDprs(dpr: number) {
     this.dpr = dpr;
     this.renderLayer.setDpr(dpr);
-    this.dataLayer.setDpr(dpr);
   }
 
   private setWidths(width: number, devicePixelRatio?: number) {
     this.width = width;
-    this.renderLayer.setWidth(width ?? this.width, devicePixelRatio);
-    this.dataLayer.setWidth(width ?? this.width, devicePixelRatio);
+    this.renderLayer.setWidth(width, devicePixelRatio);
   }
 
   private setHeights(height: number, devicePixelRatio?: number) {
     this.height = height;
-    this.renderLayer.setHeight(height ?? this.height, devicePixelRatio);
-    this.dataLayer.setHeight(height ?? this.height, devicePixelRatio);
+    this.renderLayer.setHeight(height, devicePixelRatio);
   }
 
   setSizes(width: number, height: number, devicePixelRatio?: number) {
@@ -107,7 +96,7 @@ class Controller extends EventDispatcher {
 
   emitCurrentData() {
     this.emitDataChangeEvent({
-      data: this.dataLayer.getCopiedData(),
+      data: this.renderLayer.getCopiedData(),
     });
   }
 
@@ -159,36 +148,32 @@ class Controller extends EventDispatcher {
 
   setLevel(level: Level) {
     this.level = level;
-    this.dataLayer.setLevel(level);
     this.renderLayer.setLevel(level);
     this.emitControllerData();
   }
 
   updateScore(word: string): void {
-    if (!this.dataLayer.validateWord(word)) return;
-    this.score +=
-      this.dataLayer
-        .getTexts()
-        .find((text) => text.textData() === word)
-        ?.getScore() ?? 0;
+    if (!this.renderLayer.validateWord(word)) return;
+    const targetWord = this.renderLayer
+      .getTexts()
+      .find((text) => text.textData() === word);
+    const score = targetWord?.getScore() ?? 0;
+    const special = targetWord?.getSpecial() ?? 0;
+    this.score += special * score ?? score;
   }
 
   /**
    * @summary on keyboard event
    */
   removeWord(word: string) {
-    this.dataLayer.removeViaInput(word);
     this.updateScore(word);
+    this.renderLayer.removeViaInput(word);
     this.emitCurrentData();
-
-    this.renderLayer.setTexts(this.dataLayer.getTexts());
   }
 
   addWord(textProps: Omit<TextProps, "ctx">) {
-    this.dataLayer.addWord(textProps);
+    this.renderLayer.addWord(textProps);
     this.emitCurrentData();
-
-    this.renderLayer.setTexts(this.dataLayer.getTexts());
   }
 
   playFrames(): void {
@@ -212,7 +197,7 @@ class Controller extends EventDispatcher {
       this.rafId = requestAnimationFrame(animate);
 
       if (this.playTime === 0) {
-        this.dataLayer.initialize();
+        this.renderLayer.initialize();
       }
 
       timer += deltaTime;
@@ -223,14 +208,14 @@ class Controller extends EventDispatcher {
   }
 
   updateFrame() {
-    const texts = this.dataLayer.getTexts();
+    const texts = this.renderLayer.getTexts();
 
     for (const text of texts) {
       const { y } = text.getPosition();
 
       if (y >= this.height) {
-        this.dataLayer.moveWordToFailed(text.textData());
-        this.dataLayer.removeViaInput(text.textData());
+        this.renderLayer.moveWordToFailed(text.textData());
+        this.renderLayer.removeViaInput(text.textData());
         const targetTextIndex = texts.indexOf(text);
         texts.splice(targetTextIndex, 1);
       }

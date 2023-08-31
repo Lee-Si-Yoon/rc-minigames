@@ -68,6 +68,10 @@ class Text {
     }
   }
 
+  getSpecial(): number {
+    return this.special;
+  }
+
   getScore(): number {
     return this.score;
   }
@@ -203,21 +207,18 @@ class Text {
     this.ctx.save();
     this.ctx.textAlign = "left";
     this.ctx.textBaseline = "top";
-    this.ctx.font =
-      "bold 12px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif";
-    this.ctx.fillStyle = "white";
 
     this.ctx.translate(
       this.position.x + this.dimension.width / 2,
       this.position.y + this.dimension.height / 2
     );
 
-    this.ctx.strokeRect(
-      -this.dimension.width / 2,
-      -this.dimension.height / 2,
-      this.dimension.width,
-      this.dimension.height
-    );
+    // this.ctx.strokeRect(
+    //   -this.dimension.width / 2,
+    //   -this.dimension.height / 2,
+    //   this.dimension.width,
+    //   this.dimension.height
+    // );
 
     if (this.special > 1) {
       this.ctx.rotate(Math.PI);
@@ -238,6 +239,8 @@ class Text {
     if (this.particles.length <= 0 || this.particleLifeTime <= 0) return;
     this.particles.forEach((particle, index) => {
       this.ctx.save();
+      this.ctx.textAlign = "left";
+      this.ctx.textBaseline = "top";
       this.ctx.globalAlpha = this.particleLifeTime / 100;
 
       const { x, y } = particle.getPosition();

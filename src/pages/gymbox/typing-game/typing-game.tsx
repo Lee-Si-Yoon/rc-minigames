@@ -71,7 +71,8 @@ function TypingGame() {
       spawnRef.current = setInterval(() => {
         const index = Math.floor(Math.random() * combinedArray.length);
         const word = removeAllWhiteSpaces(combinedArray[index]);
-        if (word) addWord({ data: word });
+        if (word)
+          addWord({ data: word, special: Math.random() * 10 > 7 ? 2 : 1 });
         combinedArray.splice(index, 1);
       }, 2000);
     }
@@ -197,7 +198,7 @@ function TypingGame() {
       </button>
       <Typing
         ref={ref}
-        width={"100vw"}
+        width={"100%"}
         height={height}
         initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
         backgroundComponent={

@@ -70,7 +70,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         const dpr = window.devicePixelRatio;
         const rect = containerRef.current.getBoundingClientRect();
         editor.setSizes(rect.width, rect.height, dpr);
-        editor.setScales(dpr, dpr);
+        editor.scale(dpr, dpr);
         editor.renderFrame();
       }
     };
