@@ -68,19 +68,19 @@ class Text {
     }
   }
 
-  get getScore(): number {
+  getScore(): number {
     return this.score;
   }
 
-  get getPosition(): Coord {
+  getPosition(): Coord {
     return this.position;
   }
 
-  get getDimension(): { width: number; height: number } {
+  getDimension(): { width: number; height: number } {
     return this.dimension;
   }
 
-  get getVelocity(): Coord {
+  getVelocity(): Coord {
     return this.velocity;
   }
 
@@ -120,23 +120,23 @@ class Text {
     );
   }
 
-  get textData(): string {
+  textData(): string {
     return this.data;
   }
 
-  set setPosition(position: Coord) {
+  setPosition(position: Coord) {
     this.position = position;
   }
 
-  set setVelocity(velocity: Coord) {
+  setVelocity(velocity: Coord) {
     this.velocity = velocity;
   }
 
-  set setCollideVelocity(velocity: Coord) {
+  setCollideVelocity(velocity: Coord) {
     this.collideVelocity = velocity;
   }
 
-  set setIsAlive(state: TextState) {
+  setIsAlive(state: TextState) {
     this.state = state;
   }
 
@@ -154,16 +154,16 @@ class Text {
     });
 
     this.particles.forEach((particle, index) => {
-      const { width } = particle.getDimension;
-      const { x: veloX, y: veloY } = particle.getVelocity;
-      particle.setPosition = {
+      const { width } = particle.getDimension();
+      const { x: veloX, y: veloY } = particle.getVelocity();
+      particle.setPosition({
         x: this.position.x + (index + 1) * width,
         y: this.position.y,
-      };
-      particle.setVelocity = {
+      });
+      particle.setVelocity({
         x: getRandomArbitrary(-veloX * 2 || -2, veloX * 2 || 2),
         y: getRandomArbitrary(veloY * 1, veloY * 2),
-      };
+      });
     });
   }
 
@@ -185,12 +185,12 @@ class Text {
 
     if (this.particles.length > 0 && this.state === TextState.DEAD) {
       this.particles.forEach((particle) => {
-        const { x: posX, y: posY } = particle.getPosition;
-        const { x: veloX, y: veloY } = particle.getVelocity;
-        particle.setPosition = {
+        const { x: posX, y: posY } = particle.getPosition();
+        const { x: veloX, y: veloY } = particle.getVelocity();
+        particle.setPosition({
           x: posX + veloX,
           y: posY + veloY,
-        };
+        });
       });
       if (this.particleLifeTime <= 0) {
         this.particles = [];
@@ -240,11 +240,11 @@ class Text {
       this.ctx.save();
       this.ctx.globalAlpha = this.particleLifeTime / 100;
 
-      const { x, y } = particle.getPosition;
-      const { width, height } = particle.getDimension;
+      const { x, y } = particle.getPosition();
+      const { width, height } = particle.getDimension();
       this.ctx.translate(x + width / 2, y + height / 2);
       this.ctx.rotate(Math.PI / -(this.particleLifeTime / (index * 10)));
-      this.ctx.fillText(particle.textData, -width / 2, -height / 2);
+      this.ctx.fillText(particle.textData(), -width / 2, -height / 2);
       this.ctx.translate(-(x + width / 2), -(y + height / 2));
 
       this.ctx.restore();

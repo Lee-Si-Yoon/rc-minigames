@@ -11,7 +11,7 @@ class DataLayer extends BaseLayer {
 
   private maxIndex: number = 500; // max index for brute force
 
-  private _level: Level = Level.EASY;
+  private level: Level = Level.EASY;
 
   constructor({ canvas, initData }: DataLayerConstructor) {
     super({ canvas });
@@ -22,12 +22,12 @@ class DataLayer extends BaseLayer {
     }
   }
 
-  get texts() {
+  getTexts() {
     return this.text;
   }
 
-  set level(level: Level) {
-    this._level = level;
+  setLevel(level: Level) {
+    this.level = level;
   }
 
   resetAll(): void {
@@ -55,12 +55,12 @@ class DataLayer extends BaseLayer {
     if (!word) throw new Error("invalid word");
     const self = new Text({ data: word, ctx: this.ctx, ...rest });
 
-    const { width } = self.getDimension;
+    const { width } = self.getDimension();
 
-    self.setPosition = {
+    self.setPosition({
       x: getRandomArbitrary(0, this.width - width),
       y: getRandomArbitrary(-(this.height / 4), 0),
-    };
+    });
 
     // let textIndex = 0;
 
@@ -100,29 +100,29 @@ class DataLayer extends BaseLayer {
     //   textIndex += 1;
     // }
 
-    if (this._level === Level.EASY) {
-      self.setVelocity = { x: 0, y: getRandomArbitrary(0.5, 1) };
-    } else if (this._level === Level.NORMAL) {
-      self.setVelocity = {
+    if (this.level === Level.EASY) {
+      self.setVelocity({ x: 0, y: getRandomArbitrary(0.5, 1) });
+    } else if (this.level === Level.NORMAL) {
+      self.setVelocity({
         x: getRandomArbitrary(0, 0.25),
         y: getRandomArbitrary(0.75, 1),
-      };
-    } else if (this._level === Level.HARD) {
-      self.setVelocity = {
+      });
+    } else if (this.level === Level.HARD) {
+      self.setVelocity({
         x: getRandomArbitrary(0, 0.5),
         y: getRandomArbitrary(1, 1.25),
-      };
+      });
     }
 
     this.data.words = [word, ...this.data.words];
-    this.texts.push(self);
+    this.text.push(self);
   }
 
   validateWord(word: string): boolean {
     // data.word can exist without being rendered
     return (
       this.data.words.includes(word) &&
-      this.texts.map((text) => text.textData).includes(word)
+      this.text.map((text) => text.textData()).includes(word)
     );
   }
 
@@ -138,12 +138,12 @@ class DataLayer extends BaseLayer {
       this.data.words.splice(indexOfWords, 1);
     }
     // update text state to particled
-    const stringArrayOfTexts: string[] = this.texts.map(
-      (text) => text.textData
+    const stringArrayOfTexts: string[] = this.text.map((text) =>
+      text.textData()
     );
     const indexOfParamText = stringArrayOfTexts.indexOf(word);
     if (indexOfParamText >= 0) {
-      this.texts[indexOfParamText].setIsAlive = TextState.PARTICLED;
+      this.text[indexOfParamText].setIsAlive(TextState.PARTICLED);
     }
   }
 

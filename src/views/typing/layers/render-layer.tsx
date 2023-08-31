@@ -4,42 +4,42 @@ import Text from "../text/text";
 import { Level } from "../model";
 
 class RenderLayer extends BaseLayer {
-  private _texts: Text[] = [];
-  private _level: Level = Level.EASY;
+  private texts: Text[] = [];
+  private level: Level = Level.EASY;
 
   constructor({ canvas }: CanvasLayerConstructor) {
     super({ canvas });
   }
 
-  set texts(texts: Text[]) {
-    this._texts = texts;
+  setTexts(texts: Text[]) {
+    this.texts = texts;
   }
 
-  set level(level: Level) {
-    this._level = level;
+  setLevel(level: Level) {
+    this.level = level;
   }
 
   update(): void {
-    for (const text of this._texts) {
-      const { x, y } = text.getPosition;
-      const { width } = text.getDimension;
-      const { x: velX, y: velY } = text.getVelocity;
+    for (const text of this.texts) {
+      const { x, y } = text.getPosition();
+      const { width } = text.getDimension();
+      const { x: velX, y: velY } = text.getVelocity();
 
       if (x + width > this.width) {
-        text.setPosition = { x: x - 1, y };
-        text.setVelocity = { x: velX * -1, y: velY };
+        text.setPosition({ x: x - 1, y });
+        text.setVelocity({ x: velX * -1, y: velY });
       } else if (x < 0) {
-        text.setPosition = { x: x + 1, y };
-        text.setVelocity = { x: velX * -1, y: velY };
+        text.setPosition({ x: x + 1, y });
+        text.setVelocity({ x: velX * -1, y: velY });
       }
 
       // collision
       // if (this._level === Level.HARD) {
-      const exceptSelf = this._texts.filter((other) => other !== text);
+      const exceptSelf = this.texts.filter((other) => other !== text);
 
       exceptSelf.forEach((other) => {
         if (!text.getIsCollided(other)) return;
-        const { x: otherPositionX, y: otherPositionY } = other.getPosition;
+        const { x: otherPositionX, y: otherPositionY } = other.getPosition();
         const isSelfOnTop = y < otherPositionY;
         const isSelfOnRight = x > otherPositionX;
         const newPosition = { nx: x, ny: y };
@@ -55,11 +55,11 @@ class RenderLayer extends BaseLayer {
           newPosition.ny = y + 1;
         }
 
-        text.setPosition = { x: newPosition.nx, y: newPosition.ny };
-        text.setCollideVelocity = {
+        text.setPosition({ x: newPosition.nx, y: newPosition.ny });
+        text.setCollideVelocity({
           x: text.getVelocityAfterCollision(other).x * 1,
           y: text.getVelocityAfterCollision(other).y * 1,
-        };
+        });
       });
       // }
 
@@ -72,7 +72,7 @@ class RenderLayer extends BaseLayer {
     ctx.save();
     ctx.clearRect(0, 0, this.width, this.height);
 
-    for (const text of this._texts) {
+    for (const text of this.texts) {
       text.render();
       text.renderParticles();
     }

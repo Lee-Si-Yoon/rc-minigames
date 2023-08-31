@@ -159,16 +159,18 @@ class Controller extends EventDispatcher {
 
   setLevel(level: Level) {
     this.level = level;
-    this.dataLayer.level = level;
-    this.renderLayer.level = level;
+    this.dataLayer.setLevel(level);
+    this.renderLayer.setLevel(level);
     this.emitControllerData();
   }
 
   updateScore(word: string): void {
     if (!this.dataLayer.validateWord(word)) return;
     this.score +=
-      this.dataLayer.texts.find((text) => text.textData === word)?.getScore ??
-      0;
+      this.dataLayer
+        .getTexts()
+        .find((text) => text.textData() === word)
+        ?.getScore() ?? 0;
   }
 
   /**
@@ -179,14 +181,14 @@ class Controller extends EventDispatcher {
     this.updateScore(word);
     this.emitCurrentData();
 
-    this.renderLayer.texts = this.dataLayer.texts;
+    this.renderLayer.setTexts(this.dataLayer.getTexts());
   }
 
   addWord(textProps: Omit<TextProps, "ctx">) {
     this.dataLayer.addWord(textProps);
     this.emitCurrentData();
 
-    this.renderLayer.texts = this.dataLayer.texts;
+    this.renderLayer.setTexts(this.dataLayer.getTexts());
   }
 
   playFrames(): void {
@@ -221,14 +223,14 @@ class Controller extends EventDispatcher {
   }
 
   updateFrame() {
-    const texts = this.dataLayer.texts;
+    const texts = this.dataLayer.getTexts();
 
     for (const text of texts) {
-      const { y } = text.getPosition;
+      const { y } = text.getPosition();
 
       if (y >= this.height) {
-        this.dataLayer.moveWordToFailed(text.textData);
-        this.dataLayer.removeViaInput(text.textData);
+        this.dataLayer.moveWordToFailed(text.textData());
+        this.dataLayer.removeViaInput(text.textData());
         const targetTextIndex = texts.indexOf(text);
         texts.splice(targetTextIndex, 1);
       }
