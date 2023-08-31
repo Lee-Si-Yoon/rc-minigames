@@ -3,6 +3,7 @@ import classes from "./timer.module.scss";
 import ScrollPicker from "../../../views/scroll-picker/scroll-picker";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Paths } from "../../../routes/paths";
+import LogoBar from "../../../views/logo-bar/logo-bar";
 
 const Seconds = (length: number) =>
   Array.from({ length }).map((_, i) => Number(i * 10));
@@ -48,10 +49,10 @@ function Timer() {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        rowGap: "5rem",
+        justifyContent: "space-between",
       }}
     >
+      <LogoBar />
       <div
         style={{
           display: "flex",
@@ -62,7 +63,6 @@ function Timer() {
           columnGap: "1.5rem",
         }}
       >
-        {/* TODO: change to mobile picker */}
         <ScrollPicker
           item={Minutes(6)}
           getValue={setMinutes}
@@ -77,19 +77,9 @@ function Timer() {
         <span className={classes.Legend}>초</span>
         <div className={classes.HighLight} />
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          bottom: 0,
-          position: "absolute",
-          width: "100%",
-        }}
-      >
-        <button className={classes.Button} onClick={handleOnClick}>
-          Typing
-        </button>
-      </div>
+      <button className={classes.Button} onClick={handleOnClick}>
+        Typing
+      </button>
     </div>
   );
 }

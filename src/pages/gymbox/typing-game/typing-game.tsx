@@ -7,11 +7,17 @@ import { Level, Phase, TypingRef } from "../../../views/typing/model";
 import useController from "../../../views/typing/hooks/use-controller";
 import { combinedArray } from "./mock-data";
 import Debugger from "./debugger";
-import { greyColorRGB, rgaToHex, tintColorRGB } from "../../../utils/colors";
+import {
+  greyColorHex,
+  greyColorRGB,
+  rgaToHex,
+  tintColorRGB,
+} from "../../../utils/colors";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Paths } from "../../../routes/paths";
 import { lerp, getPoint } from "../../../utils/math";
 import { removeAllWhiteSpaces } from "../../../utils/strip-punctuation";
+import { ChevronIcon, CloseIcon } from "../../../svg";
 
 function TypingGame() {
   /** BACKGROUND */
@@ -83,7 +89,7 @@ function TypingGame() {
     } else {
       setIsPlaying(Phase.PAUSED);
     }
-  }, [isInputFocused, controllerData]);
+  }, [isInputFocused, controllerData.isPlaying]);
 
   /** TIMER */
   const [searchParams] = useSearchParams();
@@ -105,10 +111,9 @@ function TypingGame() {
   React.useEffect(() => {
     if (totalTime <= timerData.playTime) {
       setIsPlaying(Phase.END);
-      navigate(
-        `/${Paths.gymboxx.score}&score=${controllerData.score}?failed=${data.failed}`,
-        { replace: true }
-      );
+      navigate(`${Paths.gymboxx.score}?score=${controllerData.score}`, {
+        replace: true,
+      });
     }
   }, [timerData.playTime, totalTime]);
 
@@ -154,7 +159,7 @@ function TypingGame() {
             )
           }
         >
-          X
+          <CloseIcon width={20} height={20} fill={greyColorHex.black} />
         </button>
         <span
           className={[
@@ -202,7 +207,31 @@ function TypingGame() {
             style={{
               backgroundColor: bgColor,
             }}
-          />
+          >
+            {!isInputFocused && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  width: "100%",
+                  paddingBottom: "1rem",
+                }}
+              >
+                <p style={{ color: "white", textAlign: "center" }}>
+                  아래 입력창을 눌러 키보드를 열어주세요.
+                </p>
+                <ChevronIcon
+                  width={20}
+                  height={20}
+                  fill={greyColorHex.white}
+                  style={{ rotate: "270deg" }}
+                />
+              </div>
+            )}
+          </div>
         }
       />
       <form onSubmit={onSubmit} className={classes.Form}>

@@ -52,13 +52,15 @@ module.exports = {
     // "arrow-parens": ["error", "as-needed"], // a => {}
     "no-param-reassign": ["error", { props: false }],
     "no-unused-expressions": [
-      "error",
+      "warn",
       {
         allowTernary: true, // a || b
         allowShortCircuit: true, // a ? b : 0
         allowTaggedTemplates: true,
       },
     ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "warn",

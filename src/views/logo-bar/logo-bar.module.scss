@@ -1,0 +1,13 @@
+.LogoBar {
+  margin-top: 2.75rem;
+  height: 2.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+
+  .BackButton {
+    all: unset;
+    cursor: pointer;
+  }
+}

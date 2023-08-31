@@ -44,15 +44,15 @@ $nav-height: 3.125rem;
 }
 
 .Mask {
-  mask-border: linear-gradient(
-    to top,
-    transparent,
-    transparent 10%,
-    white 30%,
-    white 70%,
-    transparent 90%,
-    transparent
-  );
+  // mask-border: linear-gradient(
+  //   to top,
+  //   transparent,
+  //   transparent 10%,
+  //   white 30%,
+  //   white 70%,
+  //   transparent 90%,
+  //   transparent
+  // );
 }
 
 .Navigation {
@@ -70,6 +70,7 @@ $nav-height: 3.125rem;
 
   .BackButton {
     all: unset;
+    cursor: pointer;
   }
 
   .TimerText {
