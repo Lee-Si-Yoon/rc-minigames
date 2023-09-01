@@ -1,11 +1,17 @@
 import React, { Dispatch, SetStateAction } from "react";
 
 import classes from "./debugger.module.scss";
-import { ControllerProps, Level, Phase } from "../../../views/typing/model";
+import {
+  ControllerProps,
+  Level,
+  Phase,
+  TimerProps,
+} from "../../../views/typing/model";
 import { DataProps } from "../../../views/typing/layers/model";
 
 interface DebuggerProps {
   data: DataProps;
+  timerData: TimerProps;
   controllerData: ControllerProps;
   setIsPlaying: (phase: Phase) => void;
   setLevel: (level: Level) => void;
@@ -15,6 +21,7 @@ interface DebuggerProps {
 
 function Debugger({
   data,
+  timerData,
   controllerData,
   setIsPlaying,
   setLevel,
@@ -26,8 +33,10 @@ function Debugger({
       <i className={classes.Info}>{`left words: ${JSON.stringify(
         data.words
       )}`}</i>
+      <i className={classes.Info}>{`time: ${JSON.stringify(
+        timerData.playTime
+      )}`}</i>
       <i className={classes.Info}>{`failed: ${JSON.stringify(data.failed)}`}</i>
-      <i className={classes.Info}>{`score: ${JSON.stringify(data.score)}`}</i>
       <i className={classes.Info}>{JSON.stringify(controllerData)}</i>
       <div className={classes.Controller}>
         <label htmlFor="spawn" className={classes.Info}>

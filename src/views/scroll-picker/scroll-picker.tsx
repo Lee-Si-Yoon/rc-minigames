@@ -116,7 +116,6 @@ function ScrollPicker(props: ScrollPickerProps) {
           overflowX: "clip",
           scrollSnapType: "y proximity",
           position: "absolute",
-          padding: "1rem 0",
         }}
       >
         {[-1, ...item, item[item.length - 1] + 1].map((i, index) => (

@@ -1,4 +1,5 @@
-import { Coord, RGB } from "../../utils/types";
+import { RGB } from "../../utils/colors";
+import { Coord } from "../../utils/types";
 
 interface GlowParticleProps {
   position: Coord;

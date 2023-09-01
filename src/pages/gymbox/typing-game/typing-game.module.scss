@@ -1,6 +1,9 @@
+$nav-height: 3.125rem;
+
 .DebugButton {
   all: unset;
   position: absolute;
+  top: $nav-height;
   display: inline-flex;
   padding: 0.3125rem 0.75rem;
   justify-content: center;
@@ -36,15 +39,95 @@
 }
 
 .Container {
-  height: 100%;
+  height: calc(100% - 2.5rem);
   position: relative;
 }
 
-.Jitter {
-  animation: jitter 1s linear infinite;
+.Mask {
+  // mask-border: linear-gradient(
+  //   to top,
+  //   transparent,
+  //   transparent 10%,
+  //   white 30%,
+  //   white 70%,
+  //   transparent 90%,
+  //   transparent
+  // );
 }
 
-@keyframes jitter {
+.Navigation {
+  height: $nav-height;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 0 0.5rem;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.5rem;
+
+  .BackButton {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.Jitter1 {
+  animation: jitter1 1s linear infinite;
+}
+
+@keyframes jitter1 {
+  10% {
+    transform: translate(-0.125rem, -0.1875rem) scale(1.005, 1.005);
+  }
+
+  20% {
+    transform: translate(0.1875rem, 0.125rem) scale(0.995, 0.995);
+  }
+
+  30% {
+    transform: translate(-0.25rem, -0.1625rem) scale(1.005, 1.005);
+  }
+
+  40% {
+    transform: translate(0.125rem, 0.125rem) scale(1, 1);
+  }
+
+  50% {
+    transform: translate(-0.0625rem, -0.125rem) scale(0.99, 0.99);
+  }
+
+  60% {
+    transform: translate(0, 0.125rem) scale(1.01, 1.01);
+  }
+
+  70% {
+    transform: translate(-0.0625rem, -0.25rem) scale(1, 1);
+  }
+
+  80% {
+    transform: translate(0.1875rem, 0.0625rem) scale(0.995, 0.995);
+  }
+
+  90% {
+    transform: translate(-0.1875rem, -0.125rem) scale(1.05, 1.05);
+  }
+
+  100% {
+    transform: translate(0.1275rem, 0.0625rem) scale(0.975, 0.975);
+  }
+}
+
+.Jitter2 {
+  animation: jitter2 1s linear infinite;
+}
+
+@keyframes jitter2 {
   10% {
     transform: translate(-0.125rem, -0.1875rem) scale(1.01, 1.01);
   }

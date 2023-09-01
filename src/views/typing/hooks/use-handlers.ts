@@ -2,6 +2,7 @@ import { MutableRefObject, useCallback } from "react";
 import {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
+  TimerChangeHandler,
   TypingRef,
 } from "../model";
 
@@ -57,6 +58,23 @@ function useHandlers(ref: MutableRefObject<TypingRef | null>) {
     [ref]
   );
 
+  /**
+   * @summary TIMER HANDLER
+   */
+  const addTimerChangeListener = useCallback(
+    (listener: TimerChangeHandler) => {
+      ref.current?.addTimerChangeListener(listener);
+    },
+    [ref]
+  );
+
+  const removeTimerChangeListener = useCallback(
+    (listener: TimerChangeHandler) => {
+      ref.current?.removeTimerChangeListener(listener);
+    },
+    [ref]
+  );
+
   return {
     addDataChangeListener,
     removeDataChangeListener,
@@ -64,6 +82,8 @@ function useHandlers(ref: MutableRefObject<TypingRef | null>) {
     removeCanvasElementEventListener,
     addControllerChangeListener,
     removeControllerChangeListener,
+    addTimerChangeListener,
+    removeTimerChangeListener,
   };
 }
 

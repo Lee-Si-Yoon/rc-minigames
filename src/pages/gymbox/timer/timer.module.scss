@@ -1,3 +1,6 @@
+$--grey-01: #171719;
+$--grey-04: #79828e;
+
 .Button {
   all: unset;
   text-align: center;
@@ -27,19 +30,19 @@
     right: auto;
     display: block;
     width: 100%;
-    background-color: #d9d9d9;
+    background-color: var(--grey-01, #171719);
   }
 
   &::before {
     top: -3.125rem;
     bottom: auto;
-    height: 0.0625rem;
+    height: 0.125rem;
   }
 
   &::after {
     bottom: -3.125rem;
     top: auto;
-    height: 0.0625rem;
+    height: 0.125rem;
   }
 }
 
@@ -47,7 +50,7 @@
   font-feature-settings: "clig" off, "liga" off;
   color: white;
   font-weight: 600;
-  font-size: 2rem;
+  font-size: 1.5rem;
   margin-left: -3rem;
   line-height: 0;
 }
