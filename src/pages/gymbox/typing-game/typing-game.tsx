@@ -18,6 +18,24 @@ import { Paths } from "../../../routes/paths";
 import { lerp, getPoint } from "../../../utils/math";
 import { removeAllWhiteSpaces } from "../../../utils/strip-punctuation";
 import { ChevronIcon, CloseIcon } from "../../../svg";
+import IntroText, { TextSequence } from "../../../views/intro-text/intro-text";
+
+const mockData: TextSequence[] = [
+  {
+    text: "READY",
+    fps: 12,
+    duration: 20,
+    minSize: 36,
+    maxSize: 48,
+  },
+  {
+    text: "GO!",
+    fps: 12,
+    duration: 20,
+    minSize: 52,
+    maxSize: 64,
+  },
+];
 
 function TypingGame() {
   /** BACKGROUND */
@@ -209,27 +227,30 @@ function TypingGame() {
             }}
           >
             {!isInputFocused && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  flexDirection: "column",
-                  width: "100%",
-                  paddingBottom: "1rem",
-                }}
-              >
-                <p style={{ color: "white", textAlign: "center" }}>
-                  아래 입력창을 눌러 키보드를 열어주세요.
-                </p>
-                <ChevronIcon
-                  width={20}
-                  height={20}
-                  fill={greyColorHex.white}
-                  style={{ rotate: "270deg" }}
-                />
-              </div>
+              <>
+                <IntroText data={mockData} width={"100%"} height={"100%"} />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    width: "100%",
+                    paddingBottom: "1rem",
+                  }}
+                >
+                  <p style={{ color: "white", textAlign: "center" }}>
+                    아래 입력창을 눌러 키보드를 열어주세요.
+                  </p>
+                  <ChevronIcon
+                    width={20}
+                    height={20}
+                    fill={greyColorHex.white}
+                    style={{ rotate: "270deg" }}
+                  />
+                </div>
+              </>
             )}
           </div>
         }
