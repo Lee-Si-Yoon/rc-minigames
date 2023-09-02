@@ -12,6 +12,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
+    "plugin:storybook/recommended",
   ],
   overrides: [
     {
@@ -64,5 +65,6 @@ module.exports = {
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "warn",
+    "react/no-unescaped-entities": "warn",
   },
 };
