@@ -102,7 +102,18 @@ class Controller extends BaseLayer {
     ctx.fillStyle = `rgba(255, 255, 255, 1)`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const degreeY = getPoint(1 - this.duration / this.target.duration!);
+
+    const START = { x: 0.0, y: 0.0 };
+    const MID1 = { x: 0.25, y: -1.0 };
+    const MID2 = { x: 0.75, y: 0.0 };
+    const END = { x: 1.0, y: 1.0 };
+
+    const degreeY = getPoint(
+      START,
+      MID1,
+      MID2,
+      END
+    )(1 - this.duration / this.target.duration!);
 
     ctx.font = `bold ${lerp(
       this.target.minSize ?? 16,

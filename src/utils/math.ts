@@ -1,3 +1,5 @@
+import { Coord } from "./types";
+
 function isDifferenceLessThan(
   num1: number,
   num2: number,
@@ -23,27 +25,23 @@ const lerpRange = (
   return low2 + ((high2 - low2) * (value - low1)) / (high1 - low1);
 };
 
-const START = { x: 0.0, y: 0.0 };
-const MID1 = { x: 5.0, y: 0.0 };
-const MID2 = { x: 5.0, y: 0.0 };
-const END = { x: 1.0, y: 1.0 };
-
 /**
  * @url https://javascript.info/bezier-curve#maths
  */
-const getPoint = (t: number) => {
-  const x =
-    (1 - t) ** 3 * START.x +
-    3 * (1 - t) ** 2 * t * MID1.x +
-    3 * (1 - t) * t ** 2 * MID2.x +
-    t ** 3 * END.x;
-  const y =
-    (1 - t) ** 3 * START.y +
-    3 * (1 - t) ** 2 * t * MID1.y +
-    3 * (1 - t) * t ** 2 * MID2.y +
-    t ** 3 * END.y;
-  return { x, y };
-};
+const getPoint =
+  (start: Coord, mid1: Coord, mid2: Coord, end: Coord) => (t: number) => {
+    const x =
+      (1 - t) ** 3 * start.x +
+      3 * (1 - t) ** 2 * t * mid1.x +
+      3 * (1 - t) * t ** 2 * mid2.x +
+      t ** 3 * end.x;
+    const y =
+      (1 - t) ** 3 * start.y +
+      3 * (1 - t) ** 2 * t * mid1.y +
+      3 * (1 - t) * t ** 2 * mid2.y +
+      t ** 3 * end.y;
+    return { x, y };
+  };
 
 export {
   isDifferenceLessThan,

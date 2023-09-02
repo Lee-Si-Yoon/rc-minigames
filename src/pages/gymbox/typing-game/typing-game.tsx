@@ -24,16 +24,19 @@ const mockData: TextSequence[] = [
   {
     text: "READY",
     fps: 12,
-    duration: 20,
-    minSize: 36,
+    duration: 30,
+    minSize: 24,
     maxSize: 48,
   },
   {
     text: "GO!",
     fps: 12,
     duration: 20,
-    minSize: 52,
+    minSize: 48,
     maxSize: 64,
+  },
+  {
+    text: "",
   },
 ];
 
@@ -144,7 +147,12 @@ function TypingGame() {
     const red = tintColorRGB.red_01;
     const ratio = timerData.playTime / totalTime;
 
-    const degreeY = getPoint(ratio).y;
+    const START = { x: 0.0, y: 0.0 };
+    const MID1 = { x: 5.0, y: 0.0 };
+    const MID2 = { x: 5.0, y: 0.0 };
+    const END = { x: 1.0, y: 1.0 };
+
+    const degreeY = getPoint(START, MID1, MID2, END)(ratio).y;
 
     const r = lerp(black.r, red.r, degreeY);
     const g = lerp(black.g, red.g, degreeY);
