@@ -56,6 +56,8 @@ enum GamePhase {
 function TypingGame() {
   /** BACKGROUND */
   React.useLayoutEffect(() => {
+    if (gameStartTexts.length <= 0 || onGameEndTexts.length <= 0)
+      location.reload();
     document.body.style.backgroundColor = "black";
   }, []);
 
@@ -117,19 +119,17 @@ function TypingGame() {
   }, [spawnWords, controllerData.isPlaying]);
 
   React.useEffect(() => {
-    const onGameEnd = async () => {
+    const onGameEnd = () => {
       setIsPlaying(Phase.END);
 
-      await new Promise((r) => setTimeout(r, 2000));
-
-      navigate(`${Paths.gymboxx.score}?score=${controllerData.score}`, {
-        replace: true,
-      });
+      setTimeout(() => {
+        navigate(`${Paths.gymboxx.score}?score=${controllerData.score}`);
+      }, 2000);
     };
-    const onGameStart = async () => {
-      await new Promise((r) => setTimeout(r, 1500));
-
-      setIsPlaying(Phase.PLAYING);
+    const onGameStart = () => {
+      setTimeout(() => {
+        setIsPlaying(Phase.PLAYING);
+      }, 3500);
     };
     if (gamePhase === GamePhase.GAME_PLAYING) onGameStart();
     if (gamePhase === GamePhase.END) onGameEnd();
@@ -153,6 +153,7 @@ function TypingGame() {
   };
 
   React.useEffect(() => {
+    console.log(timerData.playTime);
     if (totalTime <= timerData.playTime) setGamePhase(GamePhase.END);
   }, [timerData.playTime, totalTime]);
 
@@ -254,33 +255,19 @@ function TypingGame() {
           >
             {gamePhase === GamePhase.BEFORE_START && (
               <>
-                <div
-                  style={{
-                    width: "100%",
-                    height,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <span style={{ color: "white", textAlign: "center" }}>
-                    색깔이 있는 단어는 점수를 더 많이 받을 수 있어요
+                <div style={{ height }} className={classes.GameStartContainer}>
+                  <h2 className={classes.Blink}>GAME START</h2>
+                  <span>
+                    <b>색깔</b>이 있는 단어는 점수를 더 많이 받을 수 있어요
                   </span>
                 </div>
                 <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    width: "100%",
-                    paddingBottom: "1rem",
-                  }}
+                  className={[
+                    classes.TouchKeyboardContainer,
+                    classes.ShiftTopDown,
+                  ].join(" ")}
                 >
-                  <span style={{ color: "white", textAlign: "center" }}>
-                    아래 입력창을 눌러 키보드를 열어주세요.
-                  </span>
+                  <span>아래 입력창을 눌러 키보드를 열어주세요.</span>
                   <ChevronIcon
                     width={20}
                     height={20}
