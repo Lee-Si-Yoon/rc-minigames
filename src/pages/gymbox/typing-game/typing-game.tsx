@@ -20,25 +20,38 @@ import { removeAllWhiteSpaces } from "../../../utils/strip-punctuation";
 import { ChevronIcon, CloseIcon } from "../../../svg";
 import IntroText, { TextSequence } from "../../../views/intro-text/intro-text";
 
-const mockData: TextSequence[] = [
+const gameStartTexts: TextSequence[] = [
   {
     text: "READY",
-    fps: 12,
+    fps: 21,
     duration: 30,
     minSize: 24,
-    maxSize: 48,
+    maxSize: 42,
   },
   {
     text: "GO!",
-    fps: 12,
-    duration: 20,
-    minSize: 48,
+    fps: 21,
+    duration: 12,
+    minSize: 52,
     maxSize: 64,
   },
+];
+
+const onGameEndTexts: TextSequence[] = [
   {
-    text: "",
+    text: "GAME OVER",
+    fps: 21,
+    duration: 30,
+    minSize: 24,
+    maxSize: 42,
   },
 ];
+
+enum GamePhase {
+  BEFORE_START = "no started yet",
+  GAME_PLAYING = "game is running",
+  END = "game ended, small amount of stall before navigation",
+}
 
 function TypingGame() {
   /** BACKGROUND */
@@ -65,6 +78,9 @@ function TypingGame() {
   }, [window.visualViewport]);
 
   /** GAME */
+  const [gamePhase, setGamePhase] = React.useState<GamePhase>(
+    GamePhase.BEFORE_START
+  );
   const ref = useRef<TypingRef>(null);
   const { addWord, removeWord, data } = useData(ref);
   const { setIsPlaying, setLevel, controllerData, timerData } =
@@ -100,17 +116,24 @@ function TypingGame() {
     return () => clearInterval(spawnRef.current);
   }, [spawnWords, controllerData.isPlaying]);
 
-  const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false);
-
   React.useEffect(() => {
-    if (isInputFocused) {
-      if (controllerData.isPlaying !== Phase.PLAYING) {
-        setIsPlaying(Phase.PLAYING);
-      }
-    } else {
-      setIsPlaying(Phase.PAUSED);
-    }
-  }, [isInputFocused, controllerData.isPlaying]);
+    const onGameEnd = async () => {
+      setIsPlaying(Phase.END);
+
+      await new Promise((r) => setTimeout(r, 2000));
+
+      navigate(`${Paths.gymboxx.score}?score=${controllerData.score}`, {
+        replace: true,
+      });
+    };
+    const onGameStart = async () => {
+      await new Promise((r) => setTimeout(r, 1500));
+
+      setIsPlaying(Phase.PLAYING);
+    };
+    if (gamePhase === GamePhase.GAME_PLAYING) onGameStart();
+    if (gamePhase === GamePhase.END) onGameEnd();
+  }, [gamePhase]);
 
   /** TIMER */
   const [searchParams] = useSearchParams();
@@ -130,12 +153,7 @@ function TypingGame() {
   };
 
   React.useEffect(() => {
-    if (totalTime <= timerData.playTime) {
-      setIsPlaying(Phase.END);
-      navigate(`${Paths.gymboxx.score}?score=${controllerData.score}`, {
-        replace: true,
-      });
-    }
+    if (totalTime <= timerData.playTime) setGamePhase(GamePhase.END);
   }, [timerData.playTime, totalTime]);
 
   const [bgColor, setBgColor] = React.useState<
@@ -234,19 +252,21 @@ function TypingGame() {
               backgroundColor: bgColor,
             }}
           >
-            {!isInputFocused && (
+            {gamePhase === GamePhase.BEFORE_START && (
               <>
-                <IntroText
-                  data={mockData}
-                  width={"100%"}
-                  height={height}
+                <div
                   style={{
-                    position: "absolute",
-                    left: "-50%",
-                    top: "-50%",
-                    transform: "translate(50%, 50%)",
+                    width: "100%",
+                    height,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
-                />
+                >
+                  <span style={{ color: "white", textAlign: "center" }}>
+                    색깔이 있는 단어는 점수를 더 많이 받을 수 있어요
+                  </span>
+                </div>
                 <div
                   style={{
                     position: "absolute",
@@ -258,9 +278,9 @@ function TypingGame() {
                     paddingBottom: "1rem",
                   }}
                 >
-                  <p style={{ color: "white", textAlign: "center" }}>
+                  <span style={{ color: "white", textAlign: "center" }}>
                     아래 입력창을 눌러 키보드를 열어주세요.
-                  </p>
+                  </span>
                   <ChevronIcon
                     width={20}
                     height={20}
@@ -269,6 +289,12 @@ function TypingGame() {
                   />
                 </div>
               </>
+            )}
+            {gamePhase === GamePhase.GAME_PLAYING && (
+              <IntroText data={gameStartTexts} width={"100%"} height={height} />
+            )}
+            {gamePhase === GamePhase.END && (
+              <IntroText data={onGameEndTexts} width={"100%"} height={height} />
             )}
           </div>
         }
@@ -281,8 +307,7 @@ function TypingGame() {
           value={inputValue}
           className={classes.Input}
           onChange={onChange}
-          onFocus={() => setIsInputFocused(true)}
-          onBlur={() => setIsInputFocused(false)}
+          onFocus={() => setGamePhase(GamePhase.GAME_PLAYING)}
         />
       </form>
     </div>
