@@ -1,4 +1,5 @@
 $nav-height: 3.125rem;
+$--red-02: #e00f0a;
 
 .DebugButton {
   all: unset;
@@ -74,6 +75,98 @@ $nav-height: 3.125rem;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+.GameStartContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  h2 {
+    color: white;
+    text-align: center;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 2rem;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  span {
+    color: white;
+    text-align: center;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1.25rem;
+
+    b {
+      color: var(--red-02, #e00f0a);
+      font-weight: 400;
+    }
+  }
+}
+
+.Blink {
+  animation: blink 2s steps(2) infinite;
+}
+
+@keyframes blink {
+  from {
+    // opacity: 0;
+    color: black;
+  }
+
+  to {
+    // opacity: 1;
+    color: white;
+  }
+}
+
+.TouchKeyboardContainer {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 1rem;
+  align-items: center;
+
+  span {
+    color: white;
+    text-align: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1.25rem;
+  }
+}
+
+.ShiftTopDown {
+  svg {
+    animation: topDown 1s linear infinite;
+  }
+}
+
+@keyframes topDown {
+  0% {
+    transform: translateX(0);
+  }
+
+  33% {
+    transform: translateX(0.125rem);
+  }
+
+  66% {
+    transform: translateX(-0.125rem);
+  }
+
+  100% {
+    transform: translateX(0);
   }
 }
 
