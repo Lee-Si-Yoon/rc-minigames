@@ -8,7 +8,7 @@ abstract class BaseLayer {
   protected height: number = 0;
 
   constructor({ canvas }: CanvasLayerConstructor) {
-    this.ctx = canvas.getContext("2d", { willReadFrequently: true})!;
+    this.ctx = canvas.getContext("2d", { willReadFrequently: true })!;
     this.element = canvas;
   }
 
@@ -40,19 +40,19 @@ abstract class BaseLayer {
     this.dpr = dpr;
   }
 
-  setWidth(width: number, devicePixelRatio?: number) {
+  setWidth(width: number, devicePixelRatio: number) {
     this.width = width;
     this.element.width = devicePixelRatio ? width * devicePixelRatio : width;
     this.element.style.width = `${width}px`;
   }
 
-  setHeight(height: number, devicePixelRatio?: number) {
+  setHeight(height: number, devicePixelRatio: number) {
     this.height = height;
     this.element.height = devicePixelRatio ? height * devicePixelRatio : height;
     this.element.style.height = `${height}px`;
   }
 
-  setSize(width: number, height: number, devicePixelRatio?: number) {
+  setSize(width: number, height: number, devicePixelRatio: number) {
     this.setWidth(width, devicePixelRatio);
     this.setHeight(height, devicePixelRatio);
     this.dpr = devicePixelRatio ? devicePixelRatio : this.dpr;

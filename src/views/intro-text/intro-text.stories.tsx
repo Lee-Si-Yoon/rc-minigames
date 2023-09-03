@@ -26,11 +26,8 @@ const mockData: TextSequence[] = [
     maxSize: 64,
   },
   {
-    text: "GO!",
-    fps: 21,
-    duration: 6,
-    minSize: 64,
-    maxSize: 64,
+    text: "",
+    duration: 100,
   },
 ];
 

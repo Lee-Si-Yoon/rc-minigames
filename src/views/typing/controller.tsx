@@ -64,17 +64,17 @@ class Controller extends EventDispatcher {
     this.renderLayer.setDpr(dpr);
   }
 
-  private setWidths(width: number, devicePixelRatio?: number) {
+  private setWidths(width: number, devicePixelRatio: number) {
     this.width = width;
     this.renderLayer.setWidth(width, devicePixelRatio);
   }
 
-  private setHeights(height: number, devicePixelRatio?: number) {
+  private setHeights(height: number, devicePixelRatio: number) {
     this.height = height;
     this.renderLayer.setHeight(height, devicePixelRatio);
   }
 
-  setSizes(width: number, height: number, devicePixelRatio?: number) {
+  setSizes(width: number, height: number, devicePixelRatio: number) {
     this.setWidths(width, devicePixelRatio);
     this.setHeights(height, devicePixelRatio);
     this.setDprs(devicePixelRatio ? devicePixelRatio : this.dpr);

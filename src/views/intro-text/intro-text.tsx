@@ -17,6 +17,10 @@ export interface IntroTextProps {
   style?: React.CSSProperties;
 }
 
+enum PhaseEvent {
+  NO_DATA_LEFT = "data is not left",
+}
+
 interface ControllerProps {
   canvas: HTMLCanvasElement;
   data: TextSequence[];
@@ -38,6 +42,7 @@ class Controller extends BaseLayer {
   private interval: number = 1000 / this.fps;
   private timeStamp: number = 0;
   private rafId: number = 0;
+  private playTimeOffset: number = 10;
 
   constructor({ canvas, data }: ControllerProps) {
     super({ canvas });
@@ -49,6 +54,8 @@ class Controller extends BaseLayer {
     const target = this.data.shift();
     if (!target) {
       cancelAnimationFrame(this.rafId);
+      this.element.dispatchEvent(new Event(PhaseEvent.NO_DATA_LEFT));
+
       return;
     }
 
@@ -57,10 +64,6 @@ class Controller extends BaseLayer {
     this.text = target.text;
     this.interval = 1000 / (target.fps ?? 60);
     this.duration = target.duration ?? 0;
-  }
-
-  getIsPlaying() {
-    return this.text.length > 0;
   }
 
   start(): void {
@@ -123,7 +126,7 @@ class Controller extends BaseLayer {
     ctx.fillText(this.text, this.width / 2, this.height / 2);
     ctx.restore();
 
-    if (this.duration === 0) this.initialize();
+    if (this.duration < -this.playTimeOffset) this.initialize();
 
     this.duration -= 1;
   }
@@ -134,6 +137,7 @@ function IntroText(props: IntroTextProps) {
   const [controllerRef, setControllerRef] =
     React.useState<HTMLCanvasElement | null>(null);
   const [controller, setController] = React.useState<Controller | null>(null);
+  const [isNoDataLeft, setIsNoDataLeft] = React.useState<boolean>(false);
 
   const getControllerRef = React.useCallback((element: HTMLCanvasElement) => {
     if (!element) return;
@@ -143,22 +147,22 @@ function IntroText(props: IntroTextProps) {
 
   React.useEffect(() => {
     if (!controllerRef) return;
+    if (!props.data) setIsNoDataLeft(true);
     const canvas = new Controller({
       canvas: controllerRef,
       data: props.data,
       backgroundColor: props.backgroundColor,
     });
     setController(canvas);
-  }, [controllerRef]);
+  }, [controllerRef, props.data]);
 
   React.useEffect(() => {
     const onResize = () => {
       if (!containerRef.current || !controller) return;
-      const dpr = window.devicePixelRatio;
+      const dpr = window.devicePixelRatio ?? 1;
       const rect = containerRef.current.getBoundingClientRect();
-      controller.setSize(rect.width, rect.height);
+      controller.setSize(rect.width, rect.height, dpr);
       controller.scale(dpr, dpr);
-      controller.render();
     };
 
     onResize();
@@ -170,7 +174,16 @@ function IntroText(props: IntroTextProps) {
   React.useEffect(() => {
     if (!controller) return;
     controller.start();
+
+    const element = controller.getElement();
+    const onNoDataLeftEvent = () => setIsNoDataLeft(true);
+    element.addEventListener(PhaseEvent.NO_DATA_LEFT, onNoDataLeftEvent);
+
+    return () =>
+      element.removeEventListener(PhaseEvent.NO_DATA_LEFT, onNoDataLeftEvent);
   }, [controller]);
+
+  if (isNoDataLeft) return null;
 
   return (
     <div
