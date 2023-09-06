@@ -1,4 +1,4 @@
-import EventDispatcher from "../../utils/eventDispatcher";
+import { EventDispatcherWithRAF } from "../../utils/eventDispatcher";
 import RenderLayer from "./layers/render-layer";
 import { CanvasEvents } from "./events";
 import {
@@ -10,7 +10,6 @@ import {
 } from "./model";
 import { Words } from "./layers/model";
 import { TextProps } from "./text/text";
-import FrameController from "./frame-controller";
 import LevelState from "./level-state";
 
 interface ControllerConstructor {
@@ -18,7 +17,7 @@ interface ControllerConstructor {
   initData?: Words;
 }
 
-class Controller extends EventDispatcher {
+class Controller extends EventDispatcherWithRAF {
   private width: number = 0;
   private height: number = 0;
   private dpr: number = 1;
@@ -28,16 +27,7 @@ class Controller extends EventDispatcher {
 
   private levelState: LevelState;
 
-  private isPlaying: Phase = Phase.PAUSED;
   private score: number = 0;
-
-  private timeStamp: number = 0;
-  private playTime: number = 0;
-  private fps: number = 60;
-  private interval: number = 1000 / this.fps; // 16fps
-  private rafId: number = 0;
-
-  public frameController: FrameController;
 
   constructor({ renderLayer, initData }: ControllerConstructor) {
     super();
@@ -50,16 +40,6 @@ class Controller extends EventDispatcher {
       levelState: this.levelState,
     });
     this.element = renderLayer;
-
-    this.frameController = new FrameController({
-      initializer: this.renderLayer.initialize,
-      onPlay: () => {
-        this.updateFrame();
-        this.renderFrame();
-        this.emitTimerData();
-      },
-      emitter: this.emitControllerData,
-    });
 
     this.initialize();
   }
@@ -140,14 +120,6 @@ class Controller extends EventDispatcher {
 
   /** GAME STATES */
 
-  getIsPlaying(): Phase {
-    return this.isPlaying;
-  }
-
-  setFps(fps: number) {
-    this.fps = fps;
-  }
-
   setIsPlaying(phase: Phase) {
     this.isPlaying = phase;
 
@@ -158,7 +130,7 @@ class Controller extends EventDispatcher {
     } else if (phase === Phase.PAUSED) {
       cancelAnimationFrame(this.rafId);
     } else if (phase === Phase.PLAYING) {
-      this.playFrames();
+      this.play();
     }
 
     this.emitControllerData();
@@ -200,7 +172,7 @@ class Controller extends EventDispatcher {
     this.emitCurrentData();
   }
 
-  playFrames(): void {
+  play(): void {
     let timer = 0;
     let lastTime = 0;
 

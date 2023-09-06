@@ -84,12 +84,6 @@ class Hard implements Level {
   }
 }
 
-const con = new LevelState();
-con.getLevel().increase();
-con.setLevel(new Hard(con));
-
-console.log(`Level : ${con.getLevelName()}`);
-
 export type { Level };
 
 export default LevelState;

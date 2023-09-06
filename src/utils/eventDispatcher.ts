@@ -1,3 +1,5 @@
+import FrameController from "../views/typing/frame-controller";
+
 class Event {
   private name: string;
 
@@ -56,5 +58,45 @@ class EventDispatcher {
     this.events[name].off(cb);
   }
 }
+
+abstract class EventDispatcherWithRAF extends FrameController {
+  events: { [name: string]: Event };
+
+  constructor() {
+    super();
+    this.events = {};
+  }
+
+  emit(name: string, ...args: Array<unknown>) {
+    if (!this.events[name]) {
+      return;
+    }
+
+    this.events[name].callbacks.forEach((cb) => {
+      cb(...args);
+    });
+  }
+
+  addEventListener(name: string, cb: Function): void {
+    if (!this.events[name]) {
+      this.events[name] = new Event(name);
+    }
+
+    this.events[name].on(cb);
+  }
+
+  removeEventListener(name: string, cb?: Function) {
+    if (!cb) {
+      delete this.events[name];
+      return;
+    }
+
+    this.events[name].off(cb);
+  }
+
+  protected abstract play(): void;
+}
+
+export { EventDispatcherWithRAF };
 
 export default EventDispatcher;
