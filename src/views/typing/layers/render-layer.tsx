@@ -11,7 +11,7 @@ class RenderLayer extends BaseLayer {
 
   private levelState: LevelState;
 
-  private maxIndex: number = 500; // max index for brute force
+  private maxIndex: number = 200; // max index for brute force
 
   constructor({ canvas, initData, levelState }: DataLayerConstructor) {
     super({ canvas });
@@ -70,19 +70,10 @@ class RenderLayer extends BaseLayer {
     let textIndex = 0;
 
     while (textIndex < this.texts.length || textIndex < this.maxIndex) {
-      if (this.levelState.getLevel() === this.levelState.Easy) {
-        self.setVelocity({ x: 0, y: getRandomArbitrary(0.5, 1) });
-      } else if (this.levelState.getLevel() === this.levelState.Normal) {
-        self.setVelocity({
-          x: getRandomArbitrary(-0.25, 0.25),
-          y: getRandomArbitrary(0.75, 1),
-        });
-      } else if (this.levelState.getLevel() === this.levelState.Hard) {
-        self.setVelocity({
-          x: getRandomArbitrary(-0.5, 0.5),
-          y: getRandomArbitrary(1, 1.25),
-        });
-      }
+      self.setVelocity({
+        x: this.levelState.getLevel().getRandomXvelocity(),
+        y: this.levelState.getLevel().getRandomYvelocity(),
+      });
 
       let overLapped = false;
       this.texts.forEach((text) => {

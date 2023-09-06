@@ -1,7 +1,11 @@
+import { getRandomArbitrary } from "../../utils/math";
+
 interface Level {
   LevelState: LevelState;
   value: number;
 
+  getRandomXvelocity: () => number;
+  getRandomYvelocity: () => number;
   increase: VoidFunction;
   decrease: VoidFunction;
 }
@@ -44,6 +48,14 @@ class Easy implements Level {
     this.LevelState = LevelState;
   }
 
+  public getRandomXvelocity() {
+    return 0;
+  }
+
+  public getRandomYvelocity() {
+    return getRandomArbitrary(0.5, 1);
+  }
+
   public increase() {
     this.LevelState.setLevel(this.LevelState.Normal);
   }
@@ -60,6 +72,14 @@ class Normal implements Level {
     this.LevelState = LevelState;
   }
 
+  public getRandomXvelocity() {
+    return getRandomArbitrary(-0.25, 0.25);
+  }
+
+  public getRandomYvelocity() {
+    return getRandomArbitrary(0.75, 1);
+  }
+
   public increase() {
     this.LevelState.setLevel(this.LevelState.Hard);
   }
@@ -74,6 +94,14 @@ class Hard implements Level {
 
   constructor(LevelState: LevelState) {
     this.LevelState = LevelState;
+  }
+
+  public getRandomXvelocity() {
+    return getRandomArbitrary(-0.5, 0.5);
+  }
+
+  public getRandomYvelocity() {
+    return getRandomArbitrary(1, 1.25);
   }
 
   public increase() {
