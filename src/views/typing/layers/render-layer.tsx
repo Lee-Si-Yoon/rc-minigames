@@ -1,20 +1,22 @@
 import BaseLayer from "../../../utils/base-layer";
 import { DataLayerConstructor, DataProps } from "./model";
 import Text, { TextProps, TextState } from "../text/text";
-import { Level } from "../model";
 import { getRandomArbitrary } from "../../../utils/math";
+import LevelState from "../level-state";
 
 class RenderLayer extends BaseLayer {
   private initData: string[] = [];
   private texts: Text[] = [];
   private data: DataProps = { words: [], failed: [] };
 
-  private level: Level = Level.EASY;
+  private levelState: LevelState;
 
   private maxIndex: number = 500; // max index for brute force
 
-  constructor({ canvas, initData }: DataLayerConstructor) {
+  constructor({ canvas, initData, levelState }: DataLayerConstructor) {
     super({ canvas });
+
+    this.levelState = levelState;
 
     if (initData) {
       this.initData = initData;
@@ -28,10 +30,6 @@ class RenderLayer extends BaseLayer {
 
   setTexts(texts: Text[]) {
     this.texts = texts;
-  }
-
-  setLevel(level: Level) {
-    this.level = level;
   }
 
   resetAll(): void {
@@ -72,14 +70,14 @@ class RenderLayer extends BaseLayer {
     let textIndex = 0;
 
     while (textIndex < this.texts.length || textIndex < this.maxIndex) {
-      if (this.level === Level.EASY) {
+      if (this.levelState.getLevel() === this.levelState.Easy) {
         self.setVelocity({ x: 0, y: getRandomArbitrary(0.5, 1) });
-      } else if (this.level === Level.NORMAL) {
+      } else if (this.levelState.getLevel() === this.levelState.Normal) {
         self.setVelocity({
           x: getRandomArbitrary(-0.25, 0.25),
           y: getRandomArbitrary(0.75, 1),
         });
-      } else if (this.level === Level.HARD) {
+      } else if (this.levelState.getLevel() === this.levelState.Hard) {
         self.setVelocity({
           x: getRandomArbitrary(-0.5, 0.5),
           y: getRandomArbitrary(1, 1.25),

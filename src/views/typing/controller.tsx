@@ -10,6 +10,8 @@ import {
 } from "./model";
 import { Words } from "./layers/model";
 import { TextProps } from "./text/text";
+import FrameController from "./frame-controller";
+import LevelState from "./level-state";
 
 interface ControllerConstructor {
   renderLayer: HTMLCanvasElement;
@@ -24,8 +26,9 @@ class Controller extends EventDispatcher {
 
   private renderLayer: RenderLayer;
 
+  private levelState: LevelState;
+
   private isPlaying: Phase = Phase.PAUSED;
-  private level: Level = Level.EASY;
   private score: number = 0;
 
   private timeStamp: number = 0;
@@ -34,15 +37,29 @@ class Controller extends EventDispatcher {
   private interval: number = 1000 / this.fps; // 16fps
   private rafId: number = 0;
 
+  public frameController: FrameController;
+
   constructor({ renderLayer, initData }: ControllerConstructor) {
     super();
+
+    this.levelState = new LevelState();
 
     this.renderLayer = new RenderLayer({
       canvas: renderLayer,
       initData: initData,
+      levelState: this.levelState,
     });
-
     this.element = renderLayer;
+
+    this.frameController = new FrameController({
+      initializer: this.renderLayer.initialize,
+      onPlay: () => {
+        this.updateFrame();
+        this.renderFrame();
+        this.emitTimerData();
+      },
+      emitter: this.emitControllerData,
+    });
 
     this.initialize();
   }
@@ -104,10 +121,11 @@ class Controller extends EventDispatcher {
     const copiedData = JSON.parse(
       JSON.stringify({
         isPlaying: this.isPlaying,
-        level: this.level,
+        level: this.levelState.getLevelName(),
         score: this.score,
       })
     );
+    console.log(copiedData);
     this.emitControllerChangeEvent({ data: copiedData });
   }
 
@@ -147,8 +165,14 @@ class Controller extends EventDispatcher {
   }
 
   setLevel(level: Level) {
-    this.level = level;
-    this.renderLayer.setLevel(level);
+    if (level === Level.HARD) {
+      this.levelState.setLevel(this.levelState.Hard);
+    } else if (level === Level.NORMAL) {
+      this.levelState.setLevel(this.levelState.Normal);
+    } else if (level === Level.EASY) {
+      this.levelState.setLevel(this.levelState.Easy);
+    }
+
     this.emitControllerData();
   }
 
