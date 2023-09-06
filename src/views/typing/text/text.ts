@@ -1,6 +1,7 @@
 import { getRandomArbitrary } from "../../../utils/math";
 import { divideKOR, isKOR } from "../../../utils/parse-korean";
 import { Coord } from "../../../utils/types";
+import RigidBody from "./rigid-body";
 
 export interface TextProps {
   data: string;
@@ -18,7 +19,7 @@ export enum TextState {
   DEAD = "dead",
 }
 
-class Text {
+class Text extends RigidBody {
   protected ctx: CanvasRenderingContext2D;
 
   private data: string = "";
@@ -26,20 +27,12 @@ class Text {
   private state: TextState = TextState.INIT;
   private special: number = 1;
 
-  private position: Coord = { x: 0, y: 0 };
-  private velocity: Coord = { x: 0, y: 0 };
-  private collideVelocity: Coord = { x: 0, y: 0 };
-  private dimension: { width: number; height: number } = {
-    width: 0,
-    height: 0,
-  };
-  private mass: number = 1;
-  private corFactor: number = 1.2;
-
   private particles: Text[] = [];
   private particleLifeTime: number = 100;
 
   constructor({ data, ctx, position, mass, velocity, special }: TextProps) {
+    super();
+
     this.ctx = ctx;
 
     this.data = data;
@@ -76,68 +69,8 @@ class Text {
     return this.score;
   }
 
-  getPosition(): Coord {
-    return this.position;
-  }
-
-  getDimension(): { width: number; height: number } {
-    return this.dimension;
-  }
-
-  getVelocity(): Coord {
-    return this.velocity;
-  }
-
-  getVelocityAfterCollision(collidedText: Text): Coord {
-    /**
-     * @url http://programmerart.weebly.com/separating-axis-theorem.html
-     * @url https://blog.naver.com/PostView.naver?blogId=skz1024&logNo=222758566138
-     * @url https://github.com/DongChyeon/JS-Toy-Projects/blob/master/AirHockey/game.js#L22C28-L22C28
-     * @url https://velog.io/@dongchyeon/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%EB%A1%9C-%EC%97%90%EC%96%B4-%ED%95%98%ED%82%A4-%EA%B2%8C%EC%9E%84%EC%9D%84-%EB%A7%8C%EB%93%A4%EC%96%B4%EB%B3%B4%EC%9E%90
-     */
-    const velocity = {
-      x:
-        ((this.mass - collidedText.mass * this.corFactor) /
-          (this.mass + collidedText.mass)) *
-          this.velocity.x +
-        ((collidedText.mass + collidedText.mass * this.corFactor) /
-          (this.mass + collidedText.mass)) *
-          collidedText.velocity.x,
-      y:
-        ((this.mass - collidedText.mass * this.corFactor) /
-          (this.mass + collidedText.mass)) *
-          this.velocity.y +
-        ((collidedText.mass + collidedText.mass * this.corFactor) /
-          (this.mass + collidedText.mass)) *
-          collidedText.velocity.y,
-    };
-    return velocity;
-  }
-
-  getIsCollided(collidedText: Text): boolean {
-    return (
-      this.position.x + this.dimension.width >= collidedText.position.x &&
-      this.position.x <=
-        collidedText.position.x + collidedText.dimension.width &&
-      this.position.y + this.dimension.height >= collidedText.position.y &&
-      this.position.y <= collidedText.position.y + collidedText.dimension.height
-    );
-  }
-
   textData(): string {
     return this.data;
-  }
-
-  setPosition(position: Coord) {
-    this.position = position;
-  }
-
-  setVelocity(velocity: Coord) {
-    this.velocity = velocity;
-  }
-
-  setCollideVelocity(velocity: Coord) {
-    this.collideVelocity = velocity;
   }
 
   setIsAlive(state: TextState) {
