@@ -1,6 +1,7 @@
 import { divideKOR, isKOR } from "../../../utils/parse-korean";
 import { Coord } from "../../../utils/types";
 import RigidBody from "./rigid-body";
+import ScorableSubject from "./scorable";
 import LifeCycleState from "./text-state";
 
 export interface TextProps {
@@ -23,8 +24,9 @@ class Text extends RigidBody {
   public ctx: CanvasRenderingContext2D;
 
   public data: string = "";
-  private score: number = 0;
   private special: number = 1;
+
+  public scorableSubject: ScorableSubject;
 
   public particles: Text[] = [];
   public particleLifeTime: number = 100;
@@ -36,6 +38,8 @@ class Text extends RigidBody {
 
     this.ctx = ctx;
     this.data = data;
+
+    this.scorableSubject = new ScorableSubject(this, this.special);
 
     this.LifeCycleState = new LifeCycleState({ Text: this });
 
@@ -49,21 +53,14 @@ class Text extends RigidBody {
       (getTextMetrics(ctx, data).actualBoundingBoxAscent +
         getTextMetrics(ctx, data).actualBoundingBoxDescent) *
       1;
-
-    if (isKOR(data)) {
-      const splitedKOR = divideKOR(data);
-      this.score = splitedKOR.length * this.special;
-    } else {
-      this.score = data.length * this.special;
-    }
   }
 
   getSpecial(): number {
-    return this.special;
+    return this.scorableSubject.getSpecialty();
   }
 
   getScore(): number {
-    return this.score;
+    return this.scorableSubject.getScore();
   }
 
   textData(): string {
