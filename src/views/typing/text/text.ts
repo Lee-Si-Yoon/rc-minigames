@@ -2,6 +2,7 @@ import { getRandomArbitrary } from "../../../utils/math";
 import { divideKOR, isKOR } from "../../../utils/parse-korean";
 import { Coord } from "../../../utils/types";
 import RigidBody from "./rigid-body";
+import LifeCycleState, { LifeCycle } from "./text-state";
 
 export interface TextProps {
   data: string;
@@ -27,20 +28,18 @@ class Text extends RigidBody {
   private state: TextState = TextState.INIT;
   private special: number = 1;
 
-  private particles: Text[] = [];
-  private particleLifeTime: number = 100;
+  public particles: Text[] = [];
+  public particleLifeTime: number = 100;
 
-  constructor({ data, ctx, position, mass, velocity, special }: TextProps) {
+  public LifeCycle: LifeCycleState;
+
+  constructor({ data, ctx }: TextProps) {
     super();
 
     this.ctx = ctx;
-
     this.data = data;
 
-    this.position = position ?? { x: 0, y: 0 };
-    this.velocity = velocity ?? { x: 0, y: 0 };
-    this.mass = mass ?? 1;
-    this.special = special ?? 1;
+    this.LifeCycle = new LifeCycleState({ Text: this });
 
     const getTextMetrics = (
       ctx: CanvasRenderingContext2D,
