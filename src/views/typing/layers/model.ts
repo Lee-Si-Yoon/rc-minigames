@@ -1,3 +1,5 @@
+import LevelState from "../level-state";
+
 /**
  * @description for initial data
  */
@@ -15,6 +17,7 @@ interface CanvasLayerConstructor {
 interface DataLayerConstructor extends CanvasLayerConstructor {
   initData?: Words;
   words?: string[];
+  levelState: LevelState;
 }
 
-export { Words, DataProps, CanvasLayerConstructor, DataLayerConstructor };
+export type { Words, DataProps, CanvasLayerConstructor, DataLayerConstructor };

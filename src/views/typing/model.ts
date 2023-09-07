@@ -66,7 +66,7 @@ type TimerProps = {
 type TimerChangeParams = { data: TimerProps };
 type TimerChangeHandler = (params: TimerChangeParams) => void;
 
-export {
+export type {
   CanvasDataChangeParams,
   CanvasDataChangeHandler,
   ControllerProps,
@@ -77,6 +77,6 @@ export {
   TimerChangeHandler,
   TypingProps,
   TypingRef,
-  Phase,
-  Level,
 };
+
+export { Phase, Level };

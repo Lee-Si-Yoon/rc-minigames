@@ -52,7 +52,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       renderLayer: renderCanvasRef,
       initData: props.initData,
     });
-    editor.setFps(props.fps || 60);
+    editor.setFps(props.fps ?? 60);
     editor.setIsPlaying(Phase.PAUSED);
     setEditor(editor);
 

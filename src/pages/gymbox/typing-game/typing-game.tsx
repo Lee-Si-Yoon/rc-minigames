@@ -153,7 +153,6 @@ function TypingGame() {
   };
 
   React.useEffect(() => {
-    console.log(timerData.playTime);
     if (totalTime <= timerData.playTime) setGamePhase(GamePhase.END);
   }, [timerData.playTime, totalTime]);
 

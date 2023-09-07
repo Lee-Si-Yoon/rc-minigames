@@ -1,3 +1,3 @@
 type Coord = { x: number; y: number };
 
-export { Coord };
+export type { Coord };

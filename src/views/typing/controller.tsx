@@ -1,4 +1,4 @@
-import EventDispatcher from "../../utils/eventDispatcher";
+import { EventDispatcherWithRAF } from "../../utils/eventDispatcher";
 import RenderLayer from "./layers/render-layer";
 import { CanvasEvents } from "./events";
 import {
@@ -10,13 +10,14 @@ import {
 } from "./model";
 import { Words } from "./layers/model";
 import { TextProps } from "./text/text";
+import LevelState from "./level-state";
 
 interface ControllerConstructor {
   renderLayer: HTMLCanvasElement;
   initData?: Words;
 }
 
-class Controller extends EventDispatcher {
+class Controller extends EventDispatcherWithRAF {
   private width: number = 0;
   private height: number = 0;
   private dpr: number = 1;
@@ -24,24 +25,20 @@ class Controller extends EventDispatcher {
 
   private renderLayer: RenderLayer;
 
-  private isPlaying: Phase = Phase.PAUSED;
-  private level: Level = Level.EASY;
-  private score: number = 0;
+  private levelState: LevelState;
 
-  private timeStamp: number = 0;
-  private playTime: number = 0;
-  private fps: number = 60;
-  private interval: number = 1000 / this.fps; // 16fps
-  private rafId: number = 0;
+  private score: number = 0;
 
   constructor({ renderLayer, initData }: ControllerConstructor) {
     super();
 
+    this.levelState = new LevelState();
+
     this.renderLayer = new RenderLayer({
       canvas: renderLayer,
       initData: initData,
+      levelState: this.levelState,
     });
-
     this.element = renderLayer;
 
     this.initialize();
@@ -104,7 +101,7 @@ class Controller extends EventDispatcher {
     const copiedData = JSON.parse(
       JSON.stringify({
         isPlaying: this.isPlaying,
-        level: this.level,
+        level: this.levelState.getLevelName(),
         score: this.score,
       })
     );
@@ -122,14 +119,6 @@ class Controller extends EventDispatcher {
 
   /** GAME STATES */
 
-  getIsPlaying(): Phase {
-    return this.isPlaying;
-  }
-
-  setFps(fps: number) {
-    this.fps = fps;
-  }
-
   setIsPlaying(phase: Phase) {
     this.isPlaying = phase;
 
@@ -140,15 +129,21 @@ class Controller extends EventDispatcher {
     } else if (phase === Phase.PAUSED) {
       cancelAnimationFrame(this.rafId);
     } else if (phase === Phase.PLAYING) {
-      this.playFrames();
+      this.play();
     }
 
     this.emitControllerData();
   }
 
   setLevel(level: Level) {
-    this.level = level;
-    this.renderLayer.setLevel(level);
+    if (level === Level.HARD) {
+      this.levelState.setLevel(this.levelState.Hard);
+    } else if (level === Level.NORMAL) {
+      this.levelState.setLevel(this.levelState.Normal);
+    } else if (level === Level.EASY) {
+      this.levelState.setLevel(this.levelState.Easy);
+    }
+
     this.emitControllerData();
   }
 
@@ -176,7 +171,7 @@ class Controller extends EventDispatcher {
     this.emitCurrentData();
   }
 
-  playFrames(): void {
+  play(): void {
     let timer = 0;
     let lastTime = 0;
 
