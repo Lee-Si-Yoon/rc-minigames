@@ -1,8 +1,7 @@
-import { getRandomArbitrary } from "../../../utils/math";
 import { divideKOR, isKOR } from "../../../utils/parse-korean";
 import { Coord } from "../../../utils/types";
 import RigidBody from "./rigid-body";
-import LifeCycleState, { LifeCycle } from "./text-state";
+import LifeCycleState from "./text-state";
 
 export interface TextProps {
   data: string;
@@ -21,17 +20,16 @@ export enum TextState {
 }
 
 class Text extends RigidBody {
-  protected ctx: CanvasRenderingContext2D;
+  public ctx: CanvasRenderingContext2D;
 
-  private data: string = "";
+  public data: string = "";
   private score: number = 0;
-  private state: TextState = TextState.INIT;
   private special: number = 1;
 
   public particles: Text[] = [];
   public particleLifeTime: number = 100;
 
-  public LifeCycle: LifeCycleState;
+  public LifeCycleState: LifeCycleState;
 
   constructor({ data, ctx }: TextProps) {
     super();
@@ -39,7 +37,7 @@ class Text extends RigidBody {
     this.ctx = ctx;
     this.data = data;
 
-    this.LifeCycle = new LifeCycleState({ Text: this });
+    this.LifeCycleState = new LifeCycleState({ Text: this });
 
     const getTextMetrics = (
       ctx: CanvasRenderingContext2D,
@@ -73,69 +71,21 @@ class Text extends RigidBody {
   }
 
   setIsAlive(state: TextState) {
-    this.state = state;
-  }
-
-  splitToParticle() {
-    if (this.state !== TextState.PARTICLED) return;
-
-    this.data.split("").forEach((d) => {
-      this.particles.push(
-        new Text({
-          data: d,
-          ctx: this.ctx,
-          velocity: this.velocity,
-        })
-      );
-    });
-
-    this.particles.forEach((particle, index) => {
-      const { width } = particle.getDimension();
-      const { x: veloX, y: veloY } = particle.getVelocity();
-      particle.setPosition({
-        x: this.position.x + (index + 1) * width,
-        y: this.position.y,
-      });
-      particle.setVelocity({
-        x: getRandomArbitrary(-veloX * 2 || -2, veloX * 2 || 2),
-        y: getRandomArbitrary(veloY * 1, veloY * 2),
-      });
-    });
+    if (state === TextState.INIT) {
+      this.LifeCycleState.setLifeCycle(this.LifeCycleState.Init);
+    } else if (state === TextState.PARTICLED) {
+      this.LifeCycleState.setLifeCycle(this.LifeCycleState.Particled);
+    } else {
+      this.LifeCycleState.setLifeCycle(this.LifeCycleState.Dead);
+    }
   }
 
   update(): void {
-    if (this.state === TextState.INIT) {
-      this.position.x += this.velocity.x + this.collideVelocity.x;
-      this.position.y += this.velocity.y + this.collideVelocity.y;
-
-      if (this.collideVelocity.x > 0.1) this.collideVelocity.x *= 0.6;
-      if (this.collideVelocity.y > 0.1) this.collideVelocity.y *= 0.6;
-    }
-
-    if (this.state === TextState.PARTICLED) {
-      this.splitToParticle();
-
-      // after text is particled it is set as state=dead
-      this.state = TextState.DEAD;
-    }
-
-    if (this.particles.length > 0 && this.state === TextState.DEAD) {
-      this.particles.forEach((particle) => {
-        const { x: posX, y: posY } = particle.getPosition();
-        const { x: veloX, y: veloY } = particle.getVelocity();
-        particle.setPosition({
-          x: posX + veloX,
-          y: posY + veloY,
-        });
-      });
-      if (this.particleLifeTime <= 0) {
-        this.particles = [];
-      }
-    }
+    this.LifeCycleState.getLifeCycle().update();
   }
 
   render(): void {
-    if (this.state !== TextState.INIT) return;
+    if (this.LifeCycleState.getLifeCycle() !== this.LifeCycleState.Init) return;
     this.ctx.save();
     this.ctx.textAlign = "left";
     this.ctx.textBaseline = "top";
@@ -165,26 +115,6 @@ class Text extends RigidBody {
       -(this.position.y + this.dimension.height / 2)
     );
     this.ctx.restore();
-  }
-
-  renderParticles() {
-    if (this.particles.length <= 0 || this.particleLifeTime <= 0) return;
-    this.particles.forEach((particle, index) => {
-      this.ctx.save();
-      this.ctx.textAlign = "left";
-      this.ctx.textBaseline = "top";
-      this.ctx.globalAlpha = this.particleLifeTime / 100;
-
-      const { x, y } = particle.getPosition();
-      const { width, height } = particle.getDimension();
-      this.ctx.translate(x + width / 2, y + height / 2);
-      this.ctx.rotate(Math.PI / -(this.particleLifeTime / (index * 10)));
-      this.ctx.fillText(particle.textData(), -width / 2, -height / 2);
-      this.ctx.translate(-(x + width / 2), -(y + height / 2));
-
-      this.ctx.restore();
-    });
-    this.particleLifeTime -= 1;
   }
 }
 

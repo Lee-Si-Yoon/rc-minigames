@@ -190,7 +190,7 @@ class RenderLayer extends BaseLayer {
       if (text.getSpecial() >= 2) ctx.fillStyle = "#C90500";
 
       text.render();
-      text.renderParticles();
+      text.LifeCycleState.getLifeCycle().renderParticles();
     }
 
     ctx.restore();

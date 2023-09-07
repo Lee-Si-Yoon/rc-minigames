@@ -105,7 +105,6 @@ class Controller extends EventDispatcherWithRAF {
         score: this.score,
       })
     );
-    console.log(copiedData);
     this.emitControllerChangeEvent({ data: copiedData });
   }
 
