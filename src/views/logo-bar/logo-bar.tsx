@@ -1,8 +1,8 @@
-import React from "react";
-import classes from "./logo-bar.module.scss";
-import { ChevronIcon } from "../../svg";
-import { useNavigate } from "react-router-dom";
-import logoImg from "./gymboxx-logo.png";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronIcon } from '../../svg';
+import logoImg from './gymboxx-logo.png';
+import classes from './logo-bar.module.scss';
 
 interface LogoBarProps {
   to?: string;
@@ -11,12 +11,15 @@ interface LogoBarProps {
 function LogoBar(props: LogoBarProps) {
   const { to } = props;
   const navigate = useNavigate();
+
   return (
     <section className={classes.LogoBar}>
       {to ? (
         <button
           className={classes.BackButton}
-          onClick={() => navigate(to ?? "")}
+          onClick={() => {
+            return navigate(to ?? '');
+          }}
         >
           <ChevronIcon width={20} height={20} fill="#B0B8C1" />
         </button>
@@ -29,6 +32,6 @@ function LogoBar(props: LogoBarProps) {
   );
 }
 
-LogoBar.displayName = "LogoBar";
+LogoBar.displayName = 'LogoBar';
 
 export default LogoBar;

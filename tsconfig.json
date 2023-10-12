@@ -114,5 +114,6 @@
     "skipLibCheck": false /* Skip type checking all .d.ts files. */
   },
   "exclude": ["node_modules", "public", "**/*.json"],
-  "include": ["src"]
+  "include": ["src"],
+  "extends": "eslint-config-siyoon/tsconfig.json"
 }

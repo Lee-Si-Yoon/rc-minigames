@@ -1,13 +1,9 @@
-import React, { Dispatch, SetStateAction } from "react";
-
-import classes from "./debugger.module.scss";
-import {
-  ControllerProps,
-  Level,
-  Phase,
-  TimerProps,
-} from "../../../views/typing/model";
-import { DataProps } from "../../../views/typing/layers/model";
+import type { Dispatch, SetStateAction } from 'react';
+import React from 'react';
+import type { DataProps } from '../../../views/typing/layers/model';
+import type { ControllerProps, TimerProps } from '../../../views/typing/model';
+import { Level, Phase } from '../../../views/typing/model';
+import classes from './debugger.module.scss';
 
 interface DebuggerProps {
   data: DataProps;
@@ -43,33 +39,47 @@ function Debugger({
           spawnWords
         </label>
         <input
-          onChange={() => setSpawnWords((prevState) => !prevState)}
+          onChange={() => {
+            return setSpawnWords((prevState) => {
+              return !prevState;
+            });
+          }}
           type="checkbox"
           id="spawn"
           checked={spawnWords}
         />
-        <select onChange={(e) => setLevel(e.target.value as Level)}>
-          {Object.values(Level).map((level) => (
-            <option key={level}>{level}</option>
-          ))}
+        <select
+          onChange={(e) => {
+            return setLevel(e.target.value as Level);
+          }}
+        >
+          {Object.values(Level).map((level) => {
+            return <option key={level}>{level}</option>;
+          })}
         </select>
         <button
-          onClick={() =>
-            setIsPlaying(
+          onClick={() => {
+            return setIsPlaying(
               controllerData.isPlaying === Phase.PAUSED
                 ? Phase.PLAYING
                 : Phase.PAUSED
-            )
-          }
+            );
+          }}
         >
-          {controllerData.isPlaying === Phase.PAUSED ? "play" : "pause"}
+          {controllerData.isPlaying === Phase.PAUSED ? 'play' : 'pause'}
         </button>
-        <button onClick={() => setIsPlaying(Phase.END)}>{Phase.END}</button>
+        <button
+          onClick={() => {
+            return setIsPlaying(Phase.END);
+          }}
+        >
+          {Phase.END}
+        </button>
       </div>
     </div>
   );
 }
 
-Debugger.displayName = "Debugger";
+Debugger.displayName = 'Debugger';
 
 export default Debugger;

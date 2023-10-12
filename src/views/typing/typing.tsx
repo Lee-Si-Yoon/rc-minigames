@@ -1,6 +1,5 @@
+import type { ForwardedRef, ReactElement } from 'react';
 import React, {
-  ForwardedRef,
-  ReactElement,
   cloneElement,
   forwardRef,
   isValidElement,
@@ -9,19 +8,19 @@ import React, {
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
-import Controller from "./controller";
-import { CanvasEvents } from "./events";
-import {
+} from 'react';
+import Controller from './controller';
+import { CanvasEvents } from './events';
+import type {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
-  TimerChangeHandler,
   Level,
-  Phase,
+  TimerChangeHandler,
   TypingProps,
   TypingRef,
-} from "./model";
-import { TextProps } from "./text/text";
+} from './model';
+import { Phase } from './model';
+import type { TextProps } from './text/text';
 
 const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   props: TypingProps,
@@ -38,7 +37,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
 
   const getRenderLayerRef = useCallback((element: HTMLCanvasElement) => {
     if (!element) return;
-    element.style["touchAction"] = "none";
+    element.style.touchAction = 'none';
     setRenderCanvasRef(element);
   }, []);
 
@@ -47,7 +46,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    * @url https://github.com/ascorbic/react-artboard/blob/main/src/components/Artboard.tsx
    */
   useEffect(() => {
-    if (!renderCanvasRef) return;
+    if (!renderCanvasRef) return undefined;
     const editor = new Controller({
       renderLayer: renderCanvasRef,
       initData: props.initData,
@@ -59,7 +58,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     return () => {
       editor.destroy();
     };
-  }, [renderCanvasRef]);
+  }, [props.fps, props.initData, renderCanvasRef]);
 
   /**
    * @summary RESIZE EVENTS
@@ -74,14 +73,16 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
         editor.renderFrame();
       }
     };
+
     // on init
     onResize();
     // on resize event
-    window.addEventListener("resize", onResize);
+    window.addEventListener('resize', onResize);
+
     return () => {
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener('resize', onResize);
     };
-  }, [editor, containerRef.current, props.width, props.height]);
+  }, [editor, props.width, props.height]);
 
   /**
    * @summary CANVAS EVENTS
@@ -89,10 +90,10 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    */
   const [canvasElementEventListeners, setCanvasElementEventListeners] =
     useState<
-      Array<{
+      {
         type: string;
         listener: EventListenerOrEventListenerObject;
-      }>
+      }[]
     >([]);
 
   /**
@@ -100,12 +101,13 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    * @example for mousemove, mousedown, mouseup, etc.
    */
   useEffect(() => {
-    if (!editor) return;
+    if (!editor) return undefined;
 
     canvasElementEventListeners.forEach(({ type, listener }) => {
       const canvasElement = editor.getCanvasElement();
       canvasElement?.addEventListener(type, listener);
     });
+
     return () => {
       canvasElementEventListeners.forEach(({ type, listener }) => {
         const canvasElement = editor.getCanvasElement();
@@ -116,12 +118,11 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
 
   const addCanvasElementEventListener = useCallback(
     (type: string, listener: EventListenerOrEventListenerObject) => {
-      setCanvasElementEventListeners((listeners) => [
-        ...listeners,
-        { type, listener },
-      ]);
+      setCanvasElementEventListeners((listeners) => {
+        return [...listeners, { type, listener }];
+      });
     },
-    [editor]
+    []
   );
 
   const removeCanvasElementEventListener = useCallback(
@@ -129,11 +130,14 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
       if (!editor) {
         return;
       }
+
       const canvasElement = editor.getCanvasElement();
       canvasElement?.removeEventListener(type, listener);
-      setCanvasElementEventListeners((listeners) =>
-        listeners.filter((l) => l.type !== type && l.listener !== listener)
-      );
+      setCanvasElementEventListeners((listeners) => {
+        return listeners.filter((l) => {
+          return l.type !== type && l.listener !== listener;
+        });
+      });
     },
     [editor]
   );
@@ -147,7 +151,9 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
 
   const addDataChangeListener = useCallback(
     (listener: CanvasDataChangeHandler) => {
-      setDataChangeListeners((listeners) => [...listeners, listener]);
+      setDataChangeListeners((listeners) => {
+        return [...listeners, listener];
+      });
     },
     []
   );
@@ -156,26 +162,29 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     (listener: CanvasDataChangeHandler) => {
       if (!editor) return;
       editor.removeEventListener(CanvasEvents.DATA_CHANGE, listener);
-      setDataChangeListeners((listeners) =>
-        listeners.filter((l) => l !== listener)
-      );
+      setDataChangeListeners((listeners) => {
+        return listeners.filter((l) => {
+          return l !== listener;
+        });
+      });
     },
     [editor]
   );
 
   useEffect(() => {
-    if (!editor) return;
+    if (editor) {
+      dataChangeListeners.forEach((listener) => {
+        editor.addEventListener(CanvasEvents.DATA_CHANGE, listener);
+      });
+      editor.emitCurrentData();
+    }
 
-    dataChangeListeners.forEach((listener) => {
-      editor.addEventListener(CanvasEvents.DATA_CHANGE, listener);
-    });
-    editor.emitCurrentData();
     return () => {
       dataChangeListeners.forEach((listener) => {
         editor?.removeEventListener(CanvasEvents.DATA_CHANGE, listener);
       });
     };
-  }, [editor, dataChangeListeners]);
+  }, [dataChangeListeners, editor]);
 
   const removeWord = useCallback(
     (word: string) => {
@@ -185,7 +194,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   );
 
   const addWord = useCallback(
-    (textProps: Omit<TextProps, "ctx">) => {
+    (textProps: Omit<TextProps, 'ctx'>) => {
       editor?.addWord(textProps);
     },
     [editor]
@@ -200,7 +209,9 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
 
   const addControllerChangeListener = useCallback(
     (listener: ControllerChangeHandler) => {
-      setControllerChangeListeners((listeners) => [...listeners, listener]);
+      setControllerChangeListeners((listeners) => {
+        return [...listeners, listener];
+      });
     },
     []
   );
@@ -209,20 +220,23 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     (listener: ControllerChangeHandler) => {
       if (!editor) return;
       editor.removeEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
-      setControllerChangeListeners((listeners) =>
-        listeners.filter((l) => l !== listener)
-      );
+      setControllerChangeListeners((listeners) => {
+        return listeners.filter((l) => {
+          return l !== listener;
+        });
+      });
     },
     [editor]
   );
 
   useEffect(() => {
-    if (!editor) return;
+    if (editor) {
+      controllerChangeListeners.forEach((listener) => {
+        editor.addEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
+      });
+      editor.emitControllerData();
+    }
 
-    controllerChangeListeners.forEach((listener) => {
-      editor.addEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
-    });
-    editor.emitControllerData();
     return () => {
       controllerChangeListeners.forEach((listener) => {
         editor?.removeEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
@@ -238,7 +252,9 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   );
 
   const setLevel = useCallback(
-    (level: Level) => editor?.setLevel(level),
+    (level: Level) => {
+      return editor?.setLevel(level);
+    },
     [editor]
   );
 
@@ -250,27 +266,32 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
   >([]);
 
   const addTimerChangeListener = useCallback((listener: TimerChangeHandler) => {
-    setTimerChangeListeners((listeners) => [...listeners, listener]);
+    setTimerChangeListeners((listeners) => {
+      return [...listeners, listener];
+    });
   }, []);
 
   const removeTimerChangeListener = useCallback(
     (listener: TimerChangeHandler) => {
       if (!editor) return;
       editor.removeEventListener(CanvasEvents.TIMER_CHANGE, listener);
-      setTimerChangeListeners((listeners) =>
-        listeners.filter((l) => l !== listener)
-      );
+      setTimerChangeListeners((listeners) => {
+        return listeners.filter((l) => {
+          return l !== listener;
+        });
+      });
     },
     [editor]
   );
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor) return undefined;
 
     timerChangeListeners.forEach((listener) => {
       editor.addEventListener(CanvasEvents.TIMER_CHANGE, listener);
     });
     editor.emitControllerData();
+
     return () => {
       timerChangeListeners.forEach((listener) => {
         editor?.removeEventListener(CanvasEvents.TIMER_CHANGE, listener);
@@ -284,35 +305,36 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
    */
   useImperativeHandle(
     ref,
-    () => ({
-      // for useController
+    () => {
+      return {
+        // for useController
+        setIsPlaying,
+        setLevel,
+        addControllerChangeListener,
+        removeControllerChangeListener,
+        addTimerChangeListener,
+        removeTimerChangeListener,
+        // for useData
+        addWord,
+        removeWord,
+        addDataChangeListener,
+        removeDataChangeListener,
+        // for canvas element listener
+        addCanvasElementEventListener,
+        removeCanvasElementEventListener,
+      };
+    },
+    [
       setIsPlaying,
       setLevel,
       addControllerChangeListener,
       removeControllerChangeListener,
       addTimerChangeListener,
       removeTimerChangeListener,
-      // for useData
       addWord,
       removeWord,
       addDataChangeListener,
       removeDataChangeListener,
-      // for canvas element listener
-      addCanvasElementEventListener,
-      removeCanvasElementEventListener,
-    }),
-    [
-      // for useController
-      setIsPlaying,
-      setLevel,
-      addControllerChangeListener,
-      removeControllerChangeListener,
-      // for useData
-      addWord,
-      removeWord,
-      addDataChangeListener,
-      removeDataChangeListener,
-      // for canvas element listener
       addCanvasElementEventListener,
       removeCanvasElementEventListener,
     ]
@@ -322,7 +344,7 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
     <div
       ref={containerRef}
       tabIndex={-1}
-      style={{ width: props.width, height: props.height, outline: "none" }}
+      style={{ width: props.width, height: props.height, outline: 'none' }}
     >
       {isValidElement(props.backgroundComponent) &&
         cloneElement(props.backgroundComponent as ReactElement, {
@@ -330,17 +352,17 @@ const Typing = forwardRef<TypingRef, TypingProps>(function Typing(
           style: {
             width: props.width,
             height: props.height,
-            position: "absolute",
-            outline: "none",
-            touchAction: "none",
+            position: 'absolute',
+            outline: 'none',
+            touchAction: 'none',
             ...props.backgroundComponent.props.style,
           },
         })}
-      <canvas ref={getRenderLayerRef} style={{ position: "absolute" }} />
+      <canvas ref={getRenderLayerRef} style={{ position: 'absolute' }} />
     </div>
   );
 });
 
-Typing.displayName = "TypingGame";
+Typing.displayName = 'TypingGame';
 
 export default Typing;

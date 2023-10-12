@@ -1,5 +1,5 @@
-import BaseLayer from "../../../utils/base-layer";
-import { CanvasLayerConstructor } from "./model";
+import BaseLayer from '../../../utils/base-layer';
+import type { CanvasLayerConstructor } from './model';
 
 class InteractionLayer extends BaseLayer {
   constructor({ canvas }: CanvasLayerConstructor) {
@@ -7,7 +7,7 @@ class InteractionLayer extends BaseLayer {
   }
 
   render(): void {
-    const ctx = this.ctx;
+    const { ctx } = this;
     ctx.clearRect(0, 0, this.width, this.height);
   }
 }

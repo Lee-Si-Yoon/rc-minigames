@@ -1,5 +1,5 @@
-import { RGB } from "../../utils/colors";
-import { Coord } from "../../utils/types";
+import type { RGB } from '../../utils/colors';
+import type { Coord } from '../../utils/types';
 
 interface GlowParticleProps {
   position: Coord;
@@ -13,12 +13,19 @@ interface GlowParticleProps {
 
 class GlowParticle {
   private width: number = 0;
+
   private height: number = 0;
+
   private ctx: CanvasRenderingContext2D;
+
   private position: Coord = { x: 0, y: 0 };
+
   private radius: number = 1;
+
   private rgb: RGB = { r: 0, g: 0, b: 0 };
+
   private velocity: Coord = { x: Math.random() * 4, y: Math.random() * 4 };
+
   private sinValue = Math.random();
 
   constructor({
@@ -54,6 +61,7 @@ class GlowParticle {
       this.velocity.x *= -1;
       this.position.x -= 10;
     }
+
     if (this.position.y < 0) {
       this.velocity.y *= -1;
       this.position.y += 10;
@@ -64,7 +72,7 @@ class GlowParticle {
   }
 
   render(): void {
-    const ctx = this.ctx;
+    const { ctx } = this;
     ctx.beginPath();
     const g = ctx.createRadialGradient(
       this.position.x,
@@ -89,5 +97,5 @@ class GlowParticle {
   }
 }
 
-export { GlowParticleProps };
+export type { GlowParticleProps };
 export default GlowParticle;

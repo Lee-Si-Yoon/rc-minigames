@@ -1,6 +1,6 @@
-import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
-import IntroText, { TextSequence } from "./intro-text";
+import type { Meta, StoryObj } from '@storybook/react';
+import type { TextSequence } from './intro-text';
+import IntroText from './intro-text';
 
 const meta = {
   component: IntroText,
@@ -12,21 +12,21 @@ type Story = StoryObj<typeof meta>;
 
 const mockData: TextSequence[] = [
   {
-    text: "READY",
+    text: 'READY',
     fps: 21,
     duration: 30,
     minSize: 24,
     maxSize: 48,
   },
   {
-    text: "GO!",
+    text: 'GO!',
     fps: 21,
     duration: 12,
     minSize: 52,
     maxSize: 64,
   },
   {
-    text: "",
+    text: '',
     duration: 100,
   },
 ];
@@ -34,13 +34,13 @@ const mockData: TextSequence[] = [
 export const Primary: Story = {
   argTypes: {
     backgroundColor: {
-      controls: "string",
+      controls: 'string',
     },
   },
   args: {
     data: mockData,
     width: 500,
     height: 300,
-    backgroundColor: "black",
+    backgroundColor: 'black',
   },
 };

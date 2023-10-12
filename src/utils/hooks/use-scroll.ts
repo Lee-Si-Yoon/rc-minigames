@@ -1,6 +1,6 @@
-import { RefObject, useEffect } from "react";
-
-import { useRafState } from "./use-raf-state";
+import type { RefObject } from 'react';
+import { useEffect } from 'react';
+import { useRafState } from './use-raf-state';
 
 export interface State {
   x: number;
@@ -8,9 +8,9 @@ export interface State {
 }
 
 const useScroll = (ref: RefObject<HTMLElement>): State => {
-  if (process.env.NODE_ENV === "development") {
-    if (typeof ref !== "object" || typeof ref.current === "undefined") {
-      console.error("`useScroll` expects a single ref argument.");
+  if (process.env.NODE_ENV === 'development') {
+    if (typeof ref !== 'object' || typeof ref.current === 'undefined') {
+      console.error('`useScroll` expects a single ref argument.');
     }
   }
 
@@ -20,28 +20,28 @@ const useScroll = (ref: RefObject<HTMLElement>): State => {
   });
 
   useEffect(() => {
+    const outerRef = ref.current;
+
     const handler = () => {
-      if (ref.current) {
+      if (outerRef) {
         setState({
-          x: ref.current.scrollLeft,
-          y: ref.current.scrollTop,
+          x: outerRef.scrollLeft,
+          y: outerRef.scrollTop,
         });
       }
     };
 
-    if (ref.current) {
-      ref.current.addEventListener("scroll", handler, {
+    if (outerRef) {
+      outerRef.addEventListener('scroll', handler, {
         capture: false,
         passive: true,
       });
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.removeEventListener("scroll", handler);
-      }
+      outerRef?.removeEventListener('scroll', handler);
     };
-  }, [ref]);
+  }, [ref, setState]);
 
   return state;
 };

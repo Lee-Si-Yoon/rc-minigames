@@ -1,6 +1,6 @@
 // import { findDifferingSubstring } from "../../../utils/parse-string";
-import { Coord } from "../../../utils/types";
-import Particle from "./particle";
+import type { Coord } from '../../../utils/types';
+import Particle from './particle';
 
 interface EffectProps {
   text: string;
@@ -15,18 +15,27 @@ interface EffectProps {
  */
 class Effect {
   private context: CanvasRenderingContext2D;
+
   private canvasWidth: number = 0;
+
   private canvasHeight: number = 0;
+
   private gap: number = 1;
 
-  private text: string = "";
-  private inputValue: string = "";
+  private text: string = '';
+
+  private inputValue: string = '';
+
   private textBoxPosition: Coord = { x: 0, y: 0 };
+
   private fontSize: number = 40;
+
   private lineHeight: number = 1.4;
 
   private padding: number = 16;
+
   private maxTextWidth: number = 0;
+
   private textArray: {
     value: string;
     filled: boolean;
@@ -56,8 +65,8 @@ class Effect {
 
   private styleText(ctx: CanvasRenderingContext2D) {
     ctx.font = `${this.fontSize}px Arial`;
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
     ctx.save();
   }
 
@@ -68,9 +77,9 @@ class Effect {
       this.canvasWidth,
       this.canvasHeight
     );
-    gradient.addColorStop(0.3, "red");
-    gradient.addColorStop(0.5, "orange");
-    gradient.addColorStop(0.7, "purple");
+    gradient.addColorStop(0.3, 'red');
+    gradient.addColorStop(0.5, 'orange');
+    gradient.addColorStop(0.7, 'purple');
     ctx.fillStyle = gradient;
   }
 
@@ -95,7 +104,7 @@ class Effect {
         1.4;
 
       // Check if the word is just a space
-      if (word.trim() === "") {
+      if (word.trim() === '') {
         // Move to the next word
         currentX += wordWidth;
         continue; // Skip adding the space to this.textArray
@@ -151,9 +160,15 @@ class Effect {
     const ctx = this.context;
 
     const maxTextHeight = Math.max(
-      ...this.textArray.map((text) => text.height)
+      ...this.textArray.map((text) => {
+        return text.height;
+      })
     );
-    const maxRowCount = Math.max(...this.textArray.map((text) => text.row));
+    const maxRowCount = Math.max(
+      ...this.textArray.map((text) => {
+        return text.row;
+      })
+    );
     this.textBoxPosition.y =
       this.canvasHeight - maxTextHeight * (maxRowCount + 1);
 
@@ -168,7 +183,7 @@ class Effect {
 
     this.textArray.forEach((text) => {
       if (text.filled) {
-        ctx.fillStyle = "gray";
+        ctx.fillStyle = 'gray';
         ctx.fillText(
           text.value,
           text.position.x,
@@ -180,9 +195,9 @@ class Effect {
   }
 
   getIfAllParticlesPositionedBackToOrigin(): boolean {
-    return this.particles.every((particle) =>
-      particle.getIfPositionIsBackToOrigin()
-    );
+    return this.particles.every((particle) => {
+      return particle.getIfPositionIsBackToOrigin();
+    });
   }
 
   convertToParticles() {
@@ -193,9 +208,11 @@ class Effect {
       this.canvasWidth,
       this.canvasHeight
     ).data;
+
     for (let y = 0; y < this.canvasHeight; y += this.gap) {
       for (let x = 0; x < this.canvasWidth; x += this.gap) {
         const index = (y * this.canvasWidth + x) * 4;
+
         if (pixels[index] > 0) {
           this.particles.push(
             new Particle({

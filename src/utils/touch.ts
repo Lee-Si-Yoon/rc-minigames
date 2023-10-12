@@ -1,3 +1,4 @@
+/* eslint-disable id-denylist */
 export function addEvent(
   el: EventTarget,
   type: string,
@@ -17,13 +18,13 @@ export function removeEvent(
 }
 
 const touch = {
-  mouseup: "touchend",
-  mouseout: "touchend",
-  mousedown: "touchstart",
-  mousemove: "touchmove",
+  mouseup: 'touchend',
+  mouseout: 'touchend',
+  mousedown: 'touchstart',
+  mousemove: 'touchmove',
 };
 
-type MouseType = "mouseup" | "mouseout" | "mousedown" | "mousemove";
+type MouseType = 'mouseup' | 'mouseout' | 'mousedown' | 'mousemove';
 
 export type TouchyEvent = MouseEvent & TouchEvent;
 

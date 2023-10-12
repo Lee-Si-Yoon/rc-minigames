@@ -1,7 +1,8 @@
-import BaseLayer from "../../utils/base-layer";
-import { Coord } from "../../utils/types";
-import { tintColorRGB, greyColorRGB, RGB } from "../../utils/colors";
-import GlowParticle from "./particle";
+import BaseLayer from '../../utils/base-layer';
+import type { RGB } from '../../utils/colors';
+import { greyColorRGB, tintColorRGB } from '../../utils/colors';
+import type { Coord } from '../../utils/types';
+import GlowParticle from './particle';
 
 interface ControllerProps {
   canvas: HTMLCanvasElement;
@@ -25,12 +26,17 @@ class Controller extends BaseLayer {
   ];
 
   private totalParticles = 6;
+
   private particles: GlowParticle[] = [];
+
   private maxRadius = 900;
+
   private minRadius = 400;
 
   private fps: number = 60;
+
   private interval: number = 1000 / this.fps;
+
   private timeStamp: number = 0;
 
   private velocity: Coord = { x: Math.random() * 4, y: Math.random() * 4 };
@@ -44,14 +50,16 @@ class Controller extends BaseLayer {
     velocity,
   }: ControllerProps) {
     super({ canvas });
-    this.ctx = canvas.getContext("2d")!;
+    this.ctx = canvas.getContext('2d')!;
     this.element = canvas;
 
     if (colors) this.colors = colors;
+
     if (particleRadius) {
       this.maxRadius = particleRadius.max;
       this.minRadius = particleRadius.min;
     }
+
     if (totalParticles) this.totalParticles = totalParticles;
     if (fps) this.fps = fps;
     if (velocity) this.velocity = velocity;
@@ -87,6 +95,7 @@ class Controller extends BaseLayer {
   playFrames(): void {
     let timer = 0;
     let lastTime = 0;
+
     const animate = (timeStamp: number) => {
       this.timeStamp = timeStamp;
       const deltaTime = timeStamp - lastTime;
@@ -105,16 +114,18 @@ class Controller extends BaseLayer {
 
       timer += deltaTime;
     };
+
     animate(this.timeStamp);
   }
 
   render(): void {
-    const ctx = this.ctx;
+    const { ctx } = this;
     ctx.clearRect(0, 0, this.width, this.height);
-    ctx.globalCompositeOperation = "saturation";
+    ctx.globalCompositeOperation = 'saturation';
 
     for (let i = 0; i < this.totalParticles; i++) {
       const item = this.particles[i];
+
       if (item) {
         item.update();
         item.render();

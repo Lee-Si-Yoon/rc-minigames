@@ -3,11 +3,11 @@ type HexColors = { [key: string]: string };
 type RGBColors = { [key: string]: RGB };
 
 const tintColorHex: HexColors = {
-  red_01: "#C90500",
-  red_02: "#E00F0A",
-  red_03: "#EA251F",
-  red_04: "#E06666",
-  red_05: "#F4CCCC",
+  red_01: '#C90500',
+  red_02: '#E00F0A',
+  red_03: '#EA251F',
+  red_04: '#E06666',
+  red_05: '#F4CCCC',
 };
 const tintColorRGB: RGBColors = {
   red_01: { r: 201, g: 5, b: 0 },
@@ -18,13 +18,13 @@ const tintColorRGB: RGBColors = {
 };
 
 const greyColorHex: HexColors = {
-  black: "#000000",
-  grey_01: "#171719",
-  grey_02: "#303034",
-  grey_03: "#404044",
-  grey_04: "#79828E",
-  grey_05: "#B0B8C1",
-  white: "#FFFFFF",
+  black: '#000000',
+  grey_01: '#171719',
+  grey_02: '#303034',
+  grey_03: '#404044',
+  grey_04: '#79828E',
+  grey_05: '#B0B8C1',
+  white: '#FFFFFF',
 };
 const greyColorRGB: RGBColors = {
   black: { r: 0, g: 0, b: 0 },
@@ -70,12 +70,12 @@ function rgaToHex(rgb: RGB) {
   return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 }
 
+export type { RGB };
 export {
-  tintColorHex,
-  tintColorRGB,
   greyColorHex,
   greyColorRGB,
   parseRGBColor,
   rgaToHex,
-  RGB,
+  tintColorHex,
+  tintColorRGB,
 };

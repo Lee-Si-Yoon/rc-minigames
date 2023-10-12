@@ -1,16 +1,16 @@
+import type { ForwardedRef } from 'react';
 import React, {
-  ForwardedRef,
   forwardRef,
   useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
-import { ParticleTextProps, ParticleTextRef } from "./model";
-import Controller from "./controller";
-import { ControllerChangeHandler } from "./hooks/model";
-import { CanvasEvents } from "./events";
+} from 'react';
+import Controller from './controller';
+import { CanvasEvents } from './events';
+import type { ControllerChangeHandler } from './hooks/model';
+import type { ParticleTextProps, ParticleTextRef } from './model';
 
 const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
   function ParticleText(
@@ -28,7 +28,7 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
 
     const getBackgroundRef = useCallback((element: HTMLCanvasElement) => {
       if (!element) return;
-      element.style["touchAction"] = "none";
+      element.style.touchAction = 'none';
       setBackgroundRef(element);
     }, []);
 
@@ -40,7 +40,7 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
 
     const getInteractionRef = useCallback((element: HTMLCanvasElement) => {
       if (!element) return;
-      element.style["touchAction"] = "none";
+      element.style.touchAction = 'none';
       setInteractionCanvasRef(element);
     }, []);
 
@@ -52,7 +52,7 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
 
     const getPlainTextRef = useCallback((element: HTMLCanvasElement) => {
       if (!element) return;
-      element.style["touchAction"] = "none";
+      element.style.touchAction = 'none';
       setPlainTextCanvasRef(element);
     }, []);
 
@@ -64,7 +64,7 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
 
     const getParticleRef = useCallback((element: HTMLCanvasElement) => {
       if (!element) return;
-      element.style["touchAction"] = "none";
+      element.style.touchAction = 'none';
       setParticleCanvasRef(element);
     }, []);
 
@@ -79,7 +79,7 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
         !plainTextCanvasRef ||
         !particleCanvasRef
       )
-        return;
+        return undefined;
       const editor = new Controller({
         backgroundLayer: backgroundRef,
         interactionLayer: interactionCanvasRef,
@@ -93,7 +93,14 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
       return () => {
         editor.destroy();
       };
-    }, [backgroundRef, interactionCanvasRef]);
+    }, [
+      backgroundRef,
+      interactionCanvasRef,
+      particleCanvasRef,
+      plainTextCanvasRef,
+      props.fps,
+      props.text,
+    ]);
 
     /**
      * @summary RESIZE EVENTS
@@ -108,12 +115,14 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
           editor.renderStaticLayers();
         }
       };
+
       // on init
       onResize();
       // on resize event
-      window.addEventListener("resize", onResize);
+      window.addEventListener('resize', onResize);
+
       return () => {
-        window.removeEventListener("resize", onResize);
+        window.removeEventListener('resize', onResize);
       };
     }, [editor, props.width, props.height]);
 
@@ -126,7 +135,9 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
 
     const addControllerChangeListener = useCallback(
       (listener: ControllerChangeHandler) => {
-        setControllerChangeListeners((listeners) => [...listeners, listener]);
+        setControllerChangeListeners((listeners) => {
+          return [...listeners, listener];
+        });
       },
       []
     );
@@ -135,20 +146,23 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
       (listener: ControllerChangeHandler) => {
         if (!editor) return;
         editor.removeEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
-        setControllerChangeListeners((listeners) =>
-          listeners.filter((l) => l !== listener)
-        );
+        setControllerChangeListeners((listeners) => {
+          return listeners.filter((l) => {
+            return l !== listener;
+          });
+        });
       },
       [editor]
     );
 
     useEffect(() => {
-      if (!editor) return;
+      if (!editor) return undefined;
 
       controllerChangeListeners.forEach((listener) => {
         editor.addEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
       });
       editor.emitControllerData();
+
       return () => {
         controllerChangeListeners.forEach((listener) => {
           editor?.removeEventListener(CanvasEvents.CONTROLLER_EVENT, listener);
@@ -166,11 +180,13 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
 
     useImperativeHandle(
       ref,
-      () => ({
-        removeWord,
-        addControllerChangeListener,
-        removeControllerChangeListener,
-      }),
+      () => {
+        return {
+          removeWord,
+          addControllerChangeListener,
+          removeControllerChangeListener,
+        };
+      },
       [removeWord, addControllerChangeListener, removeControllerChangeListener]
     );
 
@@ -179,12 +195,12 @@ const ParticleText = forwardRef<ParticleTextRef, ParticleTextProps>(
         ref={containerRef}
         tabIndex={-1}
         role="presentation"
-        style={{ width: props.width, height: props.height, outline: "none" }}
+        style={{ width: props.width, height: props.height, outline: 'none' }}
       >
-        <canvas ref={getBackgroundRef} style={{ position: "absolute" }} />
-        <canvas ref={getPlainTextRef} style={{ position: "absolute" }} />
-        <canvas ref={getParticleRef} style={{ position: "absolute" }} />
-        <canvas ref={getInteractionRef} style={{ position: "absolute" }} />
+        <canvas ref={getBackgroundRef} style={{ position: 'absolute' }} />
+        <canvas ref={getPlainTextRef} style={{ position: 'absolute' }} />
+        <canvas ref={getParticleRef} style={{ position: 'absolute' }} />
+        <canvas ref={getInteractionRef} style={{ position: 'absolute' }} />
       </div>
     );
   }

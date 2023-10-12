@@ -1,7 +1,8 @@
-import { MutableRefObject, useCallback, useEffect, useState } from "react";
-import { ParticleTextRef } from "../model";
-import useHandlers from "./use-handlers";
-import { ControllerChangeHandler, ControllerProps } from "./model";
+import type { MutableRefObject } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { ParticleTextRef } from '../model';
+import type { ControllerChangeHandler, ControllerProps } from './model';
+import useHandlers from './use-handlers';
 
 function useParticle(ref: MutableRefObject<ParticleTextRef | null>) {
   const { addControllerChangeListener, removeControllerChangeListener } =

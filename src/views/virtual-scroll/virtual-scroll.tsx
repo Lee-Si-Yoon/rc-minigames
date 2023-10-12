@@ -1,9 +1,10 @@
-import React, { CSSProperties } from "react";
-import { useScroll } from "../../utils/hooks/use-scroll";
+import type { CSSProperties } from 'react';
+import React from 'react';
+import { useScroll } from '../../utils/hooks/use-scroll';
 
 interface VirtualScrollProps {
-  itemWidth: CSSProperties["width"];
-  itemHeight: CSSProperties["height"];
+  itemWidth: CSSProperties['width'];
+  itemHeight: CSSProperties['height'];
   children: React.ReactNode[];
   renderAhead: number;
   columnGap: number;
@@ -53,8 +54,8 @@ function VirtualScroll(props: VirtualScrollProps) {
       style={{
         width: itemWidth,
         height: containerHeight,
-        overflowY: "auto",
-        overflowX: "clip",
+        overflowY: 'auto',
+        overflowX: 'clip',
       }}
       ref={scrollRef}
     >
@@ -70,6 +71,6 @@ function VirtualScroll(props: VirtualScrollProps) {
   );
 }
 
-VirtualScroll.displayName = "VirtualScroll";
+VirtualScroll.displayName = 'VirtualScroll';
 
 export default VirtualScroll;

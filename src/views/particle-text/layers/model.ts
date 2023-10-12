@@ -2,4 +2,4 @@ interface CanvasLayerConstructor {
   canvas: HTMLCanvasElement;
 }
 
-export { CanvasLayerConstructor };
+export type { CanvasLayerConstructor };

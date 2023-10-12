@@ -1,19 +1,20 @@
-import React, { CSSProperties, useEffect, useRef } from "react";
-import { RGB } from "../../utils/colors";
+import type { CSSProperties } from 'react';
+import React, { useEffect, useRef } from 'react';
+import type { RGB } from '../../utils/colors';
 
 export interface FadingProp {
   texts: string[];
-  width: CSSProperties["width"];
-  height: CSSProperties["height"];
+  width: CSSProperties['width'];
+  height: CSSProperties['height'];
   textColor?: RGB;
   morphTime?: number;
   cooldownTime?: number;
-  fontSize?: CSSProperties["fontSize"];
-  fontWeight?: CSSProperties["fontWeight"];
-  fontFamily?: CSSProperties["fontFamily"];
+  fontSize?: CSSProperties['fontSize'];
+  fontWeight?: CSSProperties['fontWeight'];
+  fontFamily?: CSSProperties['fontFamily'];
   background?: {
     enabled: boolean;
-    color?: CSSProperties["backgroundColor"];
+    color?: CSSProperties['backgroundColor'];
   };
   style?: CSSProperties;
 }
@@ -24,17 +25,17 @@ function Fading(props: FadingProp) {
   const radId = useRef<number>();
 
   const fontStyle: CSSProperties = {
-    position: "absolute",
-    top: "50%",
-    transform: "translateY(-50%)",
-    textAlign: "center",
-    width: "100%",
-    fontSize: props.fontSize || "6rem",
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    textAlign: 'center',
+    width: '100%',
+    fontSize: props.fontSize || '6rem',
     fontFamily:
-      `${props.fontFamily ? `${props.fontFamily},` : ""}` +
-      "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,  Cantarell,  sans-serif",
-    fontWeight: props.fontWeight || "800",
-    userSelect: "none",
+      `${props.fontFamily ? `${props.fontFamily},` : ''}` +
+      '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,  Cantarell,  sans-serif',
+    fontWeight: props.fontWeight || '800',
+    userSelect: 'none',
   };
 
   const {
@@ -48,15 +49,16 @@ function Fading(props: FadingProp) {
   } = props;
 
   useEffect(() => {
-    if (!text1Ref.current || !text2Ref.current) return;
+    if (!text1Ref.current || !text2Ref.current) return undefined;
 
     let textIndex = texts.length - 1;
     let morph = 0;
     let cooldown = cooldownTime;
     let time = new Date();
 
-    text1Ref.current.textContent = texts[textIndex % texts.length];
-    text2Ref.current.textContent = texts[(textIndex + 1) % texts.length];
+    text1Ref.current.textContent = texts[textIndex % texts.length] ?? null;
+    text2Ref.current.textContent =
+      texts[(textIndex + 1) % texts.length] ?? null;
 
     const setMorph = (fraction: number) => {
       if (!text1Ref.current || !text2Ref.current) return;
@@ -74,8 +76,9 @@ function Fading(props: FadingProp) {
       )}px)`;
       text1Ref.current.style.opacity = `${Math.pow(fraction2, 0.4) * 100}%`;
 
-      text1Ref.current.textContent = texts[textIndex % texts.length];
-      text2Ref.current.textContent = texts[(textIndex + 1) % texts.length];
+      text1Ref.current.textContent = texts[textIndex % texts.length] ?? null;
+      text2Ref.current.textContent =
+        texts[(textIndex + 1) % texts.length] ?? null;
     };
 
     function doMorph() {
@@ -96,11 +99,11 @@ function Fading(props: FadingProp) {
       if (!text1Ref.current || !text2Ref.current) return;
       morph = 0;
 
-      text2Ref.current.style.filter = "";
-      text2Ref.current.style.opacity = "100%";
+      text2Ref.current.style.filter = '';
+      text2Ref.current.style.opacity = '100%';
 
-      text1Ref.current.style.filter = "";
-      text1Ref.current.style.opacity = "0%";
+      text1Ref.current.style.filter = '';
+      text1Ref.current.style.opacity = '0%';
     }
 
     function animate() {
@@ -126,43 +129,45 @@ function Fading(props: FadingProp) {
 
     animate();
 
-    return () => cancelAnimationFrame(radId.current || 0);
-  }, [props]);
+    return () => {
+      cancelAnimationFrame(radId.current || 0);
+    };
+  }, [cooldownTime, morphTime, props, texts]);
 
   return (
     <div
       style={{
         width: props.width,
         height: props.height,
-        outline: "none",
-        touchAction: "none",
-        position: "relative",
+        outline: 'none',
+        touchAction: 'none',
+        position: 'relative',
         ...props.style,
       }}
     >
       {background.enabled && (
         <div
           style={{
-            width: "100%",
-            height: "100%",
-            position: "absolute",
-            backgroundColor: background.color || "black",
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            backgroundColor: background.color || 'black',
           }}
         />
       )}
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          backgroundColor: "transparent",
-          filter: "url(#threshold) blur(0.0375rem)",
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          backgroundColor: 'transparent',
+          filter: 'url(#threshold) blur(0.0375rem)',
         }}
       >
         <span ref={text1Ref} style={fontStyle} />
         <span ref={text2Ref} style={fontStyle} />
       </div>
-      <svg style={{ width: "0", height: "0", display: "none" }}>
+      <svg style={{ width: '0', height: '0', display: 'none' }}>
         <defs>
           <filter id="threshold">
             <feColorMatrix
@@ -180,6 +185,6 @@ function Fading(props: FadingProp) {
   );
 }
 
-Fading.displayName = "Fading";
+Fading.displayName = 'Fading';
 
 export default Fading;

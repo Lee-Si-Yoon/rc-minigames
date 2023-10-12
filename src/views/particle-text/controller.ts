@@ -1,10 +1,10 @@
-import EventDispatcher from "../../utils/eventDispatcher";
-import { CanvasEvents } from "./events";
-import { ControllerChangeParams } from "./hooks/model";
-import BackgroundLayer from "./layers/background-layer";
-import InteractionLayer from "./layers/interaction-layer";
-import ParticleTextLayer from "./layers/particle-text-layer";
-import PlainTextLayer from "./layers/plain-text-layer";
+import EventDispatcher from '../../utils/eventDispatcher';
+import { CanvasEvents } from './events';
+import type { ControllerChangeParams } from './hooks/model';
+import BackgroundLayer from './layers/background-layer';
+import InteractionLayer from './layers/interaction-layer';
+import ParticleTextLayer from './layers/particle-text-layer';
+import PlainTextLayer from './layers/plain-text-layer';
 
 interface ControllerConstructor {
   backgroundLayer: HTMLCanvasElement;
@@ -16,19 +16,28 @@ interface ControllerConstructor {
 
 class Controller extends EventDispatcher {
   private width: number = 0;
+
   private height: number = 0;
+
   private dpr: number = 1;
   // private element: HTMLCanvasElement;
 
   private backgroundLayer: BackgroundLayer;
+
   private interactionLayer: InteractionLayer;
+
   private plainTextLayer: PlainTextLayer;
+
   private particleTextLayer: ParticleTextLayer;
 
   private timeStamp: number = 0;
+
   private playTime: number = 0;
+
   private fps: number = 60;
+
   private interval: number = 1000 / this.fps;
+
   private rafId: number = 0;
 
   constructor({

@@ -1,11 +1,12 @@
-import { RouteObject, createBrowserRouter } from "react-router-dom";
-import Root from "../pages/root/root";
-import { Paths } from "./paths";
-import TypingGame from "../pages/gymbox/typing-game/typing-game";
-import Playground from "../pages/gymbox/playground/playground";
-import Timer from "../pages/gymbox/timer/timer";
-import ParticleGame from "../pages/gymbox/particle-text/particle-text";
-import Score from "../pages/gymbox/score/score";
+import type { RouteObject } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
+import ParticleGame from '../pages/gymbox/particle-text/particle-text';
+import Playground from '../pages/gymbox/playground/playground';
+import Score from '../pages/gymbox/score/score';
+import Timer from '../pages/gymbox/timer/timer';
+import TypingGame from '../pages/gymbox/typing-game/typing-game';
+import Root from '../pages/root/root';
+import { Paths } from './paths';
 
 const routerConfig: RouteObject[] = [
   {
@@ -16,14 +17,14 @@ const routerConfig: RouteObject[] = [
         Component: Root,
       },
       {
-        path: "*",
+        path: '*',
         Component: Root,
       },
       {
         path: Paths.gymboxx.default,
         children: [
           {
-            path: Paths.gymboxx["typing-game"],
+            path: Paths.gymboxx['typing-game'],
             Component: TypingGame,
           },
           {
@@ -35,7 +36,7 @@ const routerConfig: RouteObject[] = [
             Component: Timer,
           },
           {
-            path: Paths.gymboxx["particle-text"],
+            path: Paths.gymboxx['particle-text'],
             Component: ParticleGame,
           },
           {

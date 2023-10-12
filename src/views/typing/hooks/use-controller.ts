@@ -1,14 +1,14 @@
-import { MutableRefObject, useCallback, useEffect, useState } from "react";
-import {
+import type { MutableRefObject } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type {
   ControllerChangeHandler,
   ControllerProps,
   TimerChangeHandler,
   TimerProps,
-  Level,
-  Phase,
   TypingRef,
-} from "../model";
-import useHandlers from "./use-handlers";
+} from '../model';
+import { Level, Phase } from '../model';
+import useHandlers from './use-handlers';
 
 function useController(ref: MutableRefObject<TypingRef | null>) {
   const {
@@ -31,6 +31,7 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     const listener: ControllerChangeHandler = ({ data: controllerData }) => {
       setControllerData(controllerData);
     };
+
     addControllerChangeListener(listener);
 
     return () => {
@@ -42,6 +43,7 @@ function useController(ref: MutableRefObject<TypingRef | null>) {
     const listener: TimerChangeHandler = ({ data: timerData }) => {
       setTimerData(timerData);
     };
+
     addTimerChangeListener(listener);
 
     return () => {

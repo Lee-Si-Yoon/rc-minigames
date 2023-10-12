@@ -1,14 +1,18 @@
-import { CanvasLayerConstructor } from "../views/typing/layers/model";
+import type { CanvasLayerConstructor } from '../views/typing/layers/model';
 
 abstract class BaseLayer {
   protected ctx: CanvasRenderingContext2D;
+
   protected element: HTMLCanvasElement;
+
   protected dpr: number = 0;
+
   protected width: number = 0;
+
   protected height: number = 0;
 
   constructor({ canvas }: CanvasLayerConstructor) {
-    this.ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+    this.ctx = canvas.getContext('2d', { willReadFrequently: true })!;
     this.element = canvas;
   }
 

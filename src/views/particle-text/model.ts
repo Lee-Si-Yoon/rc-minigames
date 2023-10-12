@@ -1,9 +1,9 @@
-import { ForwardedRef } from "react";
-import { ControllerChangeHandler } from "./hooks/model";
+import type { ForwardedRef } from 'react';
+import type { ControllerChangeHandler } from './hooks/model';
 
 interface ParticleTextProps {
-  width: React.CSSProperties["width"];
-  height: React.CSSProperties["height"];
+  width: React.CSSProperties['width'];
+  height: React.CSSProperties['height'];
   text: string;
   ref?: ForwardedRef<ParticleTextRef>;
   initData?: string;
@@ -17,4 +17,4 @@ interface ParticleTextRef {
   removeControllerChangeListener: (listener: ControllerChangeHandler) => void;
 }
 
-export { ParticleTextProps, ParticleTextRef };
+export type { ParticleTextProps, ParticleTextRef };

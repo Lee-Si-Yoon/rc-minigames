@@ -1,11 +1,5 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * @url https://github.com/streamich/react-use/blob/master/src/useRafState.ts
@@ -21,11 +15,17 @@ export function useRafState<S>(
   const setRafState = useCallback((value: S | ((prevState: S) => S)) => {
     cancelAnimationFrame(frame.current);
 
-    frame.current = requestAnimationFrame(() => setState(value));
+    frame.current = requestAnimationFrame(() => {
+      return setState(value);
+    });
   }, []);
 
   /* cancelAnimationFrame when unmount */
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  useEffect(() => {
+    return () => {
+      return cancelAnimationFrame(frame.current);
+    };
+  }, []);
 
   return [state, setRafState];
 }

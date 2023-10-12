@@ -1,22 +1,22 @@
-import { ForwardedRef, ReactNode } from "react";
-import { DataProps, Words } from "./layers/model";
-import { TextProps } from "./text/text";
+import type { ForwardedRef, ReactNode } from 'react';
+import type { DataProps, Words } from './layers/model';
+import type { TextProps } from './text/text';
 
 enum Phase {
-  PLAYING = "playing",
-  PAUSED = "paused",
-  END = "end",
+  PLAYING = 'playing',
+  PAUSED = 'paused',
+  END = 'end',
 }
 
 enum Level {
-  EASY = "easy",
-  NORMAL = "normal",
-  HARD = "hard",
+  EASY = 'easy',
+  NORMAL = 'normal',
+  HARD = 'hard',
 }
 
 interface TypingProps {
-  width: React.CSSProperties["width"];
-  height: React.CSSProperties["height"];
+  width: React.CSSProperties['width'];
+  height: React.CSSProperties['height'];
   ref?: ForwardedRef<TypingRef>;
   initData?: Words;
   style?: React.CSSProperties;
@@ -33,7 +33,7 @@ interface TypingRef {
   addTimerChangeListener: (listener: TimerChangeHandler) => void;
   removeTimerChangeListener: (listener: TimerChangeHandler) => void;
   // for useData
-  addWord: (textProps: Omit<TextProps, "ctx">) => void;
+  addWord: (textProps: Omit<TextProps, 'ctx'>) => void;
   removeWord: (word: string) => void;
   addDataChangeListener: (listener: CanvasDataChangeHandler) => void;
   removeDataChangeListener: (listener: CanvasDataChangeHandler) => void;
@@ -66,17 +66,16 @@ type TimerProps = {
 type TimerChangeParams = { data: TimerProps };
 type TimerChangeHandler = (params: TimerChangeParams) => void;
 
-export {
-  CanvasDataChangeParams,
+export type {
   CanvasDataChangeHandler,
-  ControllerProps,
-  ControllerChangeParams,
+  CanvasDataChangeParams,
   ControllerChangeHandler,
-  TimerProps,
-  TimerChangeParams,
+  ControllerChangeParams,
+  ControllerProps,
   TimerChangeHandler,
+  TimerChangeParams,
+  TimerProps,
   TypingProps,
   TypingRef,
-  Phase,
-  Level,
 };
+export { Level, Phase };

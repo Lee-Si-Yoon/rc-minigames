@@ -1,11 +1,12 @@
-import { Coord } from "./types";
+import type { Coord } from './types';
 
 function isDifferenceLessThan(
   num1: number,
   num2: number,
   diff: number
 ): boolean {
-  if (diff <= 0) throw new Error("diff should be bigger than 0");
+  if (diff <= 0) throw new Error('diff should be bigger than 0');
+
   return Math.abs(num1 > num2 ? num1 - num2 : num2 - num1) < diff;
 }
 
@@ -13,7 +14,9 @@ function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
-const lerp = (a: number, b: number, n: number): number => (1 - n) * a + n * b;
+const lerp = (a: number, b: number, n: number): number => {
+  return (1 - n) * a + n * b;
+};
 
 const lerpRange = (
   value: number,
@@ -28,8 +31,8 @@ const lerpRange = (
 /**
  * @url https://javascript.info/bezier-curve#maths
  */
-const getPoint =
-  (start: Coord, mid1: Coord, mid2: Coord, end: Coord) => (t: number) => {
+const getPoint = (start: Coord, mid1: Coord, mid2: Coord, end: Coord) => {
+  return (t: number) => {
     const x =
       (1 - t) ** 3 * start.x +
       3 * (1 - t) ** 2 * t * mid1.x +
@@ -40,14 +43,16 @@ const getPoint =
       3 * (1 - t) ** 2 * t * mid1.y +
       3 * (1 - t) * t ** 2 * mid2.y +
       t ** 3 * end.y;
+
     return { x, y };
   };
+};
 
 export {
-  isDifferenceLessThan,
+  getPoint,
   getRandomArbitrary,
+  isDifferenceLessThan,
   lerp,
   lerpRange,
-  getPoint,
   // getCubicBezier,
 };

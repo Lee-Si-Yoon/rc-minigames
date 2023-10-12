@@ -1,5 +1,6 @@
 class QueueNode<T> {
   data: T;
+
   next: QueueNode<T> | null;
 
   constructor(data: T) {
@@ -10,7 +11,9 @@ class QueueNode<T> {
 
 class Queue<T> {
   private length: number;
+
   private head: QueueNode<T> | null;
+
   private tail: QueueNode<T> | null;
 
   constructor() {
@@ -21,11 +24,13 @@ class Queue<T> {
 
   enqueue(data: T): void {
     const node = new QueueNode(data);
+
     if (this.length === 0) {
       this.head = node;
     } else {
       this.tail!.next = node;
     }
+
     this.tail = node;
     this.length++;
   }
@@ -34,7 +39,8 @@ class Queue<T> {
     if (this.length === 0 || this.head === null) {
       return null;
     }
-    const data = this.head.data;
+
+    const { data } = this.head;
     this.head = this.head.next;
     this.length--;
 

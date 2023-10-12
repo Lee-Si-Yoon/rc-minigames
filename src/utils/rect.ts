@@ -1,4 +1,4 @@
-import { Coord } from "./types";
+import type { Coord } from './types';
 
 interface RectProps {
   ctx: CanvasRenderingContext2D;
@@ -14,14 +14,20 @@ abstract class Rect {
   protected isDebugMode: boolean = false;
 
   protected ctx: CanvasRenderingContext2D;
+
   protected width: number = 0;
+
   protected height: number = 0;
+
   protected x: number = 0;
+
   protected y: number = 0;
+
   protected degree: number = 0;
 
   // in clockwise
   protected vertex: Coord[] = [];
+
   protected edge: Coord[] = [];
 
   constructor({ ctx, x, y, degree, width, height, isDebugMode }: RectProps) {
@@ -122,7 +128,7 @@ abstract class Rect {
   }
 
   showAABBLine() {
-    const ctx = this.ctx;
+    const { ctx } = this;
 
     const minX = Math.min(
       this.vertex[0].x,
@@ -149,7 +155,7 @@ abstract class Rect {
       this.vertex[3].y
     );
 
-    ctx.strokeStyle = "purple";
+    ctx.strokeStyle = 'purple';
     ctx.beginPath();
     ctx.moveTo(minX, minY);
     ctx.lineTo(maxX, minY);
@@ -161,7 +167,8 @@ abstract class Rect {
   }
 
   testRender() {
-    const ctx = this.ctx;
+    const { ctx } = this;
+
     if (this.degree === 0) {
       ctx.fillRect(this.x, this.y, this.width, this.height);
     } else {

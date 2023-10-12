@@ -12,7 +12,9 @@ $--grey-04: #79828e;
   font-weight: 700;
   cursor: pointer;
   background: var(--red-02, #e00f0a);
-  font-feature-settings: "clig" off, "liga" off;
+  font-feature-settings:
+    'clig' off,
+    'liga' off;
 }
 
 .HighLight {
@@ -24,7 +26,7 @@ $--grey-04: #79828e;
 
   &::before,
   &::after {
-    content: " ";
+    content: ' ';
     position: absolute;
     left: 0;
     right: auto;
@@ -47,7 +49,9 @@ $--grey-04: #79828e;
 }
 
 .Legend {
-  font-feature-settings: "clig" off, "liga" off;
+  font-feature-settings:
+    'clig' off,
+    'liga' off;
   color: white;
   font-weight: 600;
   font-size: 1.5rem;

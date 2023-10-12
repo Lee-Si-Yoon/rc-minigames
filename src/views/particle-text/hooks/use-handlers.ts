@@ -1,6 +1,7 @@
-import { MutableRefObject, useCallback } from "react";
-import { ParticleTextRef } from "../model";
-import { ControllerChangeHandler } from "./model";
+import type { MutableRefObject } from 'react';
+import { useCallback } from 'react';
+import type { ParticleTextRef } from '../model';
+import type { ControllerChangeHandler } from './model';
 
 function useHandlers(ref: MutableRefObject<ParticleTextRef | null>) {
   /**

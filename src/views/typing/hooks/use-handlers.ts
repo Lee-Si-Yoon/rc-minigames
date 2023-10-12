@@ -1,10 +1,11 @@
-import { MutableRefObject, useCallback } from "react";
-import {
+import type { MutableRefObject } from 'react';
+import { useCallback } from 'react';
+import type {
   CanvasDataChangeHandler,
   ControllerChangeHandler,
   TimerChangeHandler,
   TypingRef,
-} from "../model";
+} from '../model';
 
 function useHandlers(ref: MutableRefObject<TypingRef | null>) {
   /**

@@ -1,35 +1,37 @@
-import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
-
-import classes from "./typing-game.module.scss";
-import Typing from "../../../views/typing/typing";
-import useData from "../../../views/typing/hooks/use-data";
-import { Level, Phase, TypingRef } from "../../../views/typing/model";
-import useController from "../../../views/typing/hooks/use-controller";
-import { combinedArray } from "./mock-data";
-import Debugger from "./debugger";
+import type { ChangeEvent, FormEvent } from 'react';
+import React, { useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Paths } from '../../../routes/paths';
+import { ChevronIcon, CloseIcon } from '../../../svg';
 import {
   greyColorHex,
   greyColorRGB,
   rgaToHex,
   tintColorRGB,
-} from "../../../utils/colors";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Paths } from "../../../routes/paths";
-import { lerp, getPoint } from "../../../utils/math";
-import { removeAllWhiteSpaces } from "../../../utils/strip-punctuation";
-import { ChevronIcon, CloseIcon } from "../../../svg";
-import IntroText, { TextSequence } from "../../../views/intro-text/intro-text";
+} from '../../../utils/colors';
+import { getPoint, lerp } from '../../../utils/math';
+import { removeAllWhiteSpaces } from '../../../utils/strip-punctuation';
+import type { TextSequence } from '../../../views/intro-text/intro-text';
+import IntroText from '../../../views/intro-text/intro-text';
+import useController from '../../../views/typing/hooks/use-controller';
+import useData from '../../../views/typing/hooks/use-data';
+import type { TypingRef } from '../../../views/typing/model';
+import { Level, Phase } from '../../../views/typing/model';
+import Typing from '../../../views/typing/typing';
+import Debugger from './debugger';
+import { combinedArray } from './mock-data';
+import classes from './typing-game.module.scss';
 
 const gameStartTexts: TextSequence[] = [
   {
-    text: "READY",
+    text: 'READY',
     fps: 21,
     duration: 30,
     minSize: 24,
     maxSize: 42,
   },
   {
-    text: "GO!",
+    text: 'GO!',
     fps: 21,
     duration: 12,
     minSize: 52,
@@ -39,7 +41,7 @@ const gameStartTexts: TextSequence[] = [
 
 const onGameEndTexts: TextSequence[] = [
   {
-    text: "GAME OVER",
+    text: 'GAME OVER',
     fps: 21,
     duration: 30,
     minSize: 24,
@@ -48,17 +50,22 @@ const onGameEndTexts: TextSequence[] = [
 ];
 
 enum GamePhase {
-  BEFORE_START = "no started yet",
-  GAME_PLAYING = "game is running",
-  END = "game ended, small amount of stall before navigation",
+  BEFORE_START = 'no started yet',
+  GAME_PLAYING = 'game is running',
+  END = 'game ended, small amount of stall before navigation',
 }
 
 function TypingGame() {
+  const navigate = useNavigate();
   /** BACKGROUND */
   React.useLayoutEffect(() => {
     if (gameStartTexts.length <= 0 || onGameEndTexts.length <= 0)
       location.reload();
-    document.body.style.backgroundColor = "black";
+    document.body.style.backgroundColor = 'black';
+
+    return () => {
+      document.body.style.backgroundColor = 'initial';
+    };
   }, []);
 
   /** DEBUGGER */
@@ -72,12 +79,15 @@ function TypingGame() {
         setHeight(window.visualViewport.height - 40 - 50);
       }
     };
+
     viewportHandler();
 
-    window.visualViewport?.addEventListener("resize", viewportHandler);
-    return () =>
-      window.visualViewport?.removeEventListener("resize", viewportHandler);
-  }, [window.visualViewport]);
+    window.visualViewport?.addEventListener('resize', viewportHandler);
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', viewportHandler);
+    };
+  }, []);
 
   /** GAME */
   const [gamePhase, setGamePhase] = React.useState<GamePhase>(
@@ -88,17 +98,19 @@ function TypingGame() {
   const { setIsPlaying, setLevel, controllerData, timerData } =
     useController(ref);
 
-  const [inputValue, setInputValue] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>('');
+
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const {
       currentTarget: { value },
     } = e;
     setInputValue(value);
   };
+
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     removeWord(inputValue);
-    setInputValue("");
+    setInputValue('');
   };
 
   const [spawnWords, setSpawnWords] = useState<boolean>(true);
@@ -106,7 +118,7 @@ function TypingGame() {
 
   React.useEffect(() => {
     if (spawnWords && controllerData.isPlaying === Phase.PLAYING) {
-      if (combinedArray.length <= 0) return;
+      if (combinedArray.length <= 0) return undefined;
       spawnRef.current = setInterval(() => {
         const index = Math.floor(Math.random() * combinedArray.length);
         const word = removeAllWhiteSpaces(combinedArray[index]);
@@ -115,8 +127,11 @@ function TypingGame() {
         combinedArray.splice(index, 1);
       }, 2000);
     }
-    return () => clearInterval(spawnRef.current);
-  }, [spawnWords, controllerData.isPlaying]);
+
+    return () => {
+      clearInterval(spawnRef.current);
+    };
+  }, [spawnWords, controllerData.isPlaying, addWord]);
 
   React.useEffect(() => {
     const onGameEnd = () => {
@@ -126,29 +141,31 @@ function TypingGame() {
         navigate(`${Paths.gymboxx.score}?score=${controllerData.score}`);
       }, 2000);
     };
+
     const onGameStart = () => {
       setTimeout(() => {
         setIsPlaying(Phase.PLAYING);
       }, 3500);
     };
+
     if (gamePhase === GamePhase.GAME_PLAYING) onGameStart();
     if (gamePhase === GamePhase.END) onGameEnd();
-  }, [gamePhase]);
+  }, [controllerData.score, gamePhase, navigate, setIsPlaying]);
 
   /** TIMER */
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const paramMinute = searchParams.get("m");
-  const paramSecond = searchParams.get("s");
+  const paramMinute = searchParams.get('m');
+  const paramSecond = searchParams.get('s');
   const totalTime = (Number(paramMinute) * 60 + Number(paramSecond)) * 100;
 
   const parseMs = (ms: number) => {
     const totalSeconds = Math.floor(ms / 100);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
+
     return {
-      minutes: minutes.toString().padStart(2, "0"),
-      seconds: seconds.toString().padStart(2, "0"),
+      minutes: minutes.toString().padStart(2, '0'),
+      seconds: seconds.toString().padStart(2, '0'),
     };
   };
 
@@ -158,11 +175,11 @@ function TypingGame() {
   }, [timerData.playTime, totalTime]);
 
   const [bgColor, setBgColor] = React.useState<
-    React.CSSProperties["backgroundColor"]
+    React.CSSProperties['backgroundColor']
   >(rgaToHex(greyColorRGB.black));
 
   React.useEffect(() => {
-    const black = greyColorRGB.black;
+    const { black } = greyColorRGB;
     const red = tintColorRGB.red_01;
     const ratio = timerData.playTime / totalTime;
 
@@ -188,21 +205,21 @@ function TypingGame() {
         ? setLevel(Level.HARD)
         : setLevel(Level.NORMAL)
       : setLevel(Level.EASY);
-  }, [timerData.playTime, totalTime]);
+  }, [setLevel, timerData.playTime, totalTime]);
 
   return (
     <div className={classes.Container}>
       <nav className={classes.Navigation}>
         <button
           className={classes.BackButton}
-          onClick={() =>
-            navigate(
+          onClick={() => {
+            return navigate(
               `${Paths.gymboxx.timer}?m=${
                 parseMs(totalTime - timerData.playTime).minutes
               }&s=${parseMs(totalTime - timerData.playTime).seconds}`,
               { replace: true }
-            )
-          }
+            );
+          }}
         >
           <CloseIcon width={20} height={20} fill={greyColorHex.black} />
         </button>
@@ -212,9 +229,9 @@ function TypingGame() {
               ? timerData.playTime / totalTime > 0.9
                 ? classes.Jitter1
                 : classes.Jitter2
-              : "",
+              : '',
             classes.TimerText,
-          ].join(" ")}
+          ].join(' ')}
         >
           {parseMs(totalTime - timerData.playTime).minutes}’
           {parseMs(totalTime - timerData.playTime).seconds}’’
@@ -234,18 +251,22 @@ function TypingGame() {
       )}
       <button
         className={classes.DebugButton}
-        onClick={() => setDebugMode((prev) => !prev)}
+        onClick={() => {
+          return setDebugMode((prev) => {
+            return !prev;
+          });
+        }}
         style={{
-          color: debugMode ? "#EA251F" : "white",
+          color: debugMode ? '#EA251F' : 'white',
         }}
       >
         debug
       </button>
       <Typing
         ref={ref}
-        width={"100%"}
+        width={'100%'}
         height={height}
-        initData={["엘리코", "오버헤드프레스", "스쿼트", "짐박스"]}
+        initData={['엘리코', '오버헤드프레스', '스쿼트', '짐박스']}
         backgroundComponent={
           <div
             className={classes.Mask}
@@ -265,23 +286,23 @@ function TypingGame() {
                   className={[
                     classes.TouchKeyboardContainer,
                     classes.ShiftTopDown,
-                  ].join(" ")}
+                  ].join(' ')}
                 >
                   <span>아래 입력창을 눌러 키보드를 열어주세요.</span>
                   <ChevronIcon
                     width={20}
                     height={20}
                     fill={greyColorHex.white}
-                    style={{ rotate: "270deg" }}
+                    style={{ rotate: '270deg' }}
                   />
                 </div>
               </>
             )}
             {gamePhase === GamePhase.GAME_PLAYING && (
-              <IntroText data={gameStartTexts} width={"100%"} height={height} />
+              <IntroText data={gameStartTexts} width={'100%'} height={height} />
             )}
             {gamePhase === GamePhase.END && (
-              <IntroText data={onGameEndTexts} width={"100%"} height={height} />
+              <IntroText data={onGameEndTexts} width={'100%'} height={height} />
             )}
           </div>
         }
@@ -294,13 +315,15 @@ function TypingGame() {
           value={inputValue}
           className={classes.Input}
           onChange={onChange}
-          onFocus={() => setGamePhase(GamePhase.GAME_PLAYING)}
+          onFocus={() => {
+            return setGamePhase(GamePhase.GAME_PLAYING);
+          }}
         />
       </form>
     </div>
   );
 }
 
-TypingGame.displayName = "TypingGame";
+TypingGame.displayName = 'TypingGame';
 
 export default TypingGame;

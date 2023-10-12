@@ -1,4 +1,4 @@
-import { isDifferenceLessThan } from "../../../utils/math";
+import { isDifferenceLessThan } from '../../../utils/math';
 
 interface ParticleProps {
   position: { x: number; y: number };
@@ -10,17 +10,27 @@ interface ParticleProps {
 
 class Particle {
   private context: CanvasRenderingContext2D;
+
   private canvasWidth: number = 0;
+
   private canvasHeight: number = 0;
 
   private originalPosition: { x: number; y: number } = { x: 0, y: 0 };
+
   position: { x: number; y: number } = { x: 0, y: 0 };
+
   private deltaPostion: { x: number; y: number } = { x: 0, y: 0 };
+
   private size: number = 0;
+
   private force: number = 0;
+
   private angle: number = 0;
+
   private distance: number = 0;
+
   private friction: number = Math.random() * 0.6 + 0.15;
+
   private ease: number = Math.random() * 0.1 + 0.05;
 
   private isPositionBackToOrigin: boolean = false;

@@ -1,17 +1,12 @@
-import React, {
-  CSSProperties,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import Controller from "./control";
-import { Coord } from "../../utils/types";
-import { RGB } from "../../utils/colors";
+import type { CSSProperties } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type { RGB } from '../../utils/colors';
+import type { Coord } from '../../utils/types';
+import Controller from './control';
 
 export interface RadialGradientProp {
-  width: CSSProperties["width"];
-  height: CSSProperties["height"];
+  width: CSSProperties['width'];
+  height: CSSProperties['height'];
   style?: CSSProperties;
   totalParticles?: number;
   particleRadius?: { min: number; max: number };
@@ -30,7 +25,7 @@ function RadialGradient(props: RadialGradientProp) {
 
   const getCanvasRef = useCallback((element: HTMLCanvasElement) => {
     if (!element) return;
-    element.style["touchAction"] = "none";
+    element.style.touchAction = 'none';
     setRadiallGradientRef(element);
   }, []);
 
@@ -45,22 +40,31 @@ function RadialGradient(props: RadialGradientProp) {
       fps: props.fps,
     });
     setRadiallGradient(canvas);
-  }, [radiallGradientRef]);
+  }, [
+    props.colors,
+    props.fps,
+    props.particleRadius,
+    props.totalParticles,
+    props.velocity,
+    radiallGradientRef,
+  ]);
 
   useEffect(() => {
     const onResize = () => {
       if (containerRef.current && radiallGradient) {
         const dpr = window.devicePixelRatio;
         const rect = containerRef.current.getBoundingClientRect();
-        radiallGradient.setSize(rect.width, rect.height);
+        radiallGradient.setSize(rect.width, rect.height, dpr);
         radiallGradient.scale(dpr, dpr);
         radiallGradient.render();
       }
     };
+
     onResize();
-    window.addEventListener("resize", onResize, false);
+    window.addEventListener('resize', onResize, false);
+
     return () => {
-      window.removeEventListener("resize", onResize, false);
+      window.removeEventListener('resize', onResize, false);
     };
   }, [radiallGradient]);
 
@@ -76,15 +80,15 @@ function RadialGradient(props: RadialGradientProp) {
       style={{
         width: props.width,
         height: props.height,
-        outline: "none",
+        outline: 'none',
         ...props.style,
       }}
     >
-      <canvas ref={getCanvasRef} style={{ outline: "none" }} />
+      <canvas ref={getCanvasRef} style={{ outline: 'none' }} />
     </div>
   );
 }
 
-RadialGradient.displayName = "RadialGradient";
+RadialGradient.displayName = 'RadialGradient';
 
 export default RadialGradient;

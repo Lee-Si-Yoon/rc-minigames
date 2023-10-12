@@ -1,3 +1,3 @@
 export enum CanvasEvents {
-  CONTROLLER_EVENT = "controllerEvent",
+  CONTROLLER_EVENT = 'controllerEvent',
 }

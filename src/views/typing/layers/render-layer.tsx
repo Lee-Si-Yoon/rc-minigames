@@ -1,12 +1,15 @@
-import BaseLayer from "../../../utils/base-layer";
-import { DataLayerConstructor, DataProps } from "./model";
-import Text, { TextProps, TextState } from "../text/text";
-import { Level } from "../model";
-import { getRandomArbitrary } from "../../../utils/math";
+import BaseLayer from '../../../utils/base-layer';
+import { getRandomArbitrary } from '../../../utils/math';
+import { Level } from '../model';
+import type { TextProps } from '../text/text';
+import Text, { TextState } from '../text/text';
+import type { DataLayerConstructor, DataProps } from './model';
 
 class RenderLayer extends BaseLayer {
   private initData: string[] = [];
+
   private texts: Text[] = [];
+
   private data: DataProps = { words: [], failed: [] };
 
   private level: Level = Level.EASY;
@@ -42,21 +45,22 @@ class RenderLayer extends BaseLayer {
 
   initialize(): void {
     this.resetAll();
-    this.data.words.forEach((word) =>
-      this.addWord({
+    this.data.words.forEach((word) => {
+      return this.addWord({
         data: word,
-      })
-    );
+      });
+    });
   }
 
   getCopiedData(): DataProps {
     const data: DataProps = JSON.parse(JSON.stringify(this.data));
+
     return data;
   }
 
-  addWord(textProps: Omit<TextProps, "ctx">): void {
+  addWord(textProps: Omit<TextProps, 'ctx'>): void {
     const { data: word, ...rest } = textProps;
-    if (!word) throw new Error("invalid word");
+    if (!word) throw new Error('invalid word');
     if (this.data.words.includes(word) || this.data.failed.includes(word))
       return;
 
@@ -89,6 +93,7 @@ class RenderLayer extends BaseLayer {
       let overLapped = false;
       this.texts.forEach((text) => {
         const { x } = text.getPosition();
+
         if (
           (text !== self && self.getIsCollided(text)) ||
           x < 0 ||
@@ -114,7 +119,11 @@ class RenderLayer extends BaseLayer {
     // data.word can exist without being rendered
     return (
       this.data.words.includes(word) &&
-      this.texts.map((text) => text.textData()).includes(word)
+      this.texts
+        .map((text) => {
+          return text.textData();
+        })
+        .includes(word)
     );
   }
 
@@ -126,14 +135,17 @@ class RenderLayer extends BaseLayer {
 
   removeViaInput(word: string): void {
     const indexOfWords = this.data.words.indexOf(word);
+
     if (indexOfWords >= 0) {
       this.data.words.splice(indexOfWords, 1);
     }
+
     // update text state to particled
-    const stringArrayOfTexts: string[] = this.texts.map((text) =>
-      text.textData()
-    );
+    const stringArrayOfTexts: string[] = this.texts.map((text) => {
+      return text.textData();
+    });
     const indexOfParamText = stringArrayOfTexts.indexOf(word);
+
     if (indexOfParamText >= 0) {
       this.texts[indexOfParamText].setIsAlive(TextState.PARTICLED);
     }
@@ -155,7 +167,9 @@ class RenderLayer extends BaseLayer {
 
       // collision
       // if (this._level === Level.HARD) {
-      const exceptSelf = this.texts.filter((other) => other !== text);
+      const exceptSelf = this.texts.filter((other) => {
+        return other !== text;
+      });
 
       exceptSelf.forEach((other) => {
         if (!text.getIsCollided(other)) return;
@@ -169,6 +183,7 @@ class RenderLayer extends BaseLayer {
         } else {
           newPosition.nx = x - 1;
         }
+
         if (isSelfOnTop) {
           newPosition.ny = y - 1;
         } else {
@@ -188,17 +203,17 @@ class RenderLayer extends BaseLayer {
   }
 
   render(): void {
-    const ctx = this.ctx;
+    const { ctx } = this;
     ctx.clearRect(0, 0, this.width, this.height);
 
     ctx.font =
-      "bold 18px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif";
+      'bold 18px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif';
 
     ctx.save();
 
     for (const text of this.texts) {
-      ctx.fillStyle = "white";
-      if (text.getSpecial() >= 2) ctx.fillStyle = "#C90500";
+      ctx.fillStyle = 'white';
+      if (text.getSpecial() >= 2) ctx.fillStyle = '#C90500';
 
       text.render();
       text.renderParticles();

@@ -1,7 +1,9 @@
+/* eslint-disable id-denylist */
+/* eslint-disable @typescript-eslint/ban-types */
 class Event {
   private name: string;
 
-  callbacks: Array<Function>;
+  callbacks: Function[];
 
   constructor(name: string) {
     this.name = name;
@@ -13,7 +15,9 @@ class Event {
   }
 
   off(cb: Function) {
-    const idx = this.callbacks.findIndex((callback) => callback === cb);
+    const idx = this.callbacks.findIndex((callback) => {
+      return callback === cb;
+    });
     this.callbacks.splice(idx, 1);
   }
 
@@ -29,12 +33,12 @@ class EventDispatcher {
     this.events = {};
   }
 
-  emit(name: string, ...args: Array<unknown>) {
+  emit(name: string, ...args: unknown[]) {
     if (!this.events[name]) {
       return;
     }
 
-    this.events[name].callbacks.forEach((cb) => {
+    this?.events[name]?.callbacks.forEach((cb) => {
       cb(...args);
     });
   }
@@ -44,16 +48,17 @@ class EventDispatcher {
       this.events[name] = new Event(name);
     }
 
-    this.events[name].on(cb);
+    this?.events[name]?.on(cb);
   }
 
   removeEventListener(name: string, cb?: Function) {
     if (!cb) {
       delete this.events[name];
+
       return;
     }
 
-    this.events[name].off(cb);
+    this?.events[name]?.off(cb);
   }
 }
 

@@ -17,4 +17,4 @@ interface DataLayerConstructor extends CanvasLayerConstructor {
   words?: string[];
 }
 
-export { Words, DataProps, CanvasLayerConstructor, DataLayerConstructor };
+export type { CanvasLayerConstructor, DataLayerConstructor, DataProps, Words };

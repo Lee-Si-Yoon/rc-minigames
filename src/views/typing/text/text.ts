@@ -1,6 +1,6 @@
-import { getRandomArbitrary } from "../../../utils/math";
-import { divideKOR, isKOR } from "../../../utils/parse-korean";
-import { Coord } from "../../../utils/types";
+import { getRandomArbitrary } from '../../../utils/math';
+import { divideKOR, isKOR } from '../../../utils/parse-korean';
+import type { Coord } from '../../../utils/types';
 
 export interface TextProps {
   data: string;
@@ -13,30 +13,39 @@ export interface TextProps {
 }
 
 export enum TextState {
-  INIT = "init",
-  PARTICLED = "particled",
-  DEAD = "dead",
+  INIT = 'init',
+  PARTICLED = 'particled',
+  DEAD = 'dead',
 }
 
 class Text {
   protected ctx: CanvasRenderingContext2D;
 
-  private data: string = "";
+  private data: string = '';
+
   private score: number = 0;
+
   private state: TextState = TextState.INIT;
+
   private special: number = 1;
 
   private position: Coord = { x: 0, y: 0 };
+
   private velocity: Coord = { x: 0, y: 0 };
+
   private collideVelocity: Coord = { x: 0, y: 0 };
+
   private dimension: { width: number; height: number } = {
     width: 0,
     height: 0,
   };
+
   private mass: number = 1;
+
   private corFactor: number = 1.2;
 
   private particles: Text[] = [];
+
   private particleLifeTime: number = 100;
 
   constructor({ data, ctx, position, mass, velocity, special }: TextProps) {
@@ -52,7 +61,9 @@ class Text {
     const getTextMetrics = (
       ctx: CanvasRenderingContext2D,
       data: string
-    ): TextMetrics => ctx.measureText(data);
+    ): TextMetrics => {
+      return ctx.measureText(data);
+    };
 
     this.dimension.width = getTextMetrics(ctx, data).width * 1;
     this.dimension.height =
@@ -111,6 +122,7 @@ class Text {
           (this.mass + collidedText.mass)) *
           collidedText.velocity.y,
     };
+
     return velocity;
   }
 
@@ -147,7 +159,7 @@ class Text {
   splitToParticle() {
     if (this.state !== TextState.PARTICLED) return;
 
-    this.data.split("").forEach((d) => {
+    this.data.split('').forEach((d) => {
       this.particles.push(
         new Text({
           data: d,
@@ -196,6 +208,7 @@ class Text {
           y: posY + veloY,
         });
       });
+
       if (this.particleLifeTime <= 0) {
         this.particles = [];
       }
@@ -205,8 +218,8 @@ class Text {
   render(): void {
     if (this.state !== TextState.INIT) return;
     this.ctx.save();
-    this.ctx.textAlign = "left";
-    this.ctx.textBaseline = "top";
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'top';
 
     this.ctx.translate(
       this.position.x + this.dimension.width / 2,
@@ -223,6 +236,7 @@ class Text {
     if (this.special > 1) {
       this.ctx.rotate(Math.PI);
     }
+
     this.ctx.fillText(
       this.data,
       -this.dimension.width / 2,
@@ -239,8 +253,8 @@ class Text {
     if (this.particles.length <= 0 || this.particleLifeTime <= 0) return;
     this.particles.forEach((particle, index) => {
       this.ctx.save();
-      this.ctx.textAlign = "left";
-      this.ctx.textBaseline = "top";
+      this.ctx.textAlign = 'left';
+      this.ctx.textBaseline = 'top';
       this.ctx.globalAlpha = this.particleLifeTime / 100;
 
       const { x, y } = particle.getPosition();

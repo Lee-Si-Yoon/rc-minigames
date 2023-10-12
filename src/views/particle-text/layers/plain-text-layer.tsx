@@ -1,6 +1,6 @@
-import BaseLayer from "../../../utils/base-layer";
-import Effect from "../texts/effect";
-import { CanvasLayerConstructor } from "./model";
+import BaseLayer from '../../../utils/base-layer';
+import Effect from '../texts/effect';
+import type { CanvasLayerConstructor } from './model';
 
 interface PlainTextLayerProps extends CanvasLayerConstructor {
   text: string;
@@ -8,8 +8,10 @@ interface PlainTextLayerProps extends CanvasLayerConstructor {
 
 class PlainTextLayer extends BaseLayer {
   private renderAlignLines: boolean = false;
-  private text: string = "";
-  private inputValue: string = "";
+
+  private text: string = '';
+
+  private inputValue: string = '';
 
   constructor({ canvas, text }: PlainTextLayerProps) {
     super({ canvas });
@@ -28,15 +30,15 @@ class PlainTextLayer extends BaseLayer {
   renderDebugMode() {
     if (!this.renderAlignLines) return;
 
-    const ctx = this.ctx;
+    const { ctx } = this;
     ctx.lineWidth = 3;
-    ctx.strokeStyle = "red";
+    ctx.strokeStyle = 'red';
     ctx.beginPath();
     ctx.moveTo(this.width / 2, 0);
     ctx.lineTo(this.width / 2, this.height);
     ctx.stroke();
 
-    ctx.strokeStyle = "green";
+    ctx.strokeStyle = 'green';
     ctx.beginPath();
     ctx.moveTo(0, this.height / 2);
     ctx.lineTo(this.width, this.height / 2);
@@ -44,7 +46,7 @@ class PlainTextLayer extends BaseLayer {
   }
 
   render() {
-    const ctx = this.ctx;
+    const { ctx } = this;
     ctx.clearRect(0, 0, this.width, this.height);
 
     const effect = new Effect({

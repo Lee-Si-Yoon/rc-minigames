@@ -1,15 +1,14 @@
-import EventDispatcher from "../../utils/eventDispatcher";
-import RenderLayer from "./layers/render-layer";
-import { CanvasEvents } from "./events";
-import {
+import EventDispatcher from '../../utils/eventDispatcher';
+import { CanvasEvents } from './events';
+import type { Words } from './layers/model';
+import RenderLayer from './layers/render-layer';
+import type {
   CanvasDataChangeParams,
   ControllerChangeParams,
-  Level,
-  Phase,
   TimerChangeParams,
-} from "./model";
-import { Words } from "./layers/model";
-import { TextProps } from "./text/text";
+} from './model';
+import { Level, Phase } from './model';
+import type { TextProps } from './text/text';
 
 interface ControllerConstructor {
   renderLayer: HTMLCanvasElement;
@@ -18,20 +17,29 @@ interface ControllerConstructor {
 
 class Controller extends EventDispatcher {
   private width: number = 0;
+
   private height: number = 0;
+
   private dpr: number = 1;
+
   private element: HTMLCanvasElement;
 
   private renderLayer: RenderLayer;
 
   private isPlaying: Phase = Phase.PAUSED;
+
   private level: Level = Level.EASY;
+
   private score: number = 0;
 
   private timeStamp: number = 0;
+
   private playTime: number = 0;
+
   private fps: number = 60;
+
   private interval: number = 1000 / this.fps; // 16fps
+
   private rafId: number = 0;
 
   constructor({ renderLayer, initData }: ControllerConstructor) {
@@ -39,7 +47,7 @@ class Controller extends EventDispatcher {
 
     this.renderLayer = new RenderLayer({
       canvas: renderLayer,
-      initData: initData,
+      initData,
     });
 
     this.element = renderLayer;
@@ -154,9 +162,9 @@ class Controller extends EventDispatcher {
 
   updateScore(word: string): void {
     if (!this.renderLayer.validateWord(word)) return;
-    const targetWord = this.renderLayer
-      .getTexts()
-      .find((text) => text.textData() === word);
+    const targetWord = this.renderLayer.getTexts().find((text) => {
+      return text.textData() === word;
+    });
     const score = targetWord?.getScore() ?? 0;
     const special = targetWord?.getSpecial() ?? 0;
     this.score += special * score ?? score;
@@ -171,7 +179,7 @@ class Controller extends EventDispatcher {
     this.emitCurrentData();
   }
 
-  addWord(textProps: Omit<TextProps, "ctx">) {
+  addWord(textProps: Omit<TextProps, 'ctx'>) {
     this.renderLayer.addWord(textProps);
     this.emitCurrentData();
   }

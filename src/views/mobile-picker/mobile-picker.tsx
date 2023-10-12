@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import classes from "./mobile-picker.module.scss";
-import { useRafState } from "../../utils/hooks/use-raf-state";
+import React, { useEffect, useState } from 'react';
+import { useRafState } from '../../utils/hooks/use-raf-state';
+import classes from './mobile-picker.module.scss';
 
 interface PickerColumnProps {
   options: string[];
@@ -31,10 +31,11 @@ function PickerColumn(props: PickerColumnProps) {
     setScrollerTranslate(
       columnHeight / 2 - itemHeight / 2 - selectedIndex * itemHeight
     );
-  }, [options, value]);
+  }, [columnHeight, itemHeight, options, setScrollerTranslate, value]);
 
   const postMove = () => {
     let activeIndex;
+
     if (scrollerTranslate > maxTranslate) {
       activeIndex = 0;
     } else if (scrollerTranslate < minTranslate) {
@@ -45,15 +46,17 @@ function PickerColumn(props: PickerColumnProps) {
       );
     }
 
-    onChange(options[activeIndex]);
+    onChange(options[activeIndex]!);
   };
 
   const postWheel = () => {
     setTimeout(() => {
       if (scrollTimer > Date.now() - 250) {
         postWheel();
+
         return;
       }
+
       postMove();
     }, 250);
   };
@@ -61,7 +64,7 @@ function PickerColumn(props: PickerColumnProps) {
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (!isMoving) setIsMoving(true);
 
-    const touchY = event.targetTouches[0].pageY;
+    const touchY = event.targetTouches[0]?.pageY ?? 0;
     setStartTouchY(touchY);
     setStartScrollerTranslate(scrollerTranslate);
   };
@@ -69,9 +72,10 @@ function PickerColumn(props: PickerColumnProps) {
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
     if (!isMoving) return;
 
-    const touchY = event.targetTouches[0].pageY;
+    const touchY = event.targetTouches[0]?.pageY ?? 0;
 
     let nextScrollerTranslate = startScrollerTranslate + touchY - startTouchY;
+
     if (nextScrollerTranslate < minTranslate) {
       nextScrollerTranslate =
         minTranslate - Math.pow(minTranslate - nextScrollerTranslate, 0.8);
@@ -122,7 +126,7 @@ function PickerColumn(props: PickerColumnProps) {
       <div
         style={{
           transform: `translate3d(0, ${scrollerTranslate}px, 0)`,
-          transition: isMoving ? "0ms" : "transform 300ms ease-out",
+          transition: isMoving ? '0ms' : 'transform 300ms ease-out',
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -130,18 +134,26 @@ function PickerColumn(props: PickerColumnProps) {
         onTouchCancel={handleTouchCancel}
         onWheel={handleWheel}
       >
-        {options.map((option, index) => (
-          <div
-            key={`${index + 1}`}
-            className={`${classes.PickerItem} ${
-              option === value ? `${classes.Selected}` : ""
-            }`}
-            style={{ height: `${itemHeight}px`, lineHeight: `${itemHeight}px` }}
-            onClick={() => handleItemClick(option)}
-          >
-            {option}
-          </div>
-        ))}
+        {options.map((option, index) => {
+          return (
+            <div
+              role="presentation"
+              key={`${index + 1}`}
+              className={`${classes.PickerItem} ${
+                option === value ? `${classes.Selected}` : ''
+              }`}
+              style={{
+                height: `${itemHeight}px`,
+                lineHeight: `${itemHeight}px`,
+              }}
+              onClick={() => {
+                return handleItemClick(option);
+              }}
+            >
+              {option}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -165,14 +177,14 @@ function MobilePicker(props: MobilePickerProps) {
     getValue,
   } = props;
 
-  const options = Array.from({ length: itemLength }).map((_, index) =>
-    String(index)
-  );
+  const options = Array.from({ length: itemLength }).map((_, index) => {
+    return String(index);
+  });
   const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
     getValue(index);
-  }, [index]);
+  }, [getValue, index]);
 
   return (
     <div
@@ -185,10 +197,12 @@ function MobilePicker(props: MobilePickerProps) {
       <div className={classes.PickerInner}>
         <PickerColumn
           options={options}
-          value={options[index]}
+          value={String(options[index])}
           itemHeight={itemHeight}
           columnHeight={height}
-          onChange={(e) => setIndex(+e)}
+          onChange={(e) => {
+            return setIndex(+e);
+          }}
         />
         <div
           className={classes.PickerHighLight}
